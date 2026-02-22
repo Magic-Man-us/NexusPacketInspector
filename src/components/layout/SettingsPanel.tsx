@@ -1,5 +1,12 @@
 import { usePacketStore, VisualEffects } from "../../hooks/usePacketStore";
 import { styles } from "../../styles/components";
+import { ColorScheme } from "../../styles/theme";
+
+const SCHEMES: { id: ColorScheme; label: string; preview: string }[] = [
+  { id: "nexus", label: "NEXUS", preview: "#00ff9f" },
+  { id: "dark", label: "DARK", preview: "#7c83ff" },
+  { id: "light", label: "LIGHT", preview: "#2563eb" },
+];
 
 export function SettingsPanel() {
   const visualEffects = usePacketStore((s) => s.visualEffects);
@@ -13,77 +20,59 @@ export function SettingsPanel() {
   return (
     <div style={styles.settingsPanel}>
       <div style={styles.settingsHeader}>
-        <span style={styles.settingsTitle}>⚙ VISUAL EFFECTS</span>
+        <span style={styles.settingsTitle}>SETTINGS</span>
         <button onClick={() => setShowSettings(false)} style={styles.settingsClose}>
-          ✕
+          x
         </button>
       </div>
 
       <div style={styles.settingsContent}>
-        {/* Scanline */}
+        {/* Color Scheme */}
         <div style={styles.settingsGroup}>
-          <div style={styles.settingsRow}>
-            <span style={styles.settingsLabel}>Scanline</span>
-            <button
-              onClick={() => updateEffect("scanline", !visualEffects.scanline)}
-              style={{
-                ...styles.toggleButton,
-                backgroundColor: visualEffects.scanline ? "#00ff9f" : "#333",
-                color: visualEffects.scanline ? "#000" : "#666",
-              }}
-            >
-              {visualEffects.scanline ? "ON" : "OFF"}
-            </button>
+          <div style={styles.settingsLabel}>Color Scheme</div>
+          <div style={{ display: "flex", gap: "6px", marginTop: "8px" }}>
+            {SCHEMES.map((s) => {
+              const isActive = visualEffects.colorScheme === s.id;
+              return (
+                <button
+                  key={s.id}
+                  onClick={() => updateEffect("colorScheme", s.id)}
+                  style={{
+                    flex: 1,
+                    padding: "10px 4px",
+                    borderWidth: "2px",
+                    borderStyle: "solid",
+                    borderColor: isActive ? s.preview : "rgba(255,255,255,0.1)",
+                    borderRadius: "6px",
+                    background: isActive
+                      ? `${s.preview}15`
+                      : "rgba(0,0,0,0.2)",
+                    color: isActive ? s.preview : "#666",
+                    fontFamily: "'Orbitron'",
+                    fontSize: "9px",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    transition: "all 0.2s ease",
+                    display: "flex",
+                    flexDirection: "column" as const,
+                    alignItems: "center",
+                    gap: "6px",
+                  }}
+                >
+                  <span
+                    style={{
+                      width: "16px",
+                      height: "16px",
+                      borderRadius: "50%",
+                      backgroundColor: s.preview,
+                      boxShadow: isActive ? `0 0 10px ${s.preview}66` : "none",
+                    }}
+                  />
+                  {s.label}
+                </button>
+              );
+            })}
           </div>
-          {visualEffects.scanline && (
-            <div style={styles.settingsRow}>
-              <span style={styles.settingsSubLabel}>Speed</span>
-              <input
-                type="range"
-                min="1"
-                max="10"
-                step="0.5"
-                value={visualEffects.scanlineSpeed}
-                onChange={(e) => updateEffect("scanlineSpeed", parseFloat(e.target.value))}
-                style={styles.slider}
-              />
-              <span style={styles.sliderValue}>{visualEffects.scanlineSpeed}s</span>
-            </div>
-          )}
-        </div>
-
-        {/* CRT Effect */}
-        <div style={styles.settingsGroup}>
-          <div style={styles.settingsRow}>
-            <span style={styles.settingsLabel}>CRT Lines</span>
-            <button
-              onClick={() => updateEffect("crt", !visualEffects.crt)}
-              style={{
-                ...styles.toggleButton,
-                backgroundColor: visualEffects.crt ? "#00ff9f" : "#333",
-                color: visualEffects.crt ? "#000" : "#666",
-              }}
-            >
-              {visualEffects.crt ? "ON" : "OFF"}
-            </button>
-          </div>
-          {visualEffects.crt && (
-            <div style={styles.settingsRow}>
-              <span style={styles.settingsSubLabel}>Intensity</span>
-              <input
-                type="range"
-                min="0.02"
-                max="0.3"
-                step="0.02"
-                value={visualEffects.crtIntensity}
-                onChange={(e) => updateEffect("crtIntensity", parseFloat(e.target.value))}
-                style={styles.slider}
-              />
-              <span style={styles.sliderValue}>
-                {Math.round(visualEffects.crtIntensity * 100)}%
-              </span>
-            </div>
-          )}
         </div>
 
         {/* Grid */}
@@ -94,7 +83,7 @@ export function SettingsPanel() {
               onClick={() => updateEffect("grid", !visualEffects.grid)}
               style={{
                 ...styles.toggleButton,
-                backgroundColor: visualEffects.grid ? "#00ff9f" : "#333",
+                backgroundColor: visualEffects.grid ? "var(--accent)" : "#333",
                 color: visualEffects.grid ? "#000" : "#666",
               }}
             >
@@ -118,53 +107,6 @@ export function SettingsPanel() {
               </span>
             </div>
           )}
-        </div>
-
-        {/* Presets */}
-        <div style={styles.settingsGroup}>
-          <div style={styles.settingsLabel}>Presets</div>
-          <div style={styles.presetButtons}>
-            <button
-              onClick={() =>
-                setVisualEffects({
-                  scanline: true, scanlineSpeed: 4, crt: true, crtIntensity: 0.1, grid: true, gridOpacity: 0.02,
-                })
-              }
-              style={styles.presetButton}
-            >
-              CYBER
-            </button>
-            <button
-              onClick={() =>
-                setVisualEffects({
-                  scanline: true, scanlineSpeed: 2, crt: true, crtIntensity: 0.2, grid: true, gridOpacity: 0.05,
-                })
-              }
-              style={styles.presetButton}
-            >
-              RETRO
-            </button>
-            <button
-              onClick={() =>
-                setVisualEffects({
-                  scanline: false, scanlineSpeed: 4, crt: false, crtIntensity: 0.1, grid: false, gridOpacity: 0.02,
-                })
-              }
-              style={styles.presetButton}
-            >
-              CLEAN
-            </button>
-            <button
-              onClick={() =>
-                setVisualEffects({
-                  scanline: true, scanlineSpeed: 1, crt: true, crtIntensity: 0.25, grid: true, gridOpacity: 0.08,
-                })
-              }
-              style={styles.presetButton}
-            >
-              HEAVY
-            </button>
-          </div>
         </div>
       </div>
     </div>

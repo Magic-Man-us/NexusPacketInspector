@@ -50,36 +50,16 @@ export default function App() {
         }}
       />
 
-      {/* Visual effects overlays */}
+      {/* Grid overlay */}
       {visualEffects.grid && (
         <div
           style={{
             position: "absolute",
             inset: 0,
-            backgroundImage: `linear-gradient(rgba(0,255,159,${visualEffects.gridOpacity}) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,159,${visualEffects.gridOpacity}) 1px, transparent 1px)`,
+            backgroundImage: `linear-gradient(rgba(var(--accent-rgb),${visualEffects.gridOpacity}) 1px, transparent 1px), linear-gradient(90deg, rgba(var(--accent-rgb),${visualEffects.gridOpacity}) 1px, transparent 1px)`,
             backgroundSize: "40px 40px",
             pointerEvents: "none",
             zIndex: 1,
-          }}
-        />
-      )}
-      {visualEffects.scanline && (
-        <div
-          style={{
-            ...styles.scanline,
-            animationDuration: `${visualEffects.scanlineSpeed}s`,
-          }}
-        />
-      )}
-      {visualEffects.crt && (
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background: `repeating-linear-gradient(0deg, rgba(0,0,0,${visualEffects.crtIntensity}) 0px, rgba(0,0,0,${visualEffects.crtIntensity}) 1px, transparent 1px, transparent 2px)`,
-            pointerEvents: "none",
-            zIndex: 1,
-            animation: "flicker 0.15s infinite",
           }}
         />
       )}

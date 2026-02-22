@@ -5,7 +5,7 @@ import { usePacketStore } from "../../../hooks/usePacketStore";
 import { EmptyState } from "../../shared/EmptyState";
 import { formatTCPFlags } from "../../../lib/formatters";
 import type { StreamData } from "../../../types/stream";
-// Inject the keyframe animation once
+// Inject keyframe animations once
 const ANIM_STYLE_ID = "seq-flow-pulse-anim";
 function ensureAnimStyles() {
   if (document.getElementById(ANIM_STYLE_ID)) return;
@@ -14,21 +14,23 @@ function ensureAnimStyles() {
   style.textContent = `
     @keyframes flowPulseRight {
       0%   { offset-distance: 0%; opacity: 0; }
-      10%  { opacity: 1; }
-      90%  { opacity: 1; }
+      8%   { opacity: 1; }
+      92%  { opacity: 1; }
       100% { offset-distance: 100%; opacity: 0; }
     }
     @keyframes flowPulseLeft {
       0%   { offset-distance: 100%; opacity: 0; }
-      10%  { opacity: 1; }
-      90%  { opacity: 1; }
+      8%   { opacity: 1; }
+      92%  { opacity: 1; }
       100% { offset-distance: 0%; opacity: 0; }
     }
-    @keyframes flowGlowRight {
-      0%   { cx: 0; opacity: 0; }
-      5%   { opacity: 0.8; }
-      95%  { opacity: 0.8; }
-      100% { cx: 100%; opacity: 0; }
+    @keyframes streamDashRight {
+      from { stroke-dashoffset: 24; }
+      to   { stroke-dashoffset: 0; }
+    }
+    @keyframes streamDashLeft {
+      from { stroke-dashoffset: 0; }
+      to   { stroke-dashoffset: 24; }
     }
   `;
   document.head.appendChild(style);
@@ -203,16 +205,38 @@ function FlowDiagram({ stream, onSelectPacket }: FlowDiagramProps) {
           style={{ position: "absolute", top: 0, left: 0, pointerEvents: "none" }}
         >
           <defs>
+            {/* Gradient for forward (left→right) lines */}
             <linearGradient id="flowGradRight" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor={stream.color} stopOpacity="0.9" />
-              <stop offset="100%" stopColor={stream.color} stopOpacity="0.2" />
+              <stop offset="0%" stopColor={stream.color} stopOpacity="0.8" />
+              <stop offset="50%" stopColor={stream.color} stopOpacity="0.5" />
+              <stop offset="100%" stopColor={stream.color} stopOpacity="0.15" />
             </linearGradient>
+            {/* Gradient for reverse (right→left) lines */}
             <linearGradient id="flowGradLeft" x1="100%" y1="0%" x2="0%" y2="0%">
-              <stop offset="0%" stopColor={stream.color} stopOpacity="0.9" />
-              <stop offset="100%" stopColor={stream.color} stopOpacity="0.2" />
+              <stop offset="0%" stopColor={stream.color} stopOpacity="0.8" />
+              <stop offset="50%" stopColor={stream.color} stopOpacity="0.5" />
+              <stop offset="100%" stopColor={stream.color} stopOpacity="0.15" />
             </linearGradient>
+            {/* Tight glow for bright pulse particles */}
             <filter id="pulseGlow">
-              <feGaussianBlur stdDeviation="3" result="blur" />
+              <feGaussianBlur stdDeviation="2.5" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+            {/* Wide soft glow for the stream trail */}
+            <filter id="streamGlow">
+              <feGaussianBlur stdDeviation="4" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+            {/* Extra-wide halo for lead pulses */}
+            <filter id="leadGlow">
+              <feGaussianBlur stdDeviation="6" result="blur" />
+              <feComposite in="blur" in2="blur" operator="over" />
               <feMerge>
                 <feMergeNode in="blur" />
                 <feMergeNode in="SourceGraphic" />
@@ -226,57 +250,144 @@ function FlowDiagram({ stream, onSelectPacket }: FlowDiagramProps) {
             const x1 = isForward ? lineXSrc : lineXDst;
             const x2 = isForward ? lineXDst : lineXSrc;
             const arrowSize = 8;
-            const arrowX = isForward ? x2 - arrowSize : x2 + arrowSize;
-            const pathId = `flow-path-${i}`;
+            const pathD = `M ${x1} ${y} L ${x2} ${y}`;
+            const dashAnim = isForward ? "streamDashRight" : "streamDashLeft";
+            const pulseAnim = isForward ? "flowPulseRight" : "flowPulseLeft";
+            // Stagger each row so streams feel organic
+            const stagger = (i * 0.25) % 1.6;
 
             return (
               <g key={i}>
-                {/* The flow line */}
-                <path
-                  id={pathId}
-                  d={`M ${x1} ${y} L ${x2} ${y}`}
-                  stroke={isForward ? "url(#flowGradRight)" : "url(#flowGradLeft)"}
-                  strokeWidth="2"
-                  fill="none"
+                {/* 1) Dim base line — always visible */}
+                <line
+                  x1={x1} y1={y} x2={x2} y2={y}
+                  stroke={stream.color}
+                  strokeOpacity="0.08"
+                  strokeWidth="1"
                 />
 
-                {/* Arrowhead */}
+                {/* 2) Glowing streaming "river" — animated dashes flowing in direction */}
+                <path
+                  d={pathD}
+                  stroke={stream.color}
+                  strokeWidth="2"
+                  strokeOpacity="0.35"
+                  strokeDasharray="12 12"
+                  fill="none"
+                  filter="url(#streamGlow)"
+                  style={{
+                    animation: `${dashAnim} 0.6s linear infinite`,
+                  } as React.CSSProperties}
+                />
+
+                {/* 3) Brighter thin core stream — tighter dashes, faster */}
+                <path
+                  d={pathD}
+                  stroke={stream.color}
+                  strokeWidth="1"
+                  strokeOpacity="0.6"
+                  strokeDasharray="4 20"
+                  fill="none"
+                  style={{
+                    animation: `${dashAnim} 0.4s linear infinite`,
+                  } as React.CSSProperties}
+                />
+
+                {/* 4) Gradient overlay line for directionality fade */}
+                <path
+                  d={pathD}
+                  stroke={isForward ? "url(#flowGradRight)" : "url(#flowGradLeft)"}
+                  strokeWidth="2.5"
+                  fill="none"
+                  strokeOpacity="0.25"
+                />
+
+                {/* 5) Arrowhead */}
                 {isForward ? (
                   <polygon
-                    points={`${x2},${y} ${x2 - arrowSize},${y - 4} ${x2 - arrowSize},${y + 4}`}
+                    points={`${x2},${y} ${x2 - arrowSize},${y - 5} ${x2 - arrowSize},${y + 5}`}
                     fill={stream.color}
-                    opacity="0.8"
+                    opacity="0.85"
+                    filter="url(#pulseGlow)"
                   />
                 ) : (
                   <polygon
-                    points={`${x2},${y} ${x2 + arrowSize},${y - 4} ${x2 + arrowSize},${y + 4}`}
+                    points={`${x2},${y} ${x2 + arrowSize},${y - 5} ${x2 + arrowSize},${y + 5}`}
                     fill={stream.color}
-                    opacity="0.8"
+                    opacity="0.85"
+                    filter="url(#pulseGlow)"
                   />
                 )}
 
-                {/* Animated pulse traveling along the line */}
+                {/* 6) Lead pulse — bright dot traveling the line */}
                 <circle
-                  r="4"
+                  r="3.5"
+                  fill="#fff"
+                  filter="url(#leadGlow)"
+                  opacity="0"
+                  style={{
+                    offsetPath: `path("${pathD}")`,
+                    animation: `${pulseAnim} 1.6s ease-in-out infinite`,
+                    animationDelay: `${stagger}s`,
+                  } as React.CSSProperties}
+                />
+
+                {/* 7) Core colored pulse — slightly behind the white lead */}
+                <circle
+                  r="3"
                   fill={stream.color}
                   filter="url(#pulseGlow)"
                   opacity="0"
                   style={{
-                    offsetPath: `path("M ${x1} ${y} L ${x2} ${y}")`,
-                    animation: `${isForward ? "flowPulseRight" : "flowPulseLeft"} 1.8s ease-in-out infinite`,
-                    animationDelay: `${(i * 0.3) % 2}s`,
+                    offsetPath: `path("${pathD}")`,
+                    animation: `${pulseAnim} 1.6s ease-in-out infinite`,
+                    animationDelay: `${stagger + 0.04}s`,
                   } as React.CSSProperties}
                 />
 
-                {/* Secondary trailing glow */}
+                {/* 8) Wide trailing glow behind the pulse */}
                 <circle
-                  r="8"
+                  r="10"
                   fill={stream.color}
                   opacity="0"
                   style={{
-                    offsetPath: `path("M ${x1} ${y} L ${x2} ${y}")`,
-                    animation: `${isForward ? "flowPulseRight" : "flowPulseLeft"} 1.8s ease-in-out infinite`,
-                    animationDelay: `${((i * 0.3) % 2) + 0.08}s`,
+                    offsetPath: `path("${pathD}")`,
+                    animation: `${pulseAnim} 1.6s ease-in-out infinite`,
+                    animationDelay: `${stagger + 0.1}s`,
+                    filter: "blur(8px)",
+                  } as React.CSSProperties}
+                />
+
+                {/* 9) Second pulse wave — offset by half period for continuous stream feel */}
+                <circle
+                  r="2.5"
+                  fill="#fff"
+                  filter="url(#pulseGlow)"
+                  opacity="0"
+                  style={{
+                    offsetPath: `path("${pathD}")`,
+                    animation: `${pulseAnim} 1.6s ease-in-out infinite`,
+                    animationDelay: `${stagger + 0.8}s`,
+                  } as React.CSSProperties}
+                />
+                <circle
+                  r="2"
+                  fill={stream.color}
+                  opacity="0"
+                  style={{
+                    offsetPath: `path("${pathD}")`,
+                    animation: `${pulseAnim} 1.6s ease-in-out infinite`,
+                    animationDelay: `${stagger + 0.84}s`,
+                  } as React.CSSProperties}
+                />
+                <circle
+                  r="7"
+                  fill={stream.color}
+                  opacity="0"
+                  style={{
+                    offsetPath: `path("${pathD}")`,
+                    animation: `${pulseAnim} 1.6s ease-in-out infinite`,
+                    animationDelay: `${stagger + 0.9}s`,
                     filter: "blur(6px)",
                   } as React.CSSProperties}
                 />

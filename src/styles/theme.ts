@@ -29,6 +29,102 @@ export const STREAM_COLORS = [
   "#7fff00", "#dc143c", "#00ced1", "#ff1493", "#32cd32",
 ];
 
+// ─── Color Schemes ─────────────────────────────────────────────────────────
+
+export type ColorScheme = "nexus" | "dark" | "light";
+
+export interface SchemeVars {
+  bgPrimary: string;
+  bgSecondary: string;
+  bgSurface: string;
+  bgHover: string;
+  accent: string;
+  accentRgb: string;       // for rgba() usage
+  textPrimary: string;
+  textSecondary: string;
+  textMuted: string;
+  textDim: string;
+  textFaint: string;
+  border: string;
+  borderStrong: string;
+  scrollbarThumb: string;
+  headerBg: string;
+}
+
+export const COLOR_SCHEMES: Record<ColorScheme, SchemeVars> = {
+  nexus: {
+    bgPrimary: "#0a0f0a",
+    bgSecondary: "rgba(0,0,0,0.2)",
+    bgSurface: "rgba(0,255,159,0.03)",
+    bgHover: "rgba(0,255,159,0.06)",
+    accent: "#00ff9f",
+    accentRgb: "0,255,159",
+    textPrimary: "#e0e0e0",
+    textSecondary: "#888",
+    textMuted: "#666",
+    textDim: "#555",
+    textFaint: "#444",
+    border: "rgba(0,255,159,0.1)",
+    borderStrong: "rgba(0,255,159,0.2)",
+    scrollbarThumb: "#00ff9f",
+    headerBg: "rgba(10,15,10,0.95)",
+  },
+  dark: {
+    bgPrimary: "#12121a",
+    bgSecondary: "rgba(0,0,0,0.25)",
+    bgSurface: "rgba(124,131,255,0.04)",
+    bgHover: "rgba(124,131,255,0.08)",
+    accent: "#7c83ff",
+    accentRgb: "124,131,255",
+    textPrimary: "#d4d4e0",
+    textSecondary: "#8888a0",
+    textMuted: "#666680",
+    textDim: "#55556a",
+    textFaint: "#444458",
+    border: "rgba(124,131,255,0.12)",
+    borderStrong: "rgba(124,131,255,0.25)",
+    scrollbarThumb: "#7c83ff",
+    headerBg: "rgba(18,18,26,0.95)",
+  },
+  light: {
+    bgPrimary: "#f0f2f6",
+    bgSecondary: "rgba(0,0,0,0.04)",
+    bgSurface: "rgba(37,99,235,0.05)",
+    bgHover: "rgba(37,99,235,0.08)",
+    accent: "#2563eb",
+    accentRgb: "37,99,235",
+    textPrimary: "#1a1a2e",
+    textSecondary: "#555566",
+    textMuted: "#777788",
+    textDim: "#999",
+    textFaint: "#bbb",
+    border: "rgba(0,0,0,0.1)",
+    borderStrong: "rgba(0,0,0,0.18)",
+    scrollbarThumb: "#2563eb",
+    headerBg: "rgba(240,242,246,0.97)",
+  },
+};
+
+export function schemeToCssVars(scheme: SchemeVars): string {
+  return `
+    --bg-primary: ${scheme.bgPrimary};
+    --bg-secondary: ${scheme.bgSecondary};
+    --bg-surface: ${scheme.bgSurface};
+    --bg-hover: ${scheme.bgHover};
+    --accent: ${scheme.accent};
+    --accent-rgb: ${scheme.accentRgb};
+    --text-primary: ${scheme.textPrimary};
+    --text-secondary: ${scheme.textSecondary};
+    --text-muted: ${scheme.textMuted};
+    --text-dim: ${scheme.textDim};
+    --text-faint: ${scheme.textFaint};
+    --border: ${scheme.border};
+    --border-strong: ${scheme.borderStrong};
+    --scrollbar-thumb: ${scheme.scrollbarThumb};
+    --header-bg: ${scheme.headerBg};
+  `;
+}
+
 export const LAYER_COLORS = {
   ethernet: { bg: "rgba(255, 51, 102, 0.15)", border: "#ff3366", text: "#ff3366" },
   ip: { bg: "rgba(0, 184, 255, 0.15)", border: "#00b8ff", text: "#00b8ff" },

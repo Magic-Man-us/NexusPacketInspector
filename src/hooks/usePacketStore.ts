@@ -2,17 +2,14 @@ import { create } from "zustand";
 import { ParsedPacket } from "../types/packet";
 import { StreamData } from "../types/stream";
 import { PacketStatistics, DashboardStats } from "../types/statistics";
-import { STREAM_COLORS } from "../styles/theme";
+import { STREAM_COLORS, ColorScheme } from "../styles/theme";
 
 export type ViewId = "dashboard" | "packets" | "structure" | "routetrace" | "matrix" | "sankey" | "sequence" | "topology" | "services" | "plugins" | "livewire" | "stats";
 
 export type AppMode = "demo" | "pcap";
 
 export interface VisualEffects {
-  scanline: boolean;
-  scanlineSpeed: number;
-  crt: boolean;
-  crtIntensity: number;
+  colorScheme: ColorScheme;
   grid: boolean;
   gridOpacity: number;
 }
@@ -80,10 +77,7 @@ const defaultDashboardStats: DashboardStats = {
 };
 
 const defaultEffects: VisualEffects = {
-  scanline: false,
-  scanlineSpeed: 8,
-  crt: false,
-  crtIntensity: 0.05,
+  colorScheme: "nexus",
   grid: false,
   gridOpacity: 0.015,
 };

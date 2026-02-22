@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useCallback, useEffect } from "react";
+import { useState, useMemo, useRef, useCallback } from "react";
 import { usePacketStore } from "../../hooks/usePacketStore";
 import { PROTOCOL_COLORS } from "../../styles/theme";
 import { HexViewer } from "./HexViewer";
@@ -62,47 +62,8 @@ export function PacketSidebar() {
   const dragOffset = useRef({ x: 0, y: 0 });
   const recentPackets = useMemo(() => packets.slice(-100), [packets]);
 
-  // Don't show on plugins
-  if (activeView === "plugins") return null;
-
-  const hexPacket = selectedPacket || (packets.length > 0 ? packets[packets.length - 1] : null);
-
-  // --- Edge hover handlers ---
-  const handleEdgeEnter = () => {
-    if (collapsed && !detached) {
-      setCollapsed(false);
-      setEdgeExpanded(true);
-    }
-  };
-
-  const handleSidebarLeave = () => {
-    if (edgeExpanded && !detached) {
-      setCollapsed(true);
-      setEdgeExpanded(false);
-    }
-  };
-
-  const handleManualToggle = () => {
-    setEdgeExpanded(false);
-    setCollapsed(!collapsed);
-  };
-
-  // --- Detach / dock ---
-  const handleDetach = () => {
-    setDetached(true);
-    setCollapsed(false);
-    setEdgeExpanded(false);
-    // Default to bottom-left
-    const panelH = window.innerHeight * (DETACHED_HEIGHT_VH / 100);
-    setPos(getCornerPos("bottom-left", DETACHED_WIDTH, panelH));
-  };
-
-  const handleDock = () => {
-    setDetached(false);
-    setPos(null);
-  };
-
   // --- Drag logic (viewport-based fixed positioning) ---
+  // useCallback must be before any early returns to satisfy React hooks rules
   const onDragStart = useCallback((e: React.MouseEvent) => {
     if (!panelRef.current) return;
     e.preventDefault();
@@ -138,6 +99,45 @@ export function PacketSidebar() {
     document.addEventListener("mousemove", onMove);
     document.addEventListener("mouseup", onUp);
   }, []);
+
+  // Don't show on plugins
+  if (activeView === "plugins") return null;
+
+  const hexPacket = selectedPacket || (packets.length > 0 ? packets[packets.length - 1] : null);
+
+  // --- Edge hover handlers ---
+  const handleEdgeEnter = () => {
+    if (collapsed && !detached) {
+      setCollapsed(false);
+      setEdgeExpanded(true);
+    }
+  };
+
+  const handleSidebarLeave = () => {
+    if (edgeExpanded && !detached) {
+      setCollapsed(true);
+      setEdgeExpanded(false);
+    }
+  };
+
+  const handleManualToggle = () => {
+    setEdgeExpanded(false);
+    setCollapsed(!collapsed);
+  };
+
+  // --- Detach / dock ---
+  const handleDetach = () => {
+    setDetached(true);
+    setCollapsed(false);
+    setEdgeExpanded(false);
+    const panelH = window.innerHeight * (DETACHED_HEIGHT_VH / 100);
+    setPos(getCornerPos("bottom-left", DETACHED_WIDTH, panelH));
+  };
+
+  const handleDock = () => {
+    setDetached(false);
+    setPos(null);
+  };
 
   // --- Shared content ---
   const packetListContent = (
