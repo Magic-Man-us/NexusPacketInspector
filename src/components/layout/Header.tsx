@@ -1,6 +1,7 @@
 import { usePacketStore } from "../../hooks/usePacketStore";
 import { usePcapActions } from "../../hooks/useTauriCapture";
 import { styles } from "../../styles/components";
+import { NexusLogo } from "../shared/NexusLogo";
 
 export function Header() {
   const isCapturing = usePacketStore((s) => s.isCapturing);
@@ -28,11 +29,7 @@ export function Header() {
     <header style={styles.header}>
       <div style={styles.logoSection}>
         <div style={styles.logoIcon}>
-          <svg viewBox="0 0 40 40" style={{ width: 36, height: 36 }}>
-            <circle cx="20" cy="20" r="18" fill="none" stroke="var(--accent)" strokeWidth="2" />
-            <circle cx="20" cy="20" r="10" fill="none" stroke="var(--accent)" strokeWidth="1" opacity="0.5" />
-            <circle cx="20" cy="20" r="4" fill="var(--accent)" />
-          </svg>
+          <NexusLogo size={36} />
         </div>
         <div>
           <h1 style={styles.logoText}>NEXUS</h1>
