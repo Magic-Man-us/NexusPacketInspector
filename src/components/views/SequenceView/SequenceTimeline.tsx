@@ -36,16 +36,21 @@ function ensureAnimStyles() {
   document.head.appendChild(style);
 }
 
+let animRefCount = 0;
+
 export function SequenceTimeline() {
   const streams = usePacketStore((s) => s.streams);
   const setSelectedPacket = usePacketStore((s) => s.setSelectedPacket);
   const [selectedStream, setSelectedStream] = useState<string | null>(null);
 
   useEffect(() => {
+    animRefCount++;
     ensureAnimStyles();
     return () => {
-      const el = document.getElementById(ANIM_STYLE_ID);
-      if (el) el.remove();
+      animRefCount--;
+      if (animRefCount === 0) {
+        document.getElementById(ANIM_STYLE_ID)?.remove();
+      }
     };
   }, []);
 

@@ -46,8 +46,9 @@ export function useDemoCapture() {
       addPackets([newPacket]);
       updateStats(newPacket);
       updateDashboardStats(newPacket);
+      updateStream(newPacket);
 
-      // Update stream with route data from demo packet
+      // Patch route data onto the stream after it exists
       const key = newPacket.streamKey;
       if (newPacket.route) {
         usePacketStore.setState((state) => {
@@ -63,7 +64,6 @@ export function useDemoCapture() {
           return state;
         });
       }
-      updateStream(newPacket);
     }, 150 + Math.random() * 150);
 
     return () => clearInterval(interval);

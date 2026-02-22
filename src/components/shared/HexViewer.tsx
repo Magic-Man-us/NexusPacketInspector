@@ -89,7 +89,7 @@ function hexFromPacket(packet: ParsedPacket): { bytes: number[]; regions: ByteRe
   if (packet.payload.data) {
     const payloadStart = bytes.length;
     const hexStr = packet.payload.data.replace(/\s/g, "");
-    for (let i = 0; i < hexStr.length - 1; i += 2) {
+    for (let i = 0; i + 1 < hexStr.length; i += 2) {
       bytes.push(parseInt(hexStr.substring(i, i + 2), 16) || 0);
     }
     if (bytes.length > payloadStart) {

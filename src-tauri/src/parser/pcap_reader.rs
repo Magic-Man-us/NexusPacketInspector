@@ -46,7 +46,6 @@ fn read_pcap_legacy(data: &[u8]) -> Result<Vec<Vec<u8>>, String> {
             }
             Err(PcapError::Eof) => break,
             Err(PcapError::Incomplete(_)) => {
-                // Try to refill the buffer; if it fails (e.g. EOF), we're done
                 if reader.refill().is_err() {
                     break;
                 }

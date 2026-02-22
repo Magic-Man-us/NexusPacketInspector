@@ -204,7 +204,7 @@ function generateIP(): string {
     "1.1.1",
     "203.0.113",
   ];
-  return `${subnets[Math.floor(Math.random() * subnets.length)]}.${Math.floor(Math.random() * 255)}`;
+  return `${subnets[Math.floor(Math.random() * subnets.length)]}.${Math.floor(Math.random() * 254) + 1}`;
 }
 
 function generatePort(protocol: string): number {
@@ -366,8 +366,9 @@ export function generatePacket(
   const ttl = Math.floor(Math.random() * 64) + 32;
 
   // Compute stream key early so we can look up conversation state
-  const tempStreamKey = [srcIp, dstIp].sort().join(":") + "-" +
-    [srcPort, dstPort].sort((a, b) => a - b).join(":");
+  const sortedIps = [srcIp, dstIp].sort();
+  const sortedPorts = [srcPort, dstPort].sort((a, b) => a - b);
+  const tempStreamKey = `${sortedIps[0]}:${sortedPorts[0]}-${sortedIps[1]}:${sortedPorts[1]}`;
 
   // Try to get realistic conversation payload for unencrypted protocols
   const fragmentSize = Math.floor(Math.random() * 200) + 40;

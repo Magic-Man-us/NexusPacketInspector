@@ -41,17 +41,17 @@ fn matches_filter(
     // "ip.src == <addr>" or "ip.dst == <addr>"
     if let Some(rest) = filter.strip_prefix("ip.src") {
         let addr = rest.trim().trim_start_matches("==").trim();
-        return pkt.ip.src_ip == addr;
+        return pkt.ip.src_ip.to_lowercase() == addr;
     }
     if let Some(rest) = filter.strip_prefix("ip.dst") {
         let addr = rest.trim().trim_start_matches("==").trim();
-        return pkt.ip.dst_ip == addr;
+        return pkt.ip.dst_ip.to_lowercase() == addr;
     }
 
     // "ip.addr == <addr>" - matches either src or dst
     if let Some(rest) = filter.strip_prefix("ip.addr") {
         let addr = rest.trim().trim_start_matches("==").trim();
-        return pkt.ip.src_ip == addr || pkt.ip.dst_ip == addr;
+        return pkt.ip.src_ip.to_lowercase() == addr || pkt.ip.dst_ip.to_lowercase() == addr;
     }
 
     // "port <number>" - matches src or dst port

@@ -17,8 +17,8 @@ export function useTauriListener() {
 
     (async () => {
       const { listen } = await import("@tauri-apps/api/event");
-      const { addPackets, updateStats, updateStream, updateDashboardStats } = usePacketStore.getState();
       const unlisten = await listen<ParsedPacket[]>("packets-chunk", (event) => {
+        const { addPackets, updateStats, updateStream, updateDashboardStats } = usePacketStore.getState();
         const packets = event.payload;
         addPackets(packets);
         for (const pkt of packets) {

@@ -247,12 +247,14 @@ function RawView({ reassembled, direction }: { reassembled: ReassembledStream; d
 }
 
 function HexView({ reassembled, direction }: { reassembled: ReassembledStream; direction: Direction }) {
-  const bytes =
-    direction === "client"
-      ? reassembled.clientPayload
-      : direction === "server"
-        ? reassembled.serverPayload
-        : new Uint8Array([...reassembled.clientPayload, ...reassembled.serverPayload]);
+  const bytes = useMemo(() => {
+    if (direction === "client") return reassembled.clientPayload;
+    if (direction === "server") return reassembled.serverPayload;
+    const combined = new Uint8Array(reassembled.clientPayload.length + reassembled.serverPayload.length);
+    combined.set(reassembled.clientPayload, 0);
+    combined.set(reassembled.serverPayload, reassembled.clientPayload.length);
+    return combined;
+  }, [direction, reassembled]);
 
   if (bytes.length === 0) return <div style={{ color: "var(--text-faint)", fontSize: "11px" }}>No payload data</div>;
 

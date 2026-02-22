@@ -30,8 +30,11 @@ export function HierarchicalTopology() {
       [p.ip.srcIp, p.ip.dstIp].forEach((ip) => {
         const parts = ip.split(".");
         const subnet = `${parts[0]}.${parts[1]}.${parts[2]}.0/24`;
+        const second = parseInt(parts[1], 10);
         const isLocal =
-          parts[0] === "192" || parts[0] === "10" || parts[0] === "172";
+          parts[0] === "10" ||
+          (parts[0] === "192" && parts[1] === "168") ||
+          (parts[0] === "172" && second >= 16 && second <= 31);
         if (!subnets[subnet])
           subnets[subnet] = {
             name: subnet,

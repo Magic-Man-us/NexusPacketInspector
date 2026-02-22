@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { usePacketStore, ViewId } from "../../hooks/usePacketStore";
 import { styles } from "../../styles/components";
 
@@ -36,7 +36,7 @@ export function NavTabs() {
         };
 
         return (
-          <span key={tab.id} style={{ display: 'contents' }}>
+          <React.Fragment key={tab.id}>
             {index > 0 && <div style={styles.navSeparator} />}
             <button
               onClick={() => setActiveView(tab.id)}
@@ -56,7 +56,7 @@ export function NavTabs() {
               </span>
               {tab.label}
             </button>
-          </span>
+          </React.Fragment>
         );
       })}
     </nav>

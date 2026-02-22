@@ -60,10 +60,11 @@ export function ConversationMatrix() {
     };
   }, [packets, stats]);
 
+  const visibleIpSet = new Set(matrixData.ips);
   const maxValue = Math.max(
-    ...matrixData.conversations.map((c) =>
-      sortBy === "packets" ? c.packets : c.bytes
-    ),
+    ...matrixData.conversations
+      .filter((c) => visibleIpSet.has(c.src) && visibleIpSet.has(c.dst))
+      .map((c) => (sortBy === "packets" ? c.packets : c.bytes)),
     1
   );
 

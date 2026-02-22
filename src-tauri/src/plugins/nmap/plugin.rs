@@ -21,13 +21,15 @@ impl NmapPlugin {
     }
 
     fn find_nmap() -> Option<String> {
-        std::process::Command::new("which")
+        let cmd = if cfg!(target_os = "windows") { "where" } else { "which" };
+        std::process::Command::new(cmd)
             .arg("nmap")
             .output()
             .ok()
             .and_then(|o| {
                 if o.status.success() {
-                    Some(String::from_utf8_lossy(&o.stdout).trim().to_string())
+                    let output = String::from_utf8_lossy(&o.stdout);
+                    output.lines().next().map(|l| l.trim().to_string())
                 } else {
                     None
                 }
@@ -106,11 +108,17 @@ impl Plugin for NmapPlugin {
                 .get("customFlags")
                 .and_then(|v| v.as_str())
                 .unwrap_or("");
-            args.extend(
-                custom_flags
-                    .split_whitespace()
-                    .map(|s| s.to_string()),
-            );
+            // Sanitize: only allow flags starting with '-' and known safe patterns
+            let blocked = ["--script", "--datadir", "--stylesheet", "--webxml"];
+            for token in custom_flags.split_whitespace() {
+                let lower = token.to_lowercase();
+                if blocked.iter().any(|b| lower.starts_with(b)) {
+                    return Err(PluginError::ExecutionFailed(
+                        format!("Blocked nmap flag for security: {}", token),
+                    ));
+                }
+                args.push(token.to_string());
+            }
         } else {
             args.extend(profile.flags.clone());
         }
@@ -135,7 +143,8 @@ impl Plugin for NmapPlugin {
             .spawn()
             .map_err(|e| PluginError::ExecutionFailed(format!("Failed to spawn nmap: {}", e)))?;
 
-        let stderr = child.stderr.take().unwrap();
+        let stderr = child.stderr.take()
+            .ok_or_else(|| PluginError::ExecutionFailed("Failed to capture nmap stderr".into()))?;
         let stderr_reader = BufReader::new(stderr);
         let mut stderr_lines = stderr_reader.lines();
 
@@ -167,7 +176,8 @@ impl Plugin for NmapPlugin {
 
         // Wait for process or cancellation
         let _child_id = child.id();
-        let stdout_pipe = child.stdout.take().unwrap();
+        let stdout_pipe = child.stdout.take()
+            .ok_or_else(|| PluginError::ExecutionFailed("Failed to capture nmap stdout".into()))?;
         let mut stdout_reader = BufReader::new(stdout_pipe);
         let mut xml_output = Vec::new();
 
@@ -224,8 +234,8 @@ impl Plugin for NmapPlugin {
                 let services: HashMap<u16, String> = h
                     .ports
                     .iter()
-                    .filter(|p| p.state == "open" && p.service_name.is_some())
-                    .map(|p| (p.port_id, p.service_name.clone().unwrap()))
+                    .filter(|p| p.state == "open")
+                    .filter_map(|p| p.service_name.as_ref().map(|svc| (p.port_id, svc.clone())))
                     .collect();
                 let os_guess = h.os_matches.first().map(|o| o.name.clone());
 

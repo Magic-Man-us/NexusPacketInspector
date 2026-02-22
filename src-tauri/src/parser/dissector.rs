@@ -260,9 +260,9 @@ fn detect_protocol(
     src_port: u16,
     dst_port: u16,
 ) -> String {
-    // Check if it's an ARP packet (no IP layer)
+    // No IP or transport layer — identify by link layer only
     if sliced.net.is_none() && sliced.transport.is_none() {
-        return "ARP".to_string();
+        return "Unknown".to_string();
     }
 
     // Check transport layer for ICMP
@@ -272,27 +272,28 @@ fn detect_protocol(
         _ => {}
     }
 
-    // Detect by well-known port numbers
-    let port = std::cmp::min(src_port, dst_port);
-    match port {
-        80 => "HTTP".to_string(),
-        443 => "HTTPS".to_string(),
-        53 => "DNS".to_string(),
-        22 => "SSH".to_string(),
-        21 => "FTP".to_string(),
-        25 | 587 => "SMTP".to_string(),
-        110 => "POP3".to_string(),
-        143 => "IMAP".to_string(),
-        23 => "Telnet".to_string(),
-        3389 => "RDP".to_string(),
-        _ => {
-            // Fall back to transport protocol
-            match &sliced.transport {
-                Some(etherparse::TransportSlice::Tcp(_)) => "TCP".to_string(),
-                Some(etherparse::TransportSlice::Udp(_)) => "UDP".to_string(),
-                _ => "Unknown".to_string(),
-            }
+    // Detect by well-known port numbers — check dst first (client→server), then src (server→client)
+    for &port in &[dst_port, src_port] {
+        match port {
+            80 => return "HTTP".to_string(),
+            443 => return "HTTPS".to_string(),
+            53 => return "DNS".to_string(),
+            22 => return "SSH".to_string(),
+            21 => return "FTP".to_string(),
+            25 | 587 => return "SMTP".to_string(),
+            110 => return "POP3".to_string(),
+            143 => return "IMAP".to_string(),
+            23 => return "Telnet".to_string(),
+            3389 => return "RDP".to_string(),
+            _ => {}
         }
+    }
+
+    // Fall back to transport protocol
+    match &sliced.transport {
+        Some(etherparse::TransportSlice::Tcp(_)) => "TCP".to_string(),
+        Some(etherparse::TransportSlice::Udp(_)) => "UDP".to_string(),
+        _ => "Unknown".to_string(),
     }
 }
 

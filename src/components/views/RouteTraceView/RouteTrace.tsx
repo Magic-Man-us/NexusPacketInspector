@@ -334,6 +334,7 @@ export function RouteTrace() {
 
     return () => {
       clearTimeout(fitTimer);
+      if (svgRef.current) d3.select(svgRef.current).on(".zoom", null);
       simulation.stop();
       simulationRef.current = null;
       linkSelRef.current = null;
@@ -537,6 +538,7 @@ export function RouteTrace() {
 
     return () => {
       clearTimeout(fitTimer);
+      if (svgRef.current) d3.select(svgRef.current).on(".zoom", null);
     };
   }, [topologyKey, viewMode, selectedStream]);
 

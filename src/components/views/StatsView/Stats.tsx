@@ -452,10 +452,10 @@ function StatisticsSection() {
       if (p.isUdp) {
         udpCount++;
         udpBytes += p.length;
-      } else {
+      } else if (p.tcp) {
         tcpCount++;
         tcpBytes += p.length;
-        if (p.tcp?.flags) {
+        if (p.tcp.flags) {
           if (p.tcp.flags.syn) synCount++;
           if (p.tcp.flags.fin) finCount++;
           if (p.tcp.flags.rst) rstCount++;
@@ -600,7 +600,7 @@ function StatisticsSection() {
           { label: "PSH", value: computed.pshCount, color: "#ff6b00" },
           { label: "Est. Retransmit", value: computed.retransmissions, color: "#ff00ff" },
         ].map((row) => {
-          const max = Math.max(computed.synCount, computed.ackCount, computed.finCount, computed.rstCount, computed.pshCount, 1);
+          const max = Math.max(computed.synCount, computed.ackCount, computed.finCount, computed.rstCount, computed.pshCount, computed.retransmissions, 1);
           return (
             <div key={row.label} style={{ ...statRow, alignItems: "center" }}>
               <span style={{ color: row.color, width: "90px" }}>{row.label}</span>
@@ -731,20 +731,20 @@ function StatisticsSection() {
       {/* Row: TTL + Anomaly + Bytes per Protocol */}
       <div style={cardStyle}>
         <div style={cardTitle}>TTL DISTRIBUTION</div>
-        {Object.entries(computed.ttlBuckets)
-          .sort((a, b) => parseInt(a[0]) - parseInt(b[0]))
-          .map(([bucket, count]) => {
-            const max = Math.max(...Object.values(computed.ttlBuckets), 1);
-            return (
+        {(() => {
+          const ttlMax = Math.max(...Object.values(computed.ttlBuckets), 1);
+          return Object.entries(computed.ttlBuckets)
+            .sort((a, b) => parseInt(a[0]) - parseInt(b[0]))
+            .map(([bucket, count]) => (
               <div key={bucket} style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "3px" }}>
                 <span style={{ width: "50px", fontSize: "9px", color: "var(--text-secondary)", fontFamily: "monospace" }}>{bucket}</span>
                 <div style={{ flex: 1, height: "8px", backgroundColor: "rgba(0,0,0,0.3)", borderRadius: "3px", overflow: "hidden" }}>
-                  <div style={{ width: `${(count / max) * 100}%`, height: "100%", backgroundColor: "#00ffff", borderRadius: "3px" }} />
+                  <div style={{ width: `${(count / ttlMax) * 100}%`, height: "100%", backgroundColor: "#00ffff", borderRadius: "3px" }} />
                 </div>
                 <span style={{ width: "30px", fontSize: "9px", color: "var(--text-muted)", textAlign: "right" }}>{count}</span>
               </div>
-            );
-          })}
+            ));
+        })()}
       </div>
 
       <div style={cardStyle}>

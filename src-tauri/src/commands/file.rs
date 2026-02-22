@@ -33,24 +33,35 @@ pub async fn open_pcap(
     let _total = raw_packets.len();
 
     // Dissect packets in parallel using rayon
-    let parsed: Vec<ParsedPacket> = raw_packets
-        .par_iter()
-        .enumerate()
-        .filter_map(|(i, raw)| dissect_packet(i as u64, raw).ok())
-        .collect();
+    let parsed: Vec<ParsedPacket> = match std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+        raw_packets
+            .par_iter()
+            .enumerate()
+            .filter_map(|(i, raw)| dissect_packet(i as u64, raw).ok())
+            .collect()
+    })) {
+        Ok(result) => result,
+        Err(_) => {
+            *state.is_loading.write() = false;
+            return Err("Packet dissection failed unexpectedly".into());
+        }
+    };
 
     let parsed_count = parsed.len();
 
-    // Emit packets in batches of 1000
-    let batch_size = 1000;
-    for chunk in parsed.chunks(batch_size) {
-        let _ = app.emit("packets-chunk", chunk);
-    }
-
-    // Store in state
+    // Store in state BEFORE emitting so frontend reads are consistent
     {
         let mut packets = state.packets.write();
         *packets = parsed;
+    }
+
+    // Emit packets in batches of 1000
+    let batch_size = 1000;
+    {
+        let packets = state.packets.read();
+        for chunk in packets.chunks(batch_size) {
+            let _ = app.emit("packets-chunk", chunk);
+        }
     }
     {
         let mut file_path = state.file_path.write();
