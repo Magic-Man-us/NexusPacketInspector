@@ -5,7 +5,6 @@ const tabs: { id: ViewId; label: string; icon: string }[] = [
   { id: "dashboard", label: "DASHBOARD", icon: "◫" },
   { id: "packets", label: "PACKETS", icon: "☰" },
   { id: "structure", label: "STRUCTURE", icon: "⬢" },
-  { id: "hexdump", label: "HEX DUMP", icon: "⬡" },
   { id: "livewire", label: "LIVEWIRE", icon: "↯" },
   { id: "routetrace", label: "ROUTE TRACE", icon: "⟿" },
   { id: "matrix", label: "MATRIX", icon: "▦" },
@@ -13,7 +12,6 @@ const tabs: { id: ViewId; label: string; icon: string }[] = [
   { id: "sequence", label: "SEQUENCE", icon: "↕" },
   { id: "topology", label: "TOPOLOGY", icon: "◎" },
   { id: "services", label: "SERVICES", icon: "⚙" },
-  { id: "statistics", label: "STATS", icon: "◧" },
   { id: "plugins", label: "PLUGINS", icon: "⚡" },
 ];
 

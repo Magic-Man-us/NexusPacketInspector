@@ -13,10 +13,9 @@ import { SankeyDiagram } from "./components/views/SankeyView/SankeyDiagram";
 import { SequenceTimeline } from "./components/views/SequenceView/SequenceTimeline";
 import { HierarchicalTopology } from "./components/views/TopologyView/HierarchicalTopology";
 import { ServiceMap } from "./components/views/ServiceMapView/ServiceMap";
-import { Statistics } from "./components/views/StatisticsView/Statistics";
 import { PluginsView } from "./components/views/PluginsView/PluginsView";
 import { Dashboard } from "./components/views/DashboardView/Dashboard";
-import { HexDumpView } from "./components/views/HexDumpView/HexDumpView";
+import { HexDumpPanel } from "./components/shared/HexDumpPanel";
 import { Livewire } from "./components/views/LivewireView/Livewire";
 import { usePluginEvents } from "./hooks/usePluginEvents";
 import { PacketSidebar } from "./components/shared/PacketSidebar";
@@ -95,17 +94,16 @@ export default function App() {
         {activeView === "dashboard" && <Dashboard />}
         {activeView === "packets" && <PacketListView />}
         {activeView === "structure" && <PacketStructure />}
-        {activeView === "hexdump" && <HexDumpView />}
         {activeView === "routetrace" && <RouteTrace />}
         {activeView === "matrix" && <ConversationMatrix />}
         {activeView === "sankey" && <SankeyDiagram />}
         {activeView === "sequence" && <SequenceTimeline />}
         {activeView === "topology" && <HierarchicalTopology />}
         {activeView === "services" && <ServiceMap />}
-        {activeView === "statistics" && <Statistics />}
         {activeView === "plugins" && <PluginsView />}
         {activeView === "livewire" && <Livewire />}
         </div>
+        <HexDumpPanel />
       </div>
 
       <StatusBar />
