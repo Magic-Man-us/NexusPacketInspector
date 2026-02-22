@@ -2,7 +2,7 @@
 
 A high-performance network packet analyzer built with **Tauri v2**, **React**, **D3.js**, and **Rust**. Analyze PCAP files with real-time visualizations across 10 interactive views — or explore the demo mode with simulated network traffic.
 
-[**Live Demo**](https://magic-man-us.github.io/NexusInspector/) (demo mode — no install required)
+[**Live Demo**](https://magic-man-us.github.io/Nexus/) (demo mode — no install required)
 
 ## Features
 
@@ -72,7 +72,7 @@ The distributable binary will be in `src-tauri/target/release/bundle/`.
 
 ### Demo Mode
 
-The app starts in demo mode by default, generating simulated network traffic. Click **OPEN PCAP** to load a real capture file, or visit the [live demo](https://magic-man-us.github.io/NexusInspector/) to try it in the browser.
+The app starts in demo mode by default, generating simulated network traffic. Click **OPEN PCAP** to load a real capture file, or visit the [live demo](https://magic-man-us.github.io/NexusPacketInspector/) to try it in the browser.
 
 ## Project Structure
 
