@@ -104,7 +104,7 @@ export const usePacketStore = create<PacketStore>((set, get) => ({
   selectedPacket: null,
   setSelectedPacket: (packet) => set({ selectedPacket: packet }),
 
-  activeView: "packets",
+  activeView: "dashboard",
   setActiveView: (view) => set({ activeView: view }),
 
   isCapturing: false,

@@ -15,7 +15,6 @@ import { HierarchicalTopology } from "./components/views/TopologyView/Hierarchic
 import { ServiceMap } from "./components/views/ServiceMapView/ServiceMap";
 import { PluginsView } from "./components/views/PluginsView/PluginsView";
 import { Dashboard } from "./components/views/DashboardView/Dashboard";
-import { HexDumpPanel } from "./components/shared/HexDumpPanel";
 import { Livewire } from "./components/views/LivewireView/Livewire";
 import { usePluginEvents } from "./hooks/usePluginEvents";
 import { PacketSidebar } from "./components/shared/PacketSidebar";
@@ -103,7 +102,6 @@ export default function App() {
         {activeView === "plugins" && <PluginsView />}
         {activeView === "livewire" && <Livewire />}
         </div>
-        <HexDumpPanel />
       </div>
 
       <StatusBar />
