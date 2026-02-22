@@ -5,6 +5,7 @@ import { Header } from "./components/layout/Header";
 import { NavTabs } from "./components/layout/NavTabs";
 import { StatusBar } from "./components/layout/StatusBar";
 import { SettingsPanel } from "./components/layout/SettingsPanel";
+import { MobileWarning } from "./components/layout/MobileWarning";
 import { PacketListView } from "./components/views/PacketListView/PacketListView";
 import { PacketStructure } from "./components/views/StructureView/PacketStructure";
 import { RouteTrace } from "./components/views/RouteTraceView/RouteTrace";
@@ -34,6 +35,7 @@ export default function App() {
 
   return (
     <div style={styles.container}>
+      <MobileWarning />
       <style>{globalStyles(visualEffects)}</style>
 
       {/* Static noise texture */}
