@@ -96,7 +96,7 @@ src-tauri/src/          # Rust backend
 
 ## License
 
-MIT
+[GPL3](https://github.com/Magic-Man-us/NexusPacketInspector/blob/main/LICENSE)
 
 ## Author
 
