@@ -8,11 +8,10 @@ export function PacketSidebar() {
   const setSelectedPacket = usePacketStore((s) => s.setSelectedPacket);
   const activeView = usePacketStore((s) => s.activeView);
   const [collapsed, setCollapsed] = useState(true);
+  const recentPackets = useMemo(() => packets.slice(-100), [packets]);
 
   // Don't show on the packets view (it has its own list) or plugins
   if (activeView === "packets" || activeView === "plugins") return null;
-
-  const recentPackets = useMemo(() => packets.slice(-100), [packets]);
 
   return (
     <div
