@@ -3,6 +3,7 @@ import { usePacketStore } from "../../../hooks/usePacketStore";
 import { styles } from "../../../styles/components";
 import { PROTOCOL_COLORS, LAYER_COLORS } from "../../../styles/theme";
 import { FieldEncyclopediaPanel } from "./FieldEncyclopediaPanel";
+import { getFieldByteRange } from "../../../lib/fieldByteOffsets";
 
 interface FieldDef {
   name: string;
@@ -28,6 +29,7 @@ export interface PopoverAnchor {
 
 export function PacketStructure() {
   const packet = usePacketStore((s) => s.selectedPacket);
+  const setHighlightedByteRange = usePacketStore((s) => s.setHighlightedByteRange);
   const [hoveredField, setHoveredField] = useState<ActiveField | null>(null);
   const [anchor, setAnchor] = useState<PopoverAnchor | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -51,15 +53,24 @@ export function PacketStructure() {
     closeTimer.current = setTimeout(() => {
       setHoveredField(null);
       setAnchor(null);
+      setHighlightedByteRange(null);
     }, 100);
-  }, [cancelClose]);
+  }, [cancelClose, setHighlightedByteRange]);
 
-  const handleFieldHover = useCallback((field: FieldDef, layer: string, e: React.MouseEvent) => {
+  const handleFieldHover = useCallback((field: FieldDef, layer: string, fieldIndex: number, e: React.MouseEvent) => {
     cancelClose();
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
     setAnchor({ top: rect.top, left: rect.left, right: rect.right, bottom: rect.bottom, width: rect.width, height: rect.height });
     setHoveredField({ ...field, layer });
-  }, [cancelClose]);
+
+    const hasTcp = !!packet?.tcp;
+    const range = getFieldByteRange(layer, fieldIndex, hasTcp);
+    if (range) {
+      setHighlightedByteRange({ start: range.byteStart, end: range.byteEnd });
+    } else {
+      setHighlightedByteRange(null);
+    }
+  }, [cancelClose, packet, setHighlightedByteRange]);
 
   const handlePopoverEnter = useCallback(() => {
     cancelClose();
@@ -149,7 +160,7 @@ export function PacketStructure() {
     return (
       <div
         key={`${layer}-${index}`}
-        onMouseEnter={(e) => handleFieldHover(field, layer, e)}
+        onMouseEnter={(e) => handleFieldHover(field, layer, index, e)}
         onMouseLeave={scheduleClose}
         style={{
           minWidth: `${minWidth}px`,

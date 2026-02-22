@@ -4,6 +4,7 @@ import { LAYER_COLORS } from "../../styles/theme";
 
 interface Props {
   packet: ParsedPacket;
+  highlightedByteRange?: { start: number; end: number } | null;
 }
 
 type LayerKey = "ethernet" | "ip" | "tcp" | "udp" | "payload";
@@ -107,15 +108,16 @@ function getLayerForByte(index: number, regions: ByteRegion[]): LayerKey | null 
   return null;
 }
 
-const layerColors: Record<LayerKey, { bg: string; text: string }> = {
-  ethernet: { bg: "rgba(255,214,0,0.12)", text: "#ffd600" },
-  ip: { bg: "rgba(0,184,255,0.12)", text: "#00b8ff" },
-  tcp: { bg: "rgba(0,255,159,0.12)", text: "#00ff9f" },
-  udp: { bg: "rgba(255,214,0,0.12)", text: "#ffd600" },
-  payload: { bg: "rgba(255,107,0,0.12)", text: "#ff6b00" },
+// Derive hex viewer colors from the shared LAYER_COLORS (theme.ts)
+const layerColors: Record<LayerKey, { bg: string; text: string; bgStrong: string }> = {
+  ethernet: { bg: LAYER_COLORS.ethernet.bg, text: LAYER_COLORS.ethernet.text, bgStrong: LAYER_COLORS.ethernet.bg.replace("0.15", "0.35") },
+  ip: { bg: LAYER_COLORS.ip.bg, text: LAYER_COLORS.ip.text, bgStrong: LAYER_COLORS.ip.bg.replace("0.15", "0.35") },
+  tcp: { bg: LAYER_COLORS.tcp.bg, text: LAYER_COLORS.tcp.text, bgStrong: LAYER_COLORS.tcp.bg.replace("0.15", "0.35") },
+  udp: { bg: LAYER_COLORS.udp.bg, text: LAYER_COLORS.udp.text, bgStrong: LAYER_COLORS.udp.bg.replace("0.15", "0.35") },
+  payload: { bg: LAYER_COLORS.payload.bg, text: LAYER_COLORS.payload.text, bgStrong: LAYER_COLORS.payload.bg.replace("0.15", "0.35") },
 };
 
-export function HexViewer({ packet }: Props) {
+export function HexViewer({ packet, highlightedByteRange }: Props) {
   const [hoveredByte, setHoveredByte] = useState<number | null>(null);
   const [hoveredLayer, setHoveredLayer] = useState<LayerKey | null>(null);
 
@@ -177,7 +179,9 @@ export function HexViewer({ packet }: Props) {
                 {row.map((byte, i) => {
                   const globalIdx = offset + i;
                   const layer = getLayerForByte(globalIdx, regions);
-                  const isHighlighted =
+                  const isExternalHighlight = highlightedByteRange != null &&
+                    globalIdx >= highlightedByteRange.start && globalIdx < highlightedByteRange.end;
+                  const isLocalHighlight =
                     hoveredByte === globalIdx ||
                     (hoveredLayer !== null && layer === hoveredLayer);
 
@@ -197,9 +201,9 @@ export function HexViewer({ packet }: Props) {
                         textAlign: "center",
                         padding: "2px 0",
                         borderRadius: "2px",
-                        backgroundColor: isHighlighted && layer
-                          ? layerColors[layer].bg
-                          : "transparent",
+                        backgroundColor: isExternalHighlight && layer
+                          ? layerColors[layer].bgStrong
+                          : (isLocalHighlight && layer ? layerColors[layer].bg : "transparent"),
                         color: layer
                           ? layerColors[layer].text
                           : "var(--text-muted)",
@@ -226,7 +230,9 @@ export function HexViewer({ packet }: Props) {
                 {row.map((byte, i) => {
                   const globalIdx = offset + i;
                   const layer = getLayerForByte(globalIdx, regions);
-                  const isHighlighted =
+                  const isExternalHighlight = highlightedByteRange != null &&
+                    globalIdx >= highlightedByteRange.start && globalIdx < highlightedByteRange.end;
+                  const isLocalHighlight =
                     hoveredByte === globalIdx ||
                     (hoveredLayer !== null && layer === hoveredLayer);
                   const ch = byte >= 32 && byte <= 126 ? String.fromCharCode(byte) : ".";
@@ -237,8 +243,10 @@ export function HexViewer({ packet }: Props) {
                       style={{
                         width: "9px",
                         textAlign: "center",
-                        color: isHighlighted && layer ? layerColors[layer].text : "var(--text-dim)",
-                        backgroundColor: isHighlighted && layer ? layerColors[layer].bg : "transparent",
+                        color: (isExternalHighlight || isLocalHighlight) && layer ? layerColors[layer].text : "var(--text-dim)",
+                        backgroundColor: isExternalHighlight && layer
+                          ? layerColors[layer].bgStrong
+                          : (isLocalHighlight && layer ? layerColors[layer].bg : "transparent"),
                         borderRadius: "1px",
                       }}
                     >

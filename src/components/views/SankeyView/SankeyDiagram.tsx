@@ -21,7 +21,7 @@ export function SankeyDiagram() {
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
-  const [groupBy, setGroupBy] = useState<GroupBy>("ip");
+  const [groupBy, setGroupBy] = useState<GroupBy>("port");
   const { width: containerWidth, height: containerHeight } = useContainerSize(containerRef);
 
   const flowArray = useMemo(() => {
@@ -193,24 +193,6 @@ export function SankeyDiagram() {
         <span style={styles.sankeyTitle}>&#x2964; TRAFFIC FLOW</span>
         <div style={styles.sankeyControls}>
           <button
-            onClick={() => setGroupBy("ip")}
-            style={{
-              ...styles.sankeyBtn,
-              ...(groupBy === "ip" ? styles.sankeyBtnActive : {}),
-            }}
-          >
-            IP &rarr; IP
-          </button>
-          <button
-            onClick={() => setGroupBy("protocol")}
-            style={{
-              ...styles.sankeyBtn,
-              ...(groupBy === "protocol" ? styles.sankeyBtnActive : {}),
-            }}
-          >
-            Subnet &rarr; Protocol
-          </button>
-          <button
             onClick={() => setGroupBy("port")}
             style={{
               ...styles.sankeyBtn,
@@ -227,6 +209,24 @@ export function SankeyDiagram() {
             }}
           >
             IP &rarr; Service
+          </button>
+          <button
+            onClick={() => setGroupBy("protocol")}
+            style={{
+              ...styles.sankeyBtn,
+              ...(groupBy === "protocol" ? styles.sankeyBtnActive : {}),
+            }}
+          >
+            Subnet &rarr; Protocol
+          </button>
+          <button
+            onClick={() => setGroupBy("ip")}
+            style={{
+              ...styles.sankeyBtn,
+              ...(groupBy === "ip" ? styles.sankeyBtnActive : {}),
+            }}
+          >
+            IP &rarr; IP
           </button>
         </div>
       </div>

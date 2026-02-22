@@ -28,6 +28,10 @@ interface PacketStore {
   selectedPacket: ParsedPacket | null;
   setSelectedPacket: (packet: ParsedPacket | null) => void;
 
+  // Cross-highlight (structure view → hex viewer)
+  highlightedByteRange: { start: number; end: number } | null;
+  setHighlightedByteRange: (range: { start: number; end: number } | null) => void;
+
   // View
   activeView: ViewId;
   setActiveView: (view: ViewId) => void;
@@ -108,7 +112,10 @@ export const usePacketStore = create<PacketStore>((set, get) => ({
   clearPackets: () => set({ packets: [], selectedPacket: null }),
 
   selectedPacket: null,
-  setSelectedPacket: (packet) => set({ selectedPacket: packet }),
+  setSelectedPacket: (packet) => set({ selectedPacket: packet, highlightedByteRange: null }),
+
+  highlightedByteRange: null,
+  setHighlightedByteRange: (range) => set({ highlightedByteRange: range }),
 
   activeView: "dashboard",
   setActiveView: (view) => set({ activeView: view }),

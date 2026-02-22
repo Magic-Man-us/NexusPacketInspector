@@ -51,6 +51,7 @@ export function PacketSidebar() {
   const selectedPacket = usePacketStore((s) => s.selectedPacket);
   const setSelectedPacket = usePacketStore((s) => s.setSelectedPacket);
   const activeView = usePacketStore((s) => s.activeView);
+  const highlightedByteRange = usePacketStore((s) => s.highlightedByteRange);
   const [collapsed, setCollapsed] = useState(false);
   const [activeTab, setActiveTab] = useState<SidebarTab>("packets");
   const [splitView, setSplitView] = useState(false);
@@ -293,7 +294,7 @@ export function PacketSidebar() {
           </div>
 
           <div style={{ flex: 1, overflow: "auto", padding: "8px", minHeight: 0 }}>
-            <HexViewer packet={hexPacket} />
+            <HexViewer packet={hexPacket} highlightedByteRange={highlightedByteRange} />
           </div>
         </>
       ) : (
