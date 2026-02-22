@@ -2,6 +2,7 @@ import { useState } from "react";
 import { usePacketStore } from "../../../hooks/usePacketStore";
 import { styles } from "../../../styles/components";
 import { PROTOCOL_COLORS, LAYER_COLORS } from "../../../styles/theme";
+import { FieldEncyclopediaPanel } from "./FieldEncyclopediaPanel";
 
 interface FieldDef {
   name: string;
@@ -102,7 +103,13 @@ export function PacketStructure() {
     return (
       <div
         key={`${layer}-${index}`}
-        onClick={() => setSelectedField({ ...field, layer })}
+        onClick={() => {
+          if (selectedField?.name === field.name && selectedField?.layer === layer) {
+            setSelectedField(null);
+          } else {
+            setSelectedField({ ...field, layer });
+          }
+        }}
         onMouseEnter={() => setHoveredField({ ...field, layer })}
         onMouseLeave={() => setHoveredField(null)}
         style={{
@@ -226,11 +233,9 @@ export function PacketStructure() {
     );
   };
 
-  const activeField = selectedField || hoveredField;
-
   return (
     <div style={styles.structureContainer}>
-      <div style={{ display: "flex", flex: 1, minHeight: 0 }}>
+      <div style={{ display: "flex", flexDirection: "column" as const, flex: 1, minHeight: 0, position: "relative" as const }}>
         {/* Main structure view */}
         <div style={{ flex: 1, overflowY: "auto" as const, padding: "20px" }}>
           {/* Packet summary */}
@@ -281,122 +286,7 @@ export function PacketStructure() {
           {renderLayer("PAYLOAD (Layer 5-7)", payloadFields, "payload", "\u25A3")}
         </div>
 
-        {/* Field details panel */}
-        <div
-          style={{
-            width: "280px",
-            borderLeft: "1px solid rgba(0,255,159,0.1)",
-            backgroundColor: "rgba(0,0,0,0.2)",
-            padding: "16px",
-            overflowY: "auto" as const,
-            flexShrink: 0,
-          }}
-        >
-          <div
-            style={{
-              fontFamily: "'Orbitron', sans-serif",
-              fontSize: "10px",
-              color: "#00ff9f",
-              marginBottom: "16px",
-              letterSpacing: "1px",
-            }}
-          >
-            FIELD DETAILS
-          </div>
-
-          {activeField ? (
-            <div>
-              <div
-                style={{
-                  padding: "14px",
-                  backgroundColor: LAYER_COLORS[activeField.layer as keyof typeof LAYER_COLORS].bg,
-                  border: `1px solid ${LAYER_COLORS[activeField.layer as keyof typeof LAYER_COLORS].border}`,
-                  borderRadius: "8px",
-                  marginBottom: "16px",
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: "13px",
-                    fontWeight: 700,
-                    color: LAYER_COLORS[activeField.layer as keyof typeof LAYER_COLORS].text,
-                    marginBottom: "8px",
-                  }}
-                >
-                  {activeField.name}
-                </div>
-                <div
-                  style={{
-                    fontSize: "16px",
-                    fontFamily: "'JetBrains Mono', monospace",
-                    color: "#fff",
-                    wordBreak: "break-all" as const,
-                  }}
-                >
-                  {String(activeField.value)}
-                </div>
-              </div>
-
-              <div style={{ marginBottom: "12px" }}>
-                <div style={{ fontSize: "9px", color: "#666", marginBottom: "4px" }}>SIZE</div>
-                <div style={{ display: "flex", gap: "8px" }}>
-                  <span
-                    style={{
-                      padding: "4px 10px",
-                      backgroundColor: "rgba(0,255,159,0.1)",
-                      borderRadius: "4px",
-                      fontSize: "11px",
-                      color: "#00ff9f",
-                    }}
-                  >
-                    {activeField.bits} bits
-                  </span>
-                  <span
-                    style={{
-                      padding: "4px 10px",
-                      backgroundColor: "rgba(0,184,255,0.1)",
-                      borderRadius: "4px",
-                      fontSize: "11px",
-                      color: "#00b8ff",
-                    }}
-                  >
-                    {Math.ceil(activeField.bits / 8)} bytes
-                  </span>
-                </div>
-              </div>
-
-              <div style={{ marginBottom: "12px" }}>
-                <div style={{ fontSize: "9px", color: "#666", marginBottom: "4px" }}>DESCRIPTION</div>
-                <div style={{ fontSize: "11px", color: "#aaa", lineHeight: "1.5" }}>
-                  {activeField.desc}
-                </div>
-              </div>
-
-              {typeof activeField.value === "number" && (
-                <div>
-                  <div style={{ fontSize: "9px", color: "#666", marginBottom: "4px" }}>BINARY</div>
-                  <div
-                    style={{
-                      fontFamily: "'JetBrains Mono', monospace",
-                      fontSize: "10px",
-                      color: "#ff6b00",
-                      wordBreak: "break-all" as const,
-                      backgroundColor: "rgba(255,107,0,0.1)",
-                      padding: "8px",
-                      borderRadius: "4px",
-                    }}
-                  >
-                    {activeField.value.toString(2).padStart(activeField.bits, "0")}
-                  </div>
-                </div>
-              )}
-            </div>
-          ) : (
-            <div style={{ color: "#444", fontSize: "11px", textAlign: "center" as const, marginTop: "40px" }}>
-              Click or hover on a field to see details
-            </div>
-          )}
-        </div>
+        <FieldEncyclopediaPanel field={selectedField} onClose={() => setSelectedField(null)} />
       </div>
     </div>
   );
