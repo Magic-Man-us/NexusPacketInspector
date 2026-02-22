@@ -161,8 +161,8 @@ export function DraggablePanel({
         left: pos?.x ?? 0,
         top: pos?.y ?? 0,
         width: collapsed ? "auto" : width,
-        backgroundColor: "rgba(10,15,10,0.92)",
-        border: "1px solid rgba(0,255,159,0.2)",
+        backgroundColor: "var(--header-bg)",
+        border: "1px solid rgba(var(--accent-rgb),0.2)",
         borderRadius: "6px",
         zIndex: 50,
         boxShadow: "0 4px 20px rgba(0,0,0,0.4)",
@@ -181,7 +181,7 @@ export function DraggablePanel({
           padding: "6px 10px",
           borderBottom: collapsed
             ? "none"
-            : "1px solid rgba(0,255,159,0.15)",
+            : "1px solid rgba(var(--accent-rgb),0.15)",
           cursor: dragging ? "grabbing" : "grab",
         }}
       >
@@ -189,7 +189,7 @@ export function DraggablePanel({
           style={{
             fontFamily: "'Orbitron'",
             fontSize: "8px",
-            color: "#00ff9f",
+            color: "var(--accent)",
             letterSpacing: "1px",
           }}
         >

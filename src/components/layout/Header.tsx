@@ -31,9 +31,9 @@ export function Header() {
       <div style={styles.logoSection}>
         <div style={styles.logoIcon}>
           <svg viewBox="0 0 40 40" style={{ width: 36, height: 36 }}>
-            <circle cx="20" cy="20" r="18" fill="none" stroke="#00ff9f" strokeWidth="2" />
-            <circle cx="20" cy="20" r="10" fill="none" stroke="#00ff9f" strokeWidth="1" opacity="0.5" />
-            <circle cx="20" cy="20" r="4" fill="#00ff9f" />
+            <circle cx="20" cy="20" r="18" fill="none" stroke="var(--accent)" strokeWidth="2" />
+            <circle cx="20" cy="20" r="10" fill="none" stroke="var(--accent)" strokeWidth="1" opacity="0.5" />
+            <circle cx="20" cy="20" r="4" fill="var(--accent)" />
           </svg>
         </div>
         <div>
@@ -55,7 +55,7 @@ export function Header() {
         </div>
         <button
           onClick={openPcapFile}
-          style={{ ...styles.controlButton, background: '#00b8ff', color: '#0a0f0a' }}
+          style={{ ...styles.controlButton, background: '#00b8ff', color: 'var(--bg-primary)' }}
         >
           OPEN PCAP
         </button>
@@ -84,8 +84,8 @@ export function Header() {
           onClick={() => setShowSettings(!showSettings)}
           style={{
             ...styles.clearButton,
-            color: showSettings ? "#00ff9f" : "#888",
-            borderColor: showSettings ? "#00ff9f" : "rgba(255,255,255,0.2)",
+            color: showSettings ? "var(--accent)" : "var(--text-secondary)",
+            borderColor: showSettings ? "var(--accent)" : "rgba(255,255,255,0.2)",
           }}
         >
           ⚙ FX
@@ -108,7 +108,7 @@ export function Header() {
           target="_blank"
           rel="noopener noreferrer"
           style={{ color: '#666', transition: 'color 0.2s', display: 'flex', alignItems: 'center' }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = '#00ff9f')}
+          onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent)')}
           onMouseLeave={(e) => (e.currentTarget.style.color = '#666')}
           title="View on GitHub"
         >

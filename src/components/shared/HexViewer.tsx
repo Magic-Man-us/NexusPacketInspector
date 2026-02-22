@@ -132,7 +132,8 @@ export function HexViewer({ packet }: Props) {
     <div
       style={{
         fontFamily: "'Share Tech Mono', monospace",
-        fontSize: "11px",
+        fontSize: "12px",
+        fontWeight: 500,
         overflow: "auto",
       }}
     >
@@ -148,7 +149,8 @@ export function HexViewer({ packet }: Props) {
               borderRadius: "3px",
               backgroundColor: layerColors[r.layer].bg,
               color: layerColors[r.layer].text,
-              fontSize: "9px",
+              fontSize: "10px",
+              fontWeight: 600,
               cursor: "pointer",
               border: hoveredLayer === r.layer ? `1px solid ${layerColors[r.layer].text}` : "1px solid transparent",
             }}
@@ -165,7 +167,7 @@ export function HexViewer({ packet }: Props) {
           return (
             <div key={rowIdx} style={{ display: "flex", alignItems: "center" }}>
               {/* Offset */}
-              <span style={{ width: "50px", color: "#444", flexShrink: 0, fontSize: "10px" }}>
+              <span style={{ width: "50px", color: "var(--text-faint)", flexShrink: 0, fontSize: "10px", fontWeight: 600 }}>
                 {offset.toString(16).padStart(4, "0")}
               </span>
 
@@ -199,7 +201,7 @@ export function HexViewer({ packet }: Props) {
                           : "transparent",
                         color: layer
                           ? layerColors[layer].text
-                          : "#666",
+                          : "var(--text-muted)",
                         cursor: "crosshair",
                         marginRight: i === 7 ? "6px" : "0",
                       }}
@@ -216,7 +218,7 @@ export function HexViewer({ packet }: Props) {
               </div>
 
               {/* Separator */}
-              <span style={{ width: "16px", flexShrink: 0, color: "#333", textAlign: "center" }}>|</span>
+              <span style={{ width: "16px", flexShrink: 0, color: "var(--text-faint)", textAlign: "center" }}>|</span>
 
               {/* ASCII */}
               <div style={{ display: "flex" }}>
@@ -234,7 +236,7 @@ export function HexViewer({ packet }: Props) {
                       style={{
                         width: "9px",
                         textAlign: "center",
-                        color: isHighlighted && layer ? layerColors[layer].text : "#555",
+                        color: isHighlighted && layer ? layerColors[layer].text : "var(--text-dim)",
                         backgroundColor: isHighlighted && layer ? layerColors[layer].bg : "transparent",
                         borderRadius: "1px",
                       }}
@@ -251,7 +253,7 @@ export function HexViewer({ packet }: Props) {
 
       {/* Byte info on hover */}
       {hoveredByte !== null && (
-        <div style={{ marginTop: "8px", fontSize: "9px", color: "#888", borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: "6px" }}>
+        <div style={{ marginTop: "8px", fontSize: "10px", fontWeight: 600, color: "var(--text-secondary)", borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: "6px" }}>
           Offset: 0x{hoveredByte.toString(16).padStart(4, "0")} | Byte: 0x{bytes[hoveredByte]?.toString(16).padStart(2, "0")} ({bytes[hoveredByte]}) | Layer: {getLayerForByte(hoveredByte, regions) || "unknown"}
         </div>
       )}

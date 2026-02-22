@@ -127,9 +127,9 @@ const toolCards: ToolCard[] = [
     title: "Settings",
     accent: "#8a9bb2",
     description:
-      "Configure visual effects, themes, and application preferences.",
+      "Configure color schemes, themes, and application preferences.",
     detail:
-      "Toggle CRT scanlines, grid overlays, and noise textures. Adjust animation speeds, opacity levels, and other visual parameters to customize your workspace.",
+      "Switch between Nexus, Dark, and Light color schemes. Toggle grid overlays, adjust opacity levels, and other visual parameters to customize your workspace.",
   },
 ];
 
@@ -169,13 +169,13 @@ export function Dashboard() {
             style={{
               background: isHovered
                 ? `linear-gradient(135deg, ${card.accent}0a 0%, ${card.accent}03 100%)`
-                : "rgba(0,255,159,0.03)",
+                : "var(--bg-surface)",
               borderWidth: "2px 1px 1px 1px",
               borderStyle: "solid",
               borderTopColor: card.accent,
-              borderRightColor: isHovered ? card.accent : "rgba(0,255,159,0.15)",
-              borderBottomColor: isHovered ? card.accent : "rgba(0,255,159,0.15)",
-              borderLeftColor: isHovered ? card.accent : "rgba(0,255,159,0.15)",
+              borderRightColor: isHovered ? card.accent : "var(--border-strong)",
+              borderBottomColor: isHovered ? card.accent : "var(--border-strong)",
+              borderLeftColor: isHovered ? card.accent : "var(--border-strong)",
               borderRadius: "6px",
               padding: "24px",
               cursor: "pointer",
@@ -213,8 +213,9 @@ export function Dashboard() {
                 style={{
                   fontFamily: "'Orbitron'",
                   fontSize: "13px",
+                  fontWeight: 800,
                   letterSpacing: "1.5px",
-                  color: isHovered ? card.accent : "#ccc",
+                  color: isHovered ? card.accent : "var(--text-primary)",
                   transition: "color 0.25s ease",
                 }}
               >
@@ -225,8 +226,9 @@ export function Dashboard() {
               style={{
                 margin: 0,
                 fontSize: "12px",
+                fontWeight: 500,
                 lineHeight: "1.6",
-                color: isHovered ? "#aab4c2" : "#777",
+                color: isHovered ? "var(--text-primary)" : "var(--text-secondary)",
                 transition: "color 0.25s ease",
               }}
             >
@@ -237,8 +239,9 @@ export function Dashboard() {
                 style={{
                   margin: 0,
                   fontSize: "11px",
+                  fontWeight: 500,
                   lineHeight: "1.6",
-                  color: "#667788",
+                  color: "var(--text-muted)",
                   borderTop: `1px solid ${card.accent}22`,
                   paddingTop: "10px",
                 }}

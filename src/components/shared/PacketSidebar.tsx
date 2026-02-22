@@ -152,7 +152,7 @@ export function PacketSidebar() {
             cursor: "pointer",
             backgroundColor:
               selectedPacket?.id === p.id
-                ? "rgba(0,255,159,0.1)"
+                ? "rgba(var(--accent-rgb),0.1)"
                 : "transparent",
             display: "flex",
             gap: "6px",
@@ -199,8 +199,8 @@ export function PacketSidebar() {
           style={{
             padding: "16px",
             textAlign: "center",
-            color: "#444",
-            fontSize: "10px",
+            color: "var(--text-faint)",
+            fontSize: "11px",
           }}
         >
           No packets
@@ -216,9 +216,10 @@ export function PacketSidebar() {
           <div
             style={{
               padding: "8px 12px",
-              backgroundColor: "rgba(0,0,0,0.2)",
-              borderBottom: "1px solid rgba(0,255,159,0.05)",
-              fontSize: "9px",
+              backgroundColor: "var(--bg-console)",
+              borderBottom: "1px solid rgba(var(--accent-rgb),0.05)",
+              fontSize: "10px",
+              fontWeight: 600,
               fontFamily: "monospace",
               display: "flex",
               flexDirection: "column",
@@ -227,12 +228,12 @@ export function PacketSidebar() {
             }}
           >
             <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <span style={{ color: "#00ff9f" }}>#{hexPacket.id} {hexPacket.protocol}</span>
-              <span style={{ color: "#666" }}>{hexPacket.length} B</span>
+              <span style={{ color: "var(--accent)" }}>#{hexPacket.id} {hexPacket.protocol}</span>
+              <span style={{ color: "var(--text-muted)" }}>{hexPacket.length} B</span>
             </div>
             <div>
               <span style={{ color: "#00b8ff" }}>{hexPacket.ip.srcIp}</span>
-              <span style={{ color: "#444" }}> → </span>
+              <span style={{ color: "var(--text-faint)" }}> → </span>
               <span style={{ color: "#ff6b00" }}>{hexPacket.ip.dstIp}</span>
             </div>
           </div>
@@ -240,7 +241,7 @@ export function PacketSidebar() {
           <div
             style={{
               padding: "6px 12px",
-              borderBottom: "1px solid rgba(0,255,159,0.05)",
+              borderBottom: "1px solid rgba(var(--accent-rgb),0.05)",
               display: "flex",
               gap: "4px",
               flexShrink: 0,
@@ -270,9 +271,9 @@ export function PacketSidebar() {
               }}
               style={{
                 ...navBtnStyle,
-                border: "1px solid rgba(0,255,159,0.3)",
-                background: "rgba(0,255,159,0.05)",
-                color: "#00ff9f",
+                border: "1px solid rgba(var(--accent-rgb),0.3)",
+                background: "rgba(var(--accent-rgb),0.05)",
+                color: "var(--accent)",
               }}
             >
               LATEST
@@ -288,8 +289,8 @@ export function PacketSidebar() {
           style={{
             padding: "16px",
             textAlign: "center",
-            color: "#444",
-            fontSize: "10px",
+            color: "var(--text-faint)",
+            fontSize: "11px",
           }}
         >
           No packet selected
@@ -302,7 +303,7 @@ export function PacketSidebar() {
     <div
       style={{
         display: "flex",
-        borderBottom: "1px solid rgba(0,255,159,0.1)",
+        borderBottom: "1px solid rgba(var(--accent-rgb),0.1)",
         flexShrink: 0,
       }}
     >
@@ -311,7 +312,7 @@ export function PacketSidebar() {
         style={{
           ...tabBtnStyle,
           borderBottom: !splitView && activeTab === "packets" ? "2px solid #00ff9f" : "2px solid transparent",
-          color: !splitView && activeTab === "packets" ? "#00ff9f" : "#555",
+          color: !splitView && activeTab === "packets" ? "var(--accent)" : "#555",
         }}
       >
         PACKETS
@@ -321,7 +322,7 @@ export function PacketSidebar() {
         style={{
           ...tabBtnStyle,
           borderBottom: !splitView && activeTab === "hexdump" ? "2px solid #00ff9f" : "2px solid transparent",
-          color: !splitView && activeTab === "hexdump" ? "#00ff9f" : "#555",
+          color: !splitView && activeTab === "hexdump" ? "var(--accent)" : "#555",
         }}
       >
         HEX DUMP
@@ -331,7 +332,7 @@ export function PacketSidebar() {
         style={{
           ...tabBtnStyle,
           borderBottom: splitView ? "2px solid #00ff9f" : "2px solid transparent",
-          color: splitView ? "#00ff9f" : "#555",
+          color: splitView ? "var(--accent)" : "#555",
           marginLeft: "auto",
           fontSize: "8px",
         }}
@@ -346,7 +347,7 @@ export function PacketSidebar() {
       {splitView ? (
         <>
           {packetListContent}
-          <div style={{ height: "1px", backgroundColor: "rgba(0,255,159,0.15)", flexShrink: 0 }} />
+          <div style={{ height: "1px", backgroundColor: "rgba(var(--accent-rgb),0.15)", flexShrink: 0 }} />
           {hexDumpContent}
         </>
       ) : activeTab === "packets" ? (
@@ -374,8 +375,8 @@ export function PacketSidebar() {
             top: pos?.y ?? (window.innerHeight - panelH - SNAP_MARGIN),
             width: DETACHED_WIDTH,
             height: `${DETACHED_HEIGHT_VH}vh`,
-            backgroundColor: "rgba(10,15,10,0.95)",
-            border: "1px solid rgba(0,255,159,0.25)",
+            backgroundColor: "var(--header-bg)",
+            border: "1px solid rgba(var(--accent-rgb),0.25)",
             borderRadius: "8px",
             zIndex: 9000,
             boxShadow: "0 8px 32px rgba(0,0,0,0.6)",
@@ -394,7 +395,7 @@ export function PacketSidebar() {
               alignItems: "center",
               justifyContent: "space-between",
               padding: "8px 10px",
-              borderBottom: "1px solid rgba(0,255,159,0.15)",
+              borderBottom: "1px solid rgba(var(--accent-rgb),0.15)",
               cursor: dragging ? "grabbing" : "grab",
               flexShrink: 0,
             }}
@@ -403,7 +404,7 @@ export function PacketSidebar() {
               style={{
                 fontFamily: "'Orbitron'",
                 fontSize: "9px",
-                color: "#00ff9f",
+                color: "var(--accent)",
                 letterSpacing: "1px",
               }}
             >
@@ -450,13 +451,13 @@ export function PacketSidebar() {
         onMouseLeave={handleSidebarLeave}
         style={{
           width: collapsed ? "36px" : "360px",
-          borderRight: "1px solid rgba(0,255,159,0.1)",
+          borderRight: "1px solid rgba(var(--accent-rgb),0.1)",
           display: "flex",
           flexDirection: "column",
           flexShrink: 0,
           transition: "width 0.2s ease",
           overflow: "hidden",
-          backgroundColor: "rgba(0,0,0,0.15)",
+          backgroundColor: "var(--bg-secondary)",
         }}
       >
         {/* Title bar with toggle + detach */}
@@ -464,7 +465,7 @@ export function PacketSidebar() {
           style={{
             display: "flex",
             alignItems: "center",
-            borderBottom: "1px solid rgba(0,255,159,0.1)",
+            borderBottom: "1px solid rgba(var(--accent-rgb),0.1)",
           }}
         >
           <button
@@ -474,7 +475,7 @@ export function PacketSidebar() {
               padding: "10px",
               border: "none",
               background: "transparent",
-              color: "#00ff9f",
+              color: "var(--accent)",
               fontFamily: "'Orbitron'",
               fontSize: "10px",
               cursor: "pointer",
@@ -531,9 +532,9 @@ const navBtnStyle: React.CSSProperties = {
 
 const titleBarBtnStyle: React.CSSProperties = {
   background: "none",
-  border: "1px solid rgba(0,255,159,0.2)",
+  border: "1px solid rgba(var(--accent-rgb),0.2)",
   borderRadius: "3px",
-  color: "#00ff9f",
+  color: "var(--accent)",
   fontSize: "12px",
   cursor: "pointer",
   padding: "2px 6px",

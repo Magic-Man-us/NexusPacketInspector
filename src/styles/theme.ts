@@ -38,6 +38,7 @@ export interface SchemeVars {
   bgSecondary: string;
   bgSurface: string;
   bgHover: string;
+  bgConsole: string;        // darker bg for code/hex/terminal areas
   accent: string;
   accentRgb: string;       // for rgba() usage
   textPrimary: string;
@@ -45,6 +46,8 @@ export interface SchemeVars {
   textMuted: string;
   textDim: string;
   textFaint: string;
+  fontWeight: string;       // base font weight for readability
+  fontWeightStrong: string; // bolder weight for headings/labels
   border: string;
   borderStrong: string;
   scrollbarThumb: string;
@@ -57,13 +60,16 @@ export const COLOR_SCHEMES: Record<ColorScheme, SchemeVars> = {
     bgSecondary: "rgba(0,0,0,0.2)",
     bgSurface: "rgba(0,255,159,0.03)",
     bgHover: "rgba(0,255,159,0.06)",
+    bgConsole: "#060a06",
     accent: "#00ff9f",
     accentRgb: "0,255,159",
-    textPrimary: "#e0e0e0",
-    textSecondary: "#888",
-    textMuted: "#666",
-    textDim: "#555",
-    textFaint: "#444",
+    textPrimary: "#e8e8e8",
+    textSecondary: "#a0a0a0",
+    textMuted: "#777",
+    textDim: "#5a5a5a",
+    textFaint: "#484848",
+    fontWeight: "500",
+    fontWeightStrong: "700",
     border: "rgba(0,255,159,0.1)",
     borderStrong: "rgba(0,255,159,0.2)",
     scrollbarThumb: "#00ff9f",
@@ -74,34 +80,40 @@ export const COLOR_SCHEMES: Record<ColorScheme, SchemeVars> = {
     bgSecondary: "rgba(0,0,0,0.25)",
     bgSurface: "rgba(124,131,255,0.04)",
     bgHover: "rgba(124,131,255,0.08)",
+    bgConsole: "#0c0c14",
     accent: "#7c83ff",
     accentRgb: "124,131,255",
-    textPrimary: "#d4d4e0",
-    textSecondary: "#8888a0",
-    textMuted: "#666680",
-    textDim: "#55556a",
-    textFaint: "#444458",
+    textPrimary: "#dcdce8",
+    textSecondary: "#9999b0",
+    textMuted: "#707088",
+    textDim: "#58586e",
+    textFaint: "#48485c",
+    fontWeight: "500",
+    fontWeightStrong: "700",
     border: "rgba(124,131,255,0.12)",
     borderStrong: "rgba(124,131,255,0.25)",
     scrollbarThumb: "#7c83ff",
     headerBg: "rgba(18,18,26,0.95)",
   },
   light: {
-    bgPrimary: "#f0f2f6",
-    bgSecondary: "rgba(0,0,0,0.04)",
-    bgSurface: "rgba(37,99,235,0.05)",
-    bgHover: "rgba(37,99,235,0.08)",
+    bgPrimary: "#ebedf2",
+    bgSecondary: "rgba(0,0,0,0.06)",
+    bgSurface: "rgba(37,99,235,0.06)",
+    bgHover: "rgba(37,99,235,0.10)",
+    bgConsole: "#e0e2e8",
     accent: "#2563eb",
     accentRgb: "37,99,235",
-    textPrimary: "#1a1a2e",
-    textSecondary: "#555566",
-    textMuted: "#777788",
-    textDim: "#999",
-    textFaint: "#bbb",
-    border: "rgba(0,0,0,0.1)",
-    borderStrong: "rgba(0,0,0,0.18)",
+    textPrimary: "#111122",
+    textSecondary: "#3a3a50",
+    textMuted: "#555566",
+    textDim: "#6e6e80",
+    textFaint: "#8a8a9a",
+    fontWeight: "600",
+    fontWeightStrong: "800",
+    border: "rgba(0,0,0,0.12)",
+    borderStrong: "rgba(0,0,0,0.22)",
     scrollbarThumb: "#2563eb",
-    headerBg: "rgba(240,242,246,0.97)",
+    headerBg: "rgba(235,237,242,0.97)",
   },
 };
 
@@ -111,6 +123,7 @@ export function schemeToCssVars(scheme: SchemeVars): string {
     --bg-secondary: ${scheme.bgSecondary};
     --bg-surface: ${scheme.bgSurface};
     --bg-hover: ${scheme.bgHover};
+    --bg-console: ${scheme.bgConsole};
     --accent: ${scheme.accent};
     --accent-rgb: ${scheme.accentRgb};
     --text-primary: ${scheme.textPrimary};
@@ -118,6 +131,8 @@ export function schemeToCssVars(scheme: SchemeVars): string {
     --text-muted: ${scheme.textMuted};
     --text-dim: ${scheme.textDim};
     --text-faint: ${scheme.textFaint};
+    --font-weight: ${scheme.fontWeight};
+    --font-weight-strong: ${scheme.fontWeightStrong};
     --border: ${scheme.border};
     --border-strong: ${scheme.borderStrong};
     --scrollbar-thumb: ${scheme.scrollbarThumb};

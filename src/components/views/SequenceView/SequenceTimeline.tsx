@@ -151,7 +151,7 @@ function FlowDiagram({ stream, onSelectPacket }: FlowDiagramProps) {
           position: "sticky",
           top: 0,
           zIndex: 10,
-          backgroundColor: "#0a0f0a",
+          backgroundColor: "var(--bg-primary)",
           borderBottom: "1px solid rgba(0,255,159,0.15)",
           display: "flex",
           padding: "12px 0",

@@ -4,8 +4,6 @@ import { COLOR_SCHEMES, schemeToCssVars } from "./theme";
 export const globalStyles = (effects: VisualEffects): string => {
   const scheme = COLOR_SCHEMES[effects.colorScheme];
   return `
-  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap');
-
   :root {
     ${schemeToCssVars(scheme)}
   }
