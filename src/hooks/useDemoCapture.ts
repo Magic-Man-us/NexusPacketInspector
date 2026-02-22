@@ -7,6 +7,7 @@ export function useDemoCapture() {
   const mode = usePacketStore((s) => s.mode);
   const addPackets = usePacketStore((s) => s.addPackets);
   const updateStats = usePacketStore((s) => s.updateStats);
+  const updateDashboardStats = usePacketStore((s) => s.updateDashboardStats);
   const updateStream = usePacketStore((s) => s.updateStream);
   const packetIdRef = useRef(0);
   const existingStreamsRef = useRef<StreamInfo[]>([]);
@@ -44,6 +45,7 @@ export function useDemoCapture() {
       // Store route data in the stream via a temporary extended update
       addPackets([newPacket]);
       updateStats(newPacket);
+      updateDashboardStats(newPacket);
 
       // Update stream with route data from demo packet
       const store = usePacketStore.getState();
@@ -61,7 +63,7 @@ export function useDemoCapture() {
     }, 150 + Math.random() * 150);
 
     return () => clearInterval(interval);
-  }, [isCapturing, mode, addPackets, updateStats, updateStream]);
+  }, [isCapturing, mode, addPackets, updateStats, updateDashboardStats, updateStream]);
 
   const resetDemo = () => {
     packetIdRef.current = 0;

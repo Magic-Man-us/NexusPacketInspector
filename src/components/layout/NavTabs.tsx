@@ -2,8 +2,10 @@ import { usePacketStore, ViewId } from "../../hooks/usePacketStore";
 import { styles } from "../../styles/components";
 
 const tabs: { id: ViewId; label: string; icon: string }[] = [
+  { id: "dashboard", label: "DASHBOARD", icon: "◫" },
   { id: "packets", label: "PACKETS", icon: "☰" },
   { id: "structure", label: "STRUCTURE", icon: "⬢" },
+  { id: "hexdump", label: "HEX DUMP", icon: "⬡" },
   { id: "routetrace", label: "ROUTE TRACE", icon: "⟿" },
   { id: "matrix", label: "MATRIX", icon: "▦" },
   { id: "sankey", label: "SANKEY", icon: "⥤" },

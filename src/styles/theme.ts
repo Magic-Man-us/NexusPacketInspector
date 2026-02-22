@@ -1,4 +1,4 @@
-export const PROTOCOLS = ["TCP", "UDP", "HTTP", "HTTPS", "DNS", "ICMP", "ARP", "SSH", "FTP", "SMTP"] as const;
+export const PROTOCOLS = ["TCP", "UDP", "HTTP", "HTTPS", "DNS", "ICMP", "ARP", "SSH", "FTP", "SMTP", "DHCP", "NTP", "SNMP", "TELNET", "RDP", "MQTT", "MySQL", "PGSQL", "LDAP", "SIP"] as const;
 
 export const PROTOCOL_COLORS: Record<string, string> = {
   TCP: "#00ff9f",
@@ -11,6 +11,16 @@ export const PROTOCOL_COLORS: Record<string, string> = {
   SSH: "#9d00ff",
   FTP: "#00ff66",
   SMTP: "#ff9500",
+  DHCP: "#a0ff00",
+  NTP: "#ff66cc",
+  SNMP: "#66ffcc",
+  TELNET: "#cc6600",
+  RDP: "#6699ff",
+  MQTT: "#ff99ff",
+  MySQL: "#ffcc33",
+  PGSQL: "#3399ff",
+  LDAP: "#cc99ff",
+  SIP: "#ff6666",
 };
 
 export const STREAM_COLORS = [

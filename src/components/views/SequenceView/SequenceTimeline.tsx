@@ -111,8 +111,8 @@ export function SequenceTimeline() {
                       <div
                         style={{
                           ...styles.sequenceArrow,
-                          left: isForward ? "25%" : "75%",
-                          right: isForward ? "75%" : "25%",
+                          left: "25%",
+                          right: "25%",
                           flexDirection: isForward ? "row" : "row-reverse",
                           background: `linear-gradient(${isForward ? "90deg" : "270deg"}, ${streamData.color}aa, ${streamData.color}22)`,
                         } as React.CSSProperties}

@@ -1,11 +1,12 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import * as d3 from "d3";
 import { styles } from "../../../styles/components";
 import { PROTOCOL_COLORS } from "../../../styles/theme";
 import { usePacketStore } from "../../../hooks/usePacketStore";
 import { EmptyState } from "../../shared/EmptyState";
+import { formatBytes, PORT_SERVICE_NAMES } from "../../../lib/formatters";
 
-type GroupBy = "ip" | "protocol" | "port";
+type GroupBy = "ip" | "protocol" | "port" | "service";
 
 interface Flow {
   source: string;
@@ -18,10 +19,39 @@ export function SankeyDiagram() {
 
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const tooltipRef = useRef<HTMLDivElement>(null);
   const [groupBy, setGroupBy] = useState<GroupBy>("ip");
 
+  const flowArray = useMemo(() => {
+    const flows: Record<string, Flow> = {};
+    packets.forEach((p) => {
+      let src: string;
+      let dst: string;
+      if (groupBy === "ip") {
+        src = p.ip.srcIp;
+        dst = p.ip.dstIp;
+      } else if (groupBy === "protocol") {
+        src = p.ip.srcIp.split(".").slice(0, 2).join(".") + ".*";
+        dst = p.protocol;
+      } else if (groupBy === "service") {
+        src = p.ip.srcIp;
+        dst = PORT_SERVICE_NAMES[p.dstPort] || `Port ${p.dstPort}`;
+      } else {
+        src = p.protocol;
+        dst = `:${p.dstPort}`;
+      }
+      const key = `${src}|${dst}`;
+      if (!flows[key]) flows[key] = { source: src, target: dst, value: 0 };
+      flows[key].value += p.length;
+    });
+
+    return Object.values(flows)
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 20);
+  }, [packets, groupBy]);
+
   useEffect(() => {
-    if (!svgRef.current || !containerRef.current || packets.length === 0)
+    if (!svgRef.current || !containerRef.current || flowArray.length === 0)
       return;
 
     const container = containerRef.current;
@@ -36,28 +66,6 @@ export function SankeyDiagram() {
       .attr("width", width)
       .attr("height", height);
 
-    const flows: Record<string, Flow> = {};
-    packets.forEach((p) => {
-      let src: string;
-      let dst: string;
-      if (groupBy === "ip") {
-        src = p.ip.srcIp;
-        dst = p.ip.dstIp;
-      } else if (groupBy === "protocol") {
-        src = p.ip.srcIp.split(".").slice(0, 2).join(".") + ".*";
-        dst = p.protocol;
-      } else {
-        src = p.protocol;
-        dst = `:${p.dstPort}`;
-      }
-      const key = `${src}|${dst}`;
-      if (!flows[key]) flows[key] = { source: src, target: dst, value: 0 };
-      flows[key].value += p.length;
-    });
-
-    const flowArray = Object.values(flows)
-      .sort((a, b) => b.value - a.value)
-      .slice(0, 20);
     const sourceNodes = [...new Set(flowArray.map((f) => f.source))];
     const targetNodes = [...new Set(flowArray.map((f) => f.target))];
 
@@ -79,6 +87,8 @@ export function SankeyDiagram() {
     const g = svg
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    const tooltip = tooltipRef.current;
 
     flowArray.forEach((flow) => {
       const y1 = (sourceY(flow.source) ?? 0) + sourceY.bandwidth() / 2;
@@ -106,7 +116,29 @@ export function SankeyDiagram() {
             "#00ff9f"
         )
         .attr("stroke-opacity", 0.5)
-        .attr("stroke-width", w);
+        .attr("stroke-width", w)
+        .style("cursor", "pointer")
+        .on("mouseover", function (event) {
+          d3.select(this).attr("stroke-opacity", 0.9);
+          if (tooltip) {
+            tooltip.style.display = "block";
+            tooltip.style.left = `${event.offsetX + 12}px`;
+            tooltip.style.top = `${event.offsetY - 20}px`;
+            tooltip.textContent = `${flow.source} → ${flow.target}: ${formatBytes(flow.value)}`;
+          }
+        })
+        .on("mousemove", function (event) {
+          if (tooltip) {
+            tooltip.style.left = `${event.offsetX + 12}px`;
+            tooltip.style.top = `${event.offsetY - 20}px`;
+          }
+        })
+        .on("mouseout", function () {
+          d3.select(this).attr("stroke-opacity", 0.5);
+          if (tooltip) {
+            tooltip.style.display = "none";
+          }
+        });
     });
 
     sourceNodes.forEach((name) => {
@@ -146,7 +178,7 @@ export function SankeyDiagram() {
         .attr("font-family", "monospace")
         .text(name.length > 15 ? name.substring(0, 15) + "..." : name);
     });
-  }, [packets, groupBy]);
+  }, [flowArray]);
 
   return (
     <div style={styles.sankeyContainer}>
@@ -180,13 +212,41 @@ export function SankeyDiagram() {
           >
             Protocol &rarr; Port
           </button>
+          <button
+            onClick={() => setGroupBy("service")}
+            style={{
+              ...styles.sankeyBtn,
+              ...(groupBy === "service" ? styles.sankeyBtnActive : {}),
+            }}
+          >
+            IP &rarr; Service
+          </button>
         </div>
       </div>
-      <div ref={containerRef} style={styles.sankeyGraph}>
+      <div ref={containerRef} style={{ ...styles.sankeyGraph, position: "relative" }}>
         {packets.length === 0 ? (
           <EmptyState icon="&#x2964;" message="No traffic flow data" />
         ) : (
-          <svg ref={svgRef} />
+          <>
+            <svg ref={svgRef} />
+            <div
+              ref={tooltipRef}
+              style={{
+                display: "none",
+                position: "absolute",
+                padding: "6px 10px",
+                backgroundColor: "rgba(10,15,10,0.95)",
+                border: "1px solid rgba(0,255,159,0.4)",
+                borderRadius: "4px",
+                fontSize: "10px",
+                color: "#00ff9f",
+                fontFamily: "monospace",
+                pointerEvents: "none",
+                zIndex: 10,
+                whiteSpace: "nowrap",
+              }}
+            />
+          </>
         )}
       </div>
     </div>

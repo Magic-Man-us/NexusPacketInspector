@@ -1,10 +1,10 @@
 import { create } from "zustand";
 import { ParsedPacket } from "../types/packet";
 import { StreamData } from "../types/stream";
-import { PacketStatistics } from "../types/statistics";
+import { PacketStatistics, DashboardStats } from "../types/statistics";
 import { STREAM_COLORS } from "../styles/theme";
 
-export type ViewId = "packets" | "structure" | "routetrace" | "matrix" | "sankey" | "sequence" | "topology" | "services" | "statistics" | "plugins";
+export type ViewId = "dashboard" | "packets" | "structure" | "routetrace" | "matrix" | "sankey" | "sequence" | "topology" | "services" | "statistics" | "plugins" | "hexdump";
 
 export type AppMode = "demo" | "pcap";
 
@@ -59,6 +59,11 @@ interface PacketStore {
   visualEffects: VisualEffects;
   setVisualEffects: (effects: VisualEffects) => void;
 
+  // Dashboard stats
+  dashboardStats: DashboardStats;
+  updateDashboardStats: (packet: ParsedPacket) => void;
+  resetDashboardStats: () => void;
+
   // Loading
   isLoading: boolean;
   loadProgress: number;
@@ -66,6 +71,13 @@ interface PacketStore {
 }
 
 const defaultStats: PacketStatistics = { total: 0, protocols: {}, ips: {}, ports: {} };
+
+const defaultDashboardStats: DashboardStats = {
+  packetSizes: [],
+  timestamps: [],
+  anomalies: { rstCount: 0, oversizedCount: 0, unusualPortCount: 0 },
+  bytesPerProtocol: {},
+};
 
 const defaultEffects: VisualEffects = {
   scanline: false,
@@ -160,6 +172,22 @@ export const usePacketStore = create<PacketStore>((set, get) => ({
       };
     }),
   resetStreams: () => set({ streams: {} }),
+
+  dashboardStats: defaultDashboardStats,
+  updateDashboardStats: (packet) =>
+    set((state) => {
+      const sizes = [...state.dashboardStats.packetSizes, packet.length].slice(-200);
+      const timestamps = [...state.dashboardStats.timestamps, packet.time].slice(-500);
+      const anomalies = { ...state.dashboardStats.anomalies };
+      if (packet.tcp?.flags.rst) anomalies.rstCount++;
+      if (packet.length > 1500) anomalies.oversizedCount++;
+      const commonPorts = new Set([20, 21, 22, 23, 25, 53, 67, 68, 80, 110, 123, 143, 161, 389, 443, 465, 587, 993, 995, 1883, 3306, 3389, 5060, 5432, 8080, 8443]);
+      if (packet.dstPort > 0 && packet.dstPort < 49152 && !commonPorts.has(packet.dstPort)) anomalies.unusualPortCount++;
+      const bytesPerProtocol = { ...state.dashboardStats.bytesPerProtocol };
+      bytesPerProtocol[packet.protocol] = (bytesPerProtocol[packet.protocol] || 0) + packet.length;
+      return { dashboardStats: { packetSizes: sizes, timestamps, anomalies, bytesPerProtocol } };
+    }),
+  resetDashboardStats: () => set({ dashboardStats: defaultDashboardStats }),
 
   showSettings: false,
   setShowSettings: (show) => set({ showSettings: show }),

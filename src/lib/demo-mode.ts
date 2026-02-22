@@ -16,6 +16,16 @@ const PROTOCOLS = [
   "SSH",
   "FTP",
   "SMTP",
+  "DHCP",
+  "NTP",
+  "SNMP",
+  "TELNET",
+  "RDP",
+  "MQTT",
+  "MySQL",
+  "PGSQL",
+  "LDAP",
+  "SIP",
 ];
 
 // Router IP patterns for simulation
@@ -80,6 +90,16 @@ function generatePort(protocol: string): number {
     SSH: 22,
     FTP: 21,
     SMTP: 25,
+    DHCP: 67,
+    NTP: 123,
+    SNMP: 161,
+    TELNET: 23,
+    RDP: 3389,
+    MQTT: 1883,
+    MySQL: 3306,
+    PGSQL: 5432,
+    LDAP: 389,
+    SIP: 5060,
   };
   return commonPorts[protocol] || Math.floor(Math.random() * 65535);
 }
@@ -92,6 +112,18 @@ function generatePayloadPreview(protocol: string): string {
     SSH: "SSH-2.0-OpenSSH_8.9",
     FTP: "220 FTP Ready",
     SMTP: "EHLO mail.example.com",
+    ICMP: "Echo Request id=0x1a2b seq=1",
+    ARP: "Who has 192.168.1.1? Tell 192.168.1.100",
+    DHCP: "DHCP Discover - Transaction ID 0x3a2f",
+    NTP: "NTP v4 Client Request",
+    SNMP: "SNMP GET .1.3.6.1.2.1.1",
+    TELNET: "Telnet IAC WILL ECHO",
+    RDP: "[RDP Encrypted PDU]",
+    MQTT: "CONNECT MQIsdp client-01",
+    MySQL: "COM_QUERY SELECT * FROM users",
+    PGSQL: "Query: SELECT * FROM sessions",
+    LDAP: 'searchRequest "dc=example,dc=com"',
+    SIP: "INVITE sip:user@host SIP/2.0",
   };
   return previews[protocol] || "[Data]";
 }
@@ -199,7 +231,7 @@ export function generatePacket(
     dstPort = generatePort(protocol);
   }
 
-  const isUdp = ["UDP", "DNS"].includes(protocol);
+  const isUdp = ["UDP", "DNS", "DHCP", "NTP", "SNMP", "SIP"].includes(protocol);
   const payloadLength = Math.floor(Math.random() * 1000) + 20;
   const tcpHeaderLength = 20 + Math.floor(Math.random() * 4) * 4;
   const ipHeaderLength = 20;

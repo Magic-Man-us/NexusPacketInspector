@@ -27,7 +27,7 @@ interface TopologyLink {
   streams: string[];
 }
 
-type ViewMode = "graph" | "list";
+type ViewMode = "graph" | "hierarchical" | "list";
 
 export function RouteTrace() {
   const packets = usePacketStore((s) => s.packets);
@@ -35,6 +35,9 @@ export function RouteTrace() {
 
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const simulationRef = useRef<d3.Simulation<TopologyNode, TopologyLink> | null>(null);
+  const linkSelRef = useRef<d3.Selection<SVGLineElement, TopologyLink, SVGGElement, unknown> | null>(null);
+  const nodeSelRef = useRef<d3.Selection<SVGGElement, TopologyNode, SVGGElement, unknown> | null>(null);
   const [selectedStream, setSelectedStream] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>("graph");
 
@@ -126,9 +129,31 @@ export function RouteTrace() {
     };
   }, [streams]);
 
+  // Stable topology fingerprint — only changes when nodes/links structurally change
+  const topologyKey = useMemo(() => {
+    const nk = topology.nodes.map((n) => n.id).sort().join(",");
+    const lk = topology.links
+      .map((l) => {
+        const src = typeof l.source === "string" ? l.source : l.source.id;
+        const tgt = typeof l.target === "string" ? l.target : l.target.id;
+        return `${src}->${tgt}`;
+      })
+      .sort()
+      .join(",");
+    return `${nk}|${lk}`;
+  }, [topology]);
+
+  const nodeColors: Record<string, string> = {
+    endpoint: "#00ff9f",
+    gateway: "#ffd600",
+    isp: "#00b8ff",
+    transit: "#ff6b00",
+    "dest-gateway": "#ff00ff",
+  };
+
+  // Init effect — rebuilds only when graph structure changes
   useEffect(() => {
-    if (!svgRef.current || !containerRef.current || viewMode !== "graph")
-      return;
+    if (!svgRef.current || !containerRef.current || viewMode !== "graph") return;
     if (topology.nodes.length === 0) return;
 
     const container = containerRef.current;
@@ -173,14 +198,6 @@ export function RouteTrace() {
       .attr("fill", "#00ff9f")
       .attr("d", "M0,-5L10,0L0,5");
 
-    const nodeColors: Record<string, string> = {
-      endpoint: "#00ff9f",
-      gateway: "#ffd600",
-      isp: "#00b8ff",
-      transit: "#ff6b00",
-      "dest-gateway": "#ff00ff",
-    };
-
     const simNodes = topology.nodes.map((d) => ({ ...d }));
     const simLinks = topology.links.map((d) => ({ ...d }));
 
@@ -197,23 +214,19 @@ export function RouteTrace() {
       .force("center", d3.forceCenter(width / 2, height / 2))
       .force("collision", d3.forceCollide().radius(50));
 
+    simulationRef.current = simulation;
+
     const link = g
       .append("g")
-      .selectAll("line")
+      .selectAll<SVGLineElement, TopologyLink>("line")
       .data(simLinks)
       .join("line")
-      .attr("stroke", (d) =>
-        selectedStream && d.streams.includes(selectedStream) ? "#fff" : "#00ff9f"
-      )
-      .attr("stroke-opacity", (d) =>
-        selectedStream
-          ? d.streams.includes(selectedStream)
-            ? 1
-            : 0.1
-          : 0.4
-      )
+      .attr("stroke", "#00ff9f")
+      .attr("stroke-opacity", 0.4)
       .attr("stroke-width", (d) => Math.max(1, Math.min(d.count / 10, 5)))
       .attr("marker-end", "url(#arrow)");
+
+    linkSelRef.current = link as any;
 
     const node = g
       .append("g")
@@ -239,12 +252,11 @@ export function RouteTrace() {
           })
       );
 
+    nodeSelRef.current = node as any;
+
     node.each(function (d) {
       const el = d3.select(this);
       const color = nodeColors[d.type] || "#00ff9f";
-      const isHighlighted =
-        selectedStream && d.streams.includes(selectedStream);
-      const opacity = selectedStream ? (isHighlighted ? 1 : 0.2) : 1;
 
       if (d.type === "endpoint") {
         el.append("rect")
@@ -255,7 +267,6 @@ export function RouteTrace() {
           .attr("fill", "#0a0f0a")
           .attr("stroke", color)
           .attr("stroke-width", 2)
-          .attr("opacity", opacity)
           .style("filter", "url(#glow)");
       } else if (d.type === "gateway" || d.type === "dest-gateway") {
         el.append("polygon")
@@ -263,7 +274,6 @@ export function RouteTrace() {
           .attr("fill", "#0a0f0a")
           .attr("stroke", color)
           .attr("stroke-width", 2)
-          .attr("opacity", opacity)
           .style("filter", "url(#glow)");
       } else {
         el.append("circle")
@@ -271,7 +281,6 @@ export function RouteTrace() {
           .attr("fill", "#0a0f0a")
           .attr("stroke", color)
           .attr("stroke-width", 2)
-          .attr("opacity", opacity)
           .style("filter", "url(#glow)");
       }
 
@@ -281,7 +290,6 @@ export function RouteTrace() {
         .attr("fill", color)
         .attr("font-size", "9px")
         .attr("font-family", "monospace")
-        .attr("opacity", opacity)
         .text(d.id);
 
       if (d.hostname) {
@@ -290,7 +298,6 @@ export function RouteTrace() {
           .attr("text-anchor", "middle")
           .attr("fill", "#666")
           .attr("font-size", "8px")
-          .attr("opacity", opacity)
           .text(d.hostname.substring(0, 20));
       }
     });
@@ -325,8 +332,230 @@ export function RouteTrace() {
         );
     }, 300);
 
-    return () => { simulation.stop(); };
-  }, [topology, selectedStream, viewMode]);
+    return () => {
+      simulation.stop();
+      simulationRef.current = null;
+      linkSelRef.current = null;
+      nodeSelRef.current = null;
+    };
+  }, [topologyKey, viewMode]);
+
+  // Hierarchical layout effect
+  useEffect(() => {
+    if (!svgRef.current || !containerRef.current || viewMode !== "hierarchical") return;
+    if (topology.nodes.length === 0) return;
+
+    const container = containerRef.current;
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+    const margin = { top: 40, right: 60, bottom: 40, left: 60 };
+
+    d3.select(svgRef.current).selectAll("*").remove();
+
+    const svg = d3
+      .select(svgRef.current)
+      .attr("width", width)
+      .attr("height", height);
+
+    const g = svg.append("g");
+
+    const zoom = d3
+      .zoom<SVGSVGElement, unknown>()
+      .scaleExtent([0.1, 4])
+      .on("zoom", (event) => g.attr("transform", event.transform));
+    svg.call(zoom);
+
+    const defs = g.append("defs");
+    const filter = defs.append("filter").attr("id", "glow-h");
+    filter.append("feGaussianBlur").attr("stdDeviation", "3").attr("result", "coloredBlur");
+    const feMerge = filter.append("feMerge");
+    feMerge.append("feMergeNode").attr("in", "coloredBlur");
+    feMerge.append("feMergeNode").attr("in", "SourceGraphic");
+
+    defs
+      .append("marker")
+      .attr("id", "arrow-h")
+      .attr("viewBox", "0 -5 10 10")
+      .attr("refX", 20)
+      .attr("markerWidth", 6)
+      .attr("markerHeight", 6)
+      .attr("orient", "auto")
+      .append("path")
+      .attr("fill", "#00ff9f")
+      .attr("d", "M0,-5L10,0L0,5");
+
+    // BFS to assign layers
+    const adjMap = new Map<string, string[]>();
+    topology.nodes.forEach((n) => adjMap.set(n.id, []));
+    topology.links.forEach((l) => {
+      const src = typeof l.source === "string" ? l.source : l.source.id;
+      const tgt = typeof l.target === "string" ? l.target : l.target.id;
+      if (adjMap.has(src)) adjMap.get(src)!.push(tgt);
+    });
+
+    // Find source endpoints (nodes with type "endpoint" that appear as srcIP)
+    const sourceEndpoints = topology.nodes.filter((n) => n.type === "endpoint" && adjMap.get(n.id)!.length > 0);
+    const layerMap = new Map<string, number>();
+    const queue: string[] = [];
+
+    if (sourceEndpoints.length > 0) {
+      sourceEndpoints.forEach((n) => {
+        layerMap.set(n.id, 0);
+        queue.push(n.id);
+      });
+    } else if (topology.nodes.length > 0) {
+      layerMap.set(topology.nodes[0].id, 0);
+      queue.push(topology.nodes[0].id);
+    }
+
+    while (queue.length > 0) {
+      const curr = queue.shift()!;
+      const currLayer = layerMap.get(curr)!;
+      const neighbors = adjMap.get(curr) || [];
+      for (const nb of neighbors) {
+        if (!layerMap.has(nb)) {
+          layerMap.set(nb, currLayer + 1);
+          queue.push(nb);
+        }
+      }
+    }
+
+    // Assign unvisited nodes
+    topology.nodes.forEach((n) => {
+      if (!layerMap.has(n.id)) layerMap.set(n.id, 0);
+    });
+
+    const maxLayer = Math.max(...Array.from(layerMap.values()), 0);
+    const layerGroups = new Map<number, TopologyNode[]>();
+    topology.nodes.forEach((n) => {
+      const layer = layerMap.get(n.id)!;
+      if (!layerGroups.has(layer)) layerGroups.set(layer, []);
+      layerGroups.get(layer)!.push(n);
+    });
+
+    const innerW = width - margin.left - margin.right;
+    const innerH = height - margin.top - margin.bottom;
+
+    const positionedNodes = topology.nodes.map((n) => {
+      const layer = layerMap.get(n.id)!;
+      const nodesInLayer = layerGroups.get(layer)!;
+      const idx = nodesInLayer.indexOf(n);
+      const x = maxLayer > 0 ? margin.left + (layer / maxLayer) * innerW : width / 2;
+      const y = nodesInLayer.length > 1
+        ? margin.top + (idx / (nodesInLayer.length - 1)) * innerH
+        : height / 2;
+      return { ...n, x, y };
+    });
+
+    const nodeMap = new Map(positionedNodes.map((n) => [n.id, n]));
+
+    // Draw curved links
+    const linkGen = d3.linkHorizontal<any, any>()
+      .x((d: any) => d.x)
+      .y((d: any) => d.y);
+
+    g.append("g")
+      .selectAll("path")
+      .data(topology.links)
+      .join("path")
+      .attr("d", (l) => {
+        const src = typeof l.source === "string" ? l.source : l.source.id;
+        const tgt = typeof l.target === "string" ? l.target : l.target.id;
+        const sn = nodeMap.get(src);
+        const tn = nodeMap.get(tgt);
+        if (!sn || !tn) return "";
+        return linkGen({ source: sn, target: tn });
+      })
+      .attr("fill", "none")
+      .attr("stroke", (l) => {
+        return selectedStream && l.streams.includes(selectedStream) ? "#fff" : "#00ff9f";
+      })
+      .attr("stroke-opacity", (l) =>
+        selectedStream ? (l.streams.includes(selectedStream) ? 1 : 0.1) : 0.4
+      )
+      .attr("stroke-width", (l) => Math.max(1, Math.min(l.count / 10, 5)))
+      .attr("marker-end", "url(#arrow-h)");
+
+    // Draw nodes
+    const nodeG = g
+      .append("g")
+      .selectAll<SVGGElement, typeof positionedNodes[0]>("g")
+      .data(positionedNodes)
+      .join("g")
+      .attr("transform", (d) => `translate(${d.x},${d.y})`);
+
+    nodeG.each(function (d) {
+      const el = d3.select(this);
+      const color = nodeColors[d.type] || "#00ff9f";
+      const isHighlighted = selectedStream && d.streams.includes(selectedStream);
+      const opacity = selectedStream ? (isHighlighted ? 1 : 0.2) : 1;
+
+      if (d.type === "endpoint") {
+        el.append("rect")
+          .attr("x", -15).attr("y", -15).attr("width", 30).attr("height", 30)
+          .attr("fill", "#0a0f0a").attr("stroke", color).attr("stroke-width", 2)
+          .attr("opacity", opacity).style("filter", "url(#glow-h)");
+      } else if (d.type === "gateway" || d.type === "dest-gateway") {
+        el.append("polygon")
+          .attr("points", "0,-18 18,0 0,18 -18,0")
+          .attr("fill", "#0a0f0a").attr("stroke", color).attr("stroke-width", 2)
+          .attr("opacity", opacity).style("filter", "url(#glow-h)");
+      } else {
+        el.append("circle")
+          .attr("r", 15).attr("fill", "#0a0f0a").attr("stroke", color).attr("stroke-width", 2)
+          .attr("opacity", opacity).style("filter", "url(#glow-h)");
+      }
+
+      el.append("text")
+        .attr("dy", 30).attr("text-anchor", "middle")
+        .attr("fill", color).attr("font-size", "9px").attr("font-family", "monospace")
+        .attr("opacity", opacity).text(d.id);
+
+      if (d.hostname) {
+        el.append("text")
+          .attr("dy", 42).attr("text-anchor", "middle")
+          .attr("fill", "#666").attr("font-size", "8px").attr("opacity", opacity)
+          .text(d.hostname.substring(0, 20));
+      }
+    });
+
+    // Auto-fit
+    setTimeout(() => {
+      const gNode = g.node();
+      if (!gNode) return;
+      const bounds = gNode.getBBox();
+      const scale = 0.8 / Math.max(bounds.width / width, bounds.height / height);
+      svg.transition().duration(500).call(
+        zoom.transform,
+        d3.zoomIdentity
+          .translate(width / 2, height / 2)
+          .scale(Math.min(scale, 1))
+          .translate(-bounds.x - bounds.width / 2, -bounds.y - bounds.height / 2)
+      );
+    }, 100);
+  }, [topologyKey, viewMode, selectedStream]);
+
+  // Highlight effect — updates existing D3 selections without rebuilding
+  useEffect(() => {
+    if (viewMode !== "graph") return;
+    if (!linkSelRef.current || !nodeSelRef.current) return;
+
+    linkSelRef.current
+      .attr("stroke", (d: any) =>
+        selectedStream && d.streams.includes(selectedStream) ? "#fff" : "#00ff9f"
+      )
+      .attr("stroke-opacity", (d: any) =>
+        selectedStream ? (d.streams.includes(selectedStream) ? 1 : 0.1) : 0.4
+      );
+
+    nodeSelRef.current.each(function (d: any) {
+      const el = d3.select(this);
+      const isHighlighted = selectedStream && d.streams.includes(selectedStream);
+      const opacity = selectedStream ? (isHighlighted ? 1 : 0.2) : 1;
+      el.selectAll("rect, circle, polygon").attr("opacity", opacity);
+      el.selectAll("text").attr("opacity", opacity);
+    });
+  }, [selectedStream, viewMode]);
 
   const selectedStreamData = selectedStream ? streams[selectedStream] : null;
 
@@ -344,6 +573,15 @@ export function RouteTrace() {
               }}
             >
               GRAPH
+            </button>
+            <button
+              onClick={() => setViewMode("hierarchical")}
+              style={{
+                ...styles.viewModeBtn,
+                ...(viewMode === "hierarchical" ? styles.viewModeBtnActive : {}),
+              }}
+            >
+              STRUCTURED
             </button>
             <button
               onClick={() => setViewMode("list")}
@@ -427,7 +665,7 @@ export function RouteTrace() {
       </div>
 
       <div ref={containerRef} style={styles.routeGraphContainer}>
-        {viewMode === "graph" ? (
+        {viewMode === "graph" || viewMode === "hierarchical" ? (
           topology.nodes.length === 0 ? (
             <EmptyState
               icon="&#x27FF;"

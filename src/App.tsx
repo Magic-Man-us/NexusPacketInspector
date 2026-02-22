@@ -15,6 +15,8 @@ import { HierarchicalTopology } from "./components/views/TopologyView/Hierarchic
 import { ServiceMap } from "./components/views/ServiceMapView/ServiceMap";
 import { Statistics } from "./components/views/StatisticsView/Statistics";
 import { PluginsView } from "./components/views/PluginsView/PluginsView";
+import { Dashboard } from "./components/views/DashboardView/Dashboard";
+import { HexDumpView } from "./components/views/HexDumpView/HexDumpView";
 import { usePluginEvents } from "./hooks/usePluginEvents";
 import { PacketSidebar } from "./components/shared/PacketSidebar";
 import { globalStyles, noiseBackground } from "./styles/globalStyles";
@@ -89,8 +91,10 @@ export default function App() {
       <div style={{ ...styles.mainContent, flexDirection: "row" }}>
         <PacketSidebar />
         <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0, overflow: "hidden" }}>
+        {activeView === "dashboard" && <Dashboard />}
         {activeView === "packets" && <PacketListView />}
         {activeView === "structure" && <PacketStructure />}
+        {activeView === "hexdump" && <HexDumpView />}
         {activeView === "routetrace" && <RouteTrace />}
         {activeView === "matrix" && <ConversationMatrix />}
         {activeView === "sankey" && <SankeyDiagram />}
