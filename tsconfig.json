@@ -26,5 +26,5 @@
     "**/*.mts",
     "**/*.cts"
   ],
-  "exclude": ["node_modules", "dist", "build", "coverage", "**/src-tauri/**"]
+  "exclude": ["node_modules", "dist", "build", "coverage", "**/src-tauri/**", "**/__tests__/**"]
 }
