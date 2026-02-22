@@ -17,7 +17,7 @@ export function PluginsView() {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              color: "#444",
+              color: "var(--text-faint)",
               fontSize: "11px",
             }}
           >
@@ -31,7 +31,7 @@ export function PluginsView() {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              color: "#444",
+              color: "var(--text-faint)",
               fontSize: "11px",
             }}
           >

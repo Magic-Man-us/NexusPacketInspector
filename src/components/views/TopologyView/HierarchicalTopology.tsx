@@ -140,7 +140,7 @@ export function HierarchicalTopology() {
       .attr("dy", 3)
       .attr("x", (d) => (d.children ? -12 : 10))
       .attr("text-anchor", (d) => (d.children ? "end" : "start"))
-      .attr("fill", "#888")
+      .attr("fill", "var(--text-secondary)")
       .attr("font-size", "10px")
       .attr("font-family", "monospace")
       .text((d) =>
@@ -163,7 +163,7 @@ export function HierarchicalTopology() {
         )}
       </div>
       <DraggablePanel title="LEGEND" defaultCorner="bottom-left" width={140}>
-        <div style={{ fontSize: "9px", color: "#888", display: "flex", flexDirection: "column", gap: "4px" }}>
+        <div style={{ fontSize: "9px", color: "var(--text-secondary)", display: "flex", flexDirection: "column", gap: "4px" }}>
           <div><span style={{ color: "#ffd600" }}>&#x25CF;</span> Root</div>
           <div><span style={{ color: "#00b8ff" }}>&#x25CF;</span> Category</div>
           <div><span style={{ color: "#00ff9f" }}>&#x25CF;</span> Subnet</div>

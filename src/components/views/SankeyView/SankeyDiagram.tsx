@@ -154,7 +154,7 @@ export function SankeyDiagram() {
         .attr("y", y + sourceY.bandwidth() / 2)
         .attr("dy", "0.35em")
         .attr("text-anchor", "end")
-        .attr("fill", "#888")
+        .attr("fill", "var(--text-secondary)")
         .attr("font-size", "10px")
         .attr("font-family", "monospace")
         .text(name.length > 15 ? name.substring(0, 15) + "..." : name);
@@ -173,7 +173,7 @@ export function SankeyDiagram() {
         .attr("x", x + 15)
         .attr("y", y + targetY.bandwidth() / 2)
         .attr("dy", "0.35em")
-        .attr("fill", "#888")
+        .attr("fill", "var(--text-secondary)")
         .attr("font-size", "10px")
         .attr("font-family", "monospace")
         .text(name.length > 15 ? name.substring(0, 15) + "..." : name);

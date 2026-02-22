@@ -84,7 +84,7 @@ export function VirtualPacketTable({ packets }: Props) {
                     }`,
                   }}
                 >
-                  <span style={{ ...styles.tableCell, width: "50px", color: "#666" }}>
+                  <span style={{ ...styles.tableCell, width: "50px", color: "var(--text-muted)" }}>
                     {pkt.id}
                   </span>
                   <span style={{ ...styles.tableCell, width: "80px", fontSize: "10px" }}>
@@ -121,7 +121,7 @@ export function VirtualPacketTable({ packets }: Props) {
                     {pkt.ip.dstIp}
                   </span>
                   <span style={{ ...styles.tableCell, width: "50px" }}>{pkt.length}</span>
-                  <span style={{ ...styles.tableCell, flex: 1, color: "#888" }}>
+                  <span style={{ ...styles.tableCell, flex: 1, color: "var(--text-secondary)" }}>
                     {pkt.tcp?.flags && (
                       <span style={styles.flag}>{formatTCPFlags(pkt.tcp.flags)}</span>
                     )}

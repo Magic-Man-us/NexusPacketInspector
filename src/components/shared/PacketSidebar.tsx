@@ -169,7 +169,7 @@ export function PacketSidebar() {
               flexShrink: 0,
             }}
           />
-          <span style={{ color: "#888", width: "28px", flexShrink: 0 }}>
+          <span style={{ color: "var(--text-secondary)", width: "28px", flexShrink: 0 }}>
             #{p.id}
           </span>
           <span
@@ -183,7 +183,7 @@ export function PacketSidebar() {
           </span>
           <span
             style={{
-              color: "#555",
+              color: "var(--text-dim)",
               overflow: "hidden",
               textOverflow: "ellipsis",
               whiteSpace: "nowrap",
@@ -311,8 +311,8 @@ export function PacketSidebar() {
         onClick={() => { setActiveTab("packets"); setSplitView(false); }}
         style={{
           ...tabBtnStyle,
-          borderBottom: !splitView && activeTab === "packets" ? "2px solid #00ff9f" : "2px solid transparent",
-          color: !splitView && activeTab === "packets" ? "var(--accent)" : "#555",
+          borderBottom: !splitView && activeTab === "packets" ? "2px solid var(--accent)" : "2px solid transparent",
+          color: !splitView && activeTab === "packets" ? "var(--accent)" : "var(--text-dim)",
         }}
       >
         PACKETS
@@ -321,8 +321,8 @@ export function PacketSidebar() {
         onClick={() => { setActiveTab("hexdump"); setSplitView(false); }}
         style={{
           ...tabBtnStyle,
-          borderBottom: !splitView && activeTab === "hexdump" ? "2px solid #00ff9f" : "2px solid transparent",
-          color: !splitView && activeTab === "hexdump" ? "var(--accent)" : "#555",
+          borderBottom: !splitView && activeTab === "hexdump" ? "2px solid var(--accent)" : "2px solid transparent",
+          color: !splitView && activeTab === "hexdump" ? "var(--accent)" : "var(--text-dim)",
         }}
       >
         HEX DUMP
@@ -331,8 +331,8 @@ export function PacketSidebar() {
         onClick={() => setSplitView(!splitView)}
         style={{
           ...tabBtnStyle,
-          borderBottom: splitView ? "2px solid #00ff9f" : "2px solid transparent",
-          color: splitView ? "var(--accent)" : "#555",
+          borderBottom: splitView ? "2px solid var(--accent)" : "2px solid transparent",
+          color: splitView ? "var(--accent)" : "var(--text-dim)",
           marginLeft: "auto",
           fontSize: "8px",
         }}
@@ -524,7 +524,7 @@ const navBtnStyle: React.CSSProperties = {
   border: "1px solid rgba(255,255,255,0.1)",
   borderRadius: "3px",
   background: "transparent",
-  color: "#666",
+  color: "var(--text-muted)",
   fontSize: "9px",
   cursor: "pointer",
   fontFamily: "'Orbitron'",

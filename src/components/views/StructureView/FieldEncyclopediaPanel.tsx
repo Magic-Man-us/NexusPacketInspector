@@ -17,7 +17,7 @@ export function FieldEncyclopediaPanel({ field, anchor, onMouseEnter, onMouseLea
   const entry = field ? getFieldEncyclopedia(field.layer, field.name) : null;
   const colors = field
     ? LAYER_COLORS[field.layer as keyof typeof LAYER_COLORS]
-    : { border: "#555", text: "#555", bg: "transparent" };
+    : { border: "var(--text-dim)", text: "var(--text-dim)", bg: "transparent" };
 
   const position = useMemo(() => {
     if (!anchor) return { top: 0, left: 0 };
@@ -87,7 +87,7 @@ export function FieldEncyclopediaPanel({ field, anchor, onMouseEnter, onMouseLea
             fontFamily: "'Orbitron', sans-serif",
             fontSize: "8px",
             fontWeight: 700,
-            color: "#666",
+            color: "var(--text-muted)",
             letterSpacing: "1.5px",
           }}
         >
@@ -147,7 +147,7 @@ export function FieldEncyclopediaPanel({ field, anchor, onMouseEnter, onMouseLea
             <span
               style={{
                 padding: "2px 6px",
-                backgroundColor: "rgba(0,255,159,0.1)",
+                backgroundColor: "rgba(var(--accent-rgb),0.1)",
                 borderRadius: "3px",
                 fontSize: "9px",
                 color: "#00ff9f",
@@ -184,7 +184,7 @@ export function FieldEncyclopediaPanel({ field, anchor, onMouseEnter, onMouseLea
                       border: `1px solid ${colors.border}25`,
                       borderRadius: "3px",
                       fontSize: "9px",
-                      color: "#ccc",
+                      color: "var(--text-primary)",
                       fontFamily: "'Share Tech Mono', monospace",
                       lineHeight: "1.4",
                     }}
@@ -200,7 +200,7 @@ export function FieldEncyclopediaPanel({ field, anchor, onMouseEnter, onMouseLea
             </Section>
           </>
         ) : (
-          <div style={{ color: "#555", fontSize: "11px", fontStyle: "italic" }}>
+          <div style={{ color: "var(--text-dim)", fontSize: "11px", fontStyle: "italic" }}>
             No encyclopedia entry available for this field.
           </div>
         )}
@@ -230,7 +230,7 @@ export function FieldEncyclopediaPanel({ field, anchor, onMouseEnter, onMouseLea
 
 const bodyTextStyle: React.CSSProperties = {
   fontSize: "10px",
-  color: "#bbb",
+  color: "var(--text-secondary)",
   lineHeight: "1.5",
   fontFamily: "'Share Tech Mono', monospace",
   margin: 0,

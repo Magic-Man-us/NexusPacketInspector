@@ -68,7 +68,7 @@ export function PacketDetails() {
           border: "1px solid rgba(0,255,159,0.2)",
           borderRadius: "4px",
           background: showHex ? "rgba(0,255,159,0.1)" : "transparent",
-          color: showHex ? "#00ff9f" : "#666",
+          color: showHex ? "#00ff9f" : "var(--text-muted)",
           fontFamily: "'Orbitron'",
           fontSize: "9px",
           cursor: "pointer",

@@ -21,7 +21,7 @@ export function ScanProgress() {
               display: "flex",
               justifyContent: "space-between",
               fontSize: "9px",
-              color: "#888",
+              color: "var(--text-secondary)",
               marginBottom: "4px",
             }}
           >
@@ -58,7 +58,7 @@ export function ScanProgress() {
           padding: "8px",
           fontFamily: "'Share Tech Mono', monospace",
           fontSize: "10px",
-          color: "#888",
+          color: "var(--text-secondary)",
         }}
       >
         {progressLines.map((line, i) => (
@@ -67,7 +67,7 @@ export function ScanProgress() {
           </div>
         ))}
         {progressLines.length === 0 && (
-          <div style={{ color: "#444" }}>Waiting for output...</div>
+          <div style={{ color: "var(--text-faint)" }}>Waiting for output...</div>
         )}
       </div>
     </div>

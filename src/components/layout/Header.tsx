@@ -107,9 +107,9 @@ export function Header() {
           href="https://github.com/Magic-Man-us/NexusPacketInspector"
           target="_blank"
           rel="noopener noreferrer"
-          style={{ color: '#666', transition: 'color 0.2s', display: 'flex', alignItems: 'center' }}
+          style={{ color: 'var(--text-muted)', transition: 'color 0.2s', display: 'flex', alignItems: 'center' }}
           onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent)')}
-          onMouseLeave={(e) => (e.currentTarget.style.color = '#666')}
+          onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
           title="View on GitHub"
         >
           <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">

@@ -57,13 +57,13 @@ export function NmapPanel() {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          color: "#666",
+          color: "var(--text-muted)",
           gap: "12px",
         }}
       >
-        <div style={{ fontSize: "36px", color: "#333" }}>!</div>
+        <div style={{ fontSize: "36px", color: "var(--text-faint)" }}>!</div>
         <div style={{ fontSize: "13px" }}>NMAP is not installed</div>
-        <div style={{ fontSize: "10px", color: "#444" }}>
+        <div style={{ fontSize: "10px", color: "var(--text-faint)" }}>
           Install nmap to enable network scanning
         </div>
       </div>
@@ -93,7 +93,7 @@ export function NmapPanel() {
               style={{
                 display: "block",
                 fontSize: "9px",
-                color: "#666",
+                color: "var(--text-muted)",
                 marginBottom: "4px",
                 fontFamily: "'Orbitron'",
               }}
@@ -125,7 +125,7 @@ export function NmapPanel() {
               style={{
                 display: "block",
                 fontSize: "9px",
-                color: "#666",
+                color: "var(--text-muted)",
                 marginBottom: "4px",
                 fontFamily: "'Orbitron'",
               }}
@@ -240,14 +240,14 @@ export function NmapPanel() {
               >
                 SCAN SUMMARY
               </div>
-              <div style={{ fontSize: "11px", color: "#ccc" }}>
+              <div style={{ fontSize: "11px", color: "var(--text-primary)" }}>
                 {result.summary}
               </div>
               {scanData.scanInfo.args && (
                 <div
                   style={{
                     fontSize: "9px",
-                    color: "#666",
+                    color: "var(--text-muted)",
                     marginTop: "4px",
                     fontFamily: "'Share Tech Mono', monospace",
                   }}
@@ -268,7 +268,7 @@ export function NmapPanel() {
               <div
                 style={{
                   textAlign: "center",
-                  color: "#444",
+                  color: "var(--text-faint)",
                   padding: "20px",
                   fontSize: "11px",
                 }}
@@ -285,11 +285,11 @@ export function NmapPanel() {
               alignItems: "center",
               justifyContent: "center",
               height: "100%",
-              color: "#444",
+              color: "var(--text-faint)",
               gap: "8px",
             }}
           >
-            <div style={{ fontSize: "36px", color: "#333" }}>&#9906;</div>
+            <div style={{ fontSize: "36px", color: "var(--text-faint)" }}>&#9906;</div>
             <div style={{ fontSize: "11px" }}>
               Enter a target and click SCAN to begin
             </div>
@@ -333,7 +333,7 @@ function HostCard({ host }: { host: NmapHost }) {
             {host.address}
           </span>
           {host.hostname && (
-            <span style={{ fontSize: "10px", color: "#888", marginLeft: "10px" }}>
+            <span style={{ fontSize: "10px", color: "var(--text-secondary)", marginLeft: "10px" }}>
               ({host.hostname})
             </span>
           )}
@@ -365,7 +365,7 @@ function HostCard({ host }: { host: NmapHost }) {
               display: "flex",
               padding: "6px 14px",
               fontSize: "8px",
-              color: "#666",
+              color: "var(--text-muted)",
               fontFamily: "'Orbitron'",
               borderBottom: "1px solid rgba(255,255,255,0.05)",
             }}
@@ -389,7 +389,7 @@ function HostCard({ host }: { host: NmapHost }) {
                 style={{
                   width: "70px",
                   fontFamily: "'Share Tech Mono', monospace",
-                  color: "#ccc",
+                  color: "var(--text-primary)",
                 }}
               >
                 {port.portId}/{port.protocol}
@@ -405,7 +405,7 @@ function HostCard({ host }: { host: NmapHost }) {
               <span style={{ width: "100px", color: "#00b8ff" }}>
                 {port.serviceName || "-"}
               </span>
-              <span style={{ flex: 1, color: "#888" }}>
+              <span style={{ flex: 1, color: "var(--text-secondary)" }}>
                 {[port.serviceProduct, port.serviceVersion]
                   .filter(Boolean)
                   .join(" ") || "-"}

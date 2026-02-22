@@ -296,7 +296,7 @@ export function RouteTrace() {
         el.append("text")
           .attr("dy", 42)
           .attr("text-anchor", "middle")
-          .attr("fill", "#666")
+          .attr("fill", "var(--text-muted)")
           .attr("font-size", "8px")
           .text(d.hostname.substring(0, 20));
       }
@@ -514,7 +514,7 @@ export function RouteTrace() {
       if (d.hostname) {
         el.append("text")
           .attr("dy", 42).attr("text-anchor", "middle")
-          .attr("fill", "#666").attr("font-size", "8px").attr("opacity", opacity)
+          .attr("fill", "var(--text-muted)").attr("font-size", "8px").attr("opacity", opacity)
           .text(d.hostname.substring(0, 20));
       }
     });

@@ -160,14 +160,14 @@ function FlowDiagram({ stream, onSelectPacket }: FlowDiagramProps) {
         <div style={{ width: lineXSrc, textAlign: "center" }}>
           <div style={endpointBoxStyle(stream.color)}>
             {stream.srcIP}
-            <span style={{ color: "#666", fontSize: "9px" }}>:{stream.srcPort}</span>
+            <span style={{ color: "var(--text-muted)", fontSize: "9px" }}>:{stream.srcPort}</span>
           </div>
         </div>
         <div style={{ flex: 1 }} />
         <div style={{ width: dimensions.w - lineXDst, textAlign: "center" }}>
           <div style={endpointBoxStyle(stream.color)}>
             {stream.dstIP}
-            <span style={{ color: "#666", fontSize: "9px" }}>:{stream.dstPort}</span>
+            <span style={{ color: "var(--text-muted)", fontSize: "9px" }}>:{stream.dstPort}</span>
           </div>
         </div>
       </div>
@@ -443,23 +443,23 @@ function FlowDiagram({ stream, onSelectPacket }: FlowDiagramProps) {
                     {flags}
                   </span>
                 )}
-                <span style={{ color: "#888" }}>{pkt.length}B</span>
+                <span style={{ color: "var(--text-secondary)" }}>{pkt.length}B</span>
                 {isForward ? (
-                  <span style={{ color: "#444", fontSize: "10px" }}>&rarr;</span>
+                  <span style={{ color: "var(--text-faint)", fontSize: "10px" }}>&rarr;</span>
                 ) : (
-                  <span style={{ color: "#444", fontSize: "10px" }}>&larr;</span>
+                  <span style={{ color: "var(--text-faint)", fontSize: "10px" }}>&larr;</span>
                 )}
               </div>
 
               {/* Info (far right) */}
               <div style={infoCellStyle}>
                 {pkt.tcp && (
-                  <span style={{ color: "#555" }}>
+                  <span style={{ color: "var(--text-dim)" }}>
                     Seq {pkt.tcp.sequenceNumber % 10000}
                   </span>
                 )}
                 {pkt.tcp && pkt.tcp.ackNumber > 0 && (
-                  <span style={{ color: "#444", marginLeft: "6px" }}>
+                  <span style={{ color: "var(--text-faint)", marginLeft: "6px" }}>
                     Ack {pkt.tcp.ackNumber % 10000}
                   </span>
                 )}
@@ -492,7 +492,7 @@ const timeCellStyle: React.CSSProperties = {
   position: "absolute",
   left: "8px",
   fontSize: "9px",
-  color: "#666",
+  color: "var(--text-muted)",
   fontFamily: "'Share Tech Mono', monospace",
   whiteSpace: "nowrap",
 };

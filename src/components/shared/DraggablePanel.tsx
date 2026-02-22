@@ -204,7 +204,7 @@ export function DraggablePanel({
             style={{
               background: "none",
               border: "none",
-              color: "#666",
+              color: "var(--text-muted)",
               fontSize: "10px",
               cursor: "pointer",
               padding: "0 4px",

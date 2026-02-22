@@ -167,7 +167,7 @@ export function PacketStructure() {
               right: 0,
               width: "8px",
               height: "8px",
-              backgroundColor: field.active ? "#00ff9f" : "#333",
+              backgroundColor: field.active ? "#00ff9f" : "var(--bg-secondary)",
               borderRadius: "0 4px 0 4px",
             }}
           />
@@ -198,7 +198,7 @@ export function PacketStructure() {
         <div
           style={{
             fontSize: "7px",
-            color: isHovered ? "#333" : "#555",
+            color: isHovered ? "var(--text-faint)" : "var(--text-dim)",
             marginTop: "4px",
           }}
         >
@@ -244,7 +244,7 @@ export function PacketStructure() {
           <span
             style={{
               fontSize: "9px",
-              color: "#666",
+              color: "var(--text-muted)",
               marginLeft: "auto",
             }}
           >
@@ -284,7 +284,7 @@ export function PacketStructure() {
             }}
           >
             <div>
-              <span style={{ color: "#666", fontSize: "10px" }}>PACKET </span>
+              <span style={{ color: "var(--text-muted)", fontSize: "10px" }}>PACKET </span>
               <span
                 style={{
                   color: "#00ff9f",
@@ -302,10 +302,10 @@ export function PacketStructure() {
               </span>
             </div>
             <div style={{ width: "1px", height: "24px", backgroundColor: "rgba(255,255,255,0.1)" }} />
-            <div style={{ fontFamily: "monospace", fontSize: "11px", color: "#888" }}>
+            <div style={{ fontFamily: "monospace", fontSize: "11px", color: "var(--text-secondary)" }}>
               {packet.ip.srcIp}:{packet.srcPort} {"\u2192"} {packet.ip.dstIp}:{packet.dstPort}
             </div>
-            <div style={{ marginLeft: "auto", color: "#666", fontSize: "11px" }}>
+            <div style={{ marginLeft: "auto", color: "var(--text-muted)", fontSize: "11px" }}>
               {packet.length} bytes
             </div>
           </div>

@@ -47,7 +47,7 @@ export function SettingsPanel() {
                     background: isActive
                       ? `${s.preview}15`
                       : "rgba(0,0,0,0.2)",
-                    color: isActive ? s.preview : "#666",
+                    color: isActive ? s.preview : "var(--text-muted)",
                     fontFamily: "'Orbitron'",
                     fontSize: "9px",
                     fontWeight: 700,
@@ -83,8 +83,8 @@ export function SettingsPanel() {
               onClick={() => updateEffect("grid", !visualEffects.grid)}
               style={{
                 ...styles.toggleButton,
-                backgroundColor: visualEffects.grid ? "var(--accent)" : "#333",
-                color: visualEffects.grid ? "#000" : "#666",
+                backgroundColor: visualEffects.grid ? "var(--accent)" : "var(--bg-secondary)",
+                color: visualEffects.grid ? "#000" : "var(--text-muted)",
               }}
             >
               {visualEffects.grid ? "ON" : "OFF"}

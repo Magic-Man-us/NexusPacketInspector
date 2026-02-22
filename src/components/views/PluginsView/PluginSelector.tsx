@@ -60,7 +60,7 @@ export function PluginSelector({ selected, onSelect }: Props) {
                 style={{
                   fontSize: "12px",
                   fontWeight: "bold",
-                  color: selected === plugin.name ? "#00ff9f" : "#ccc",
+                  color: selected === plugin.name ? "#00ff9f" : "var(--text-primary)",
                   textTransform: "uppercase",
                 }}
               >
@@ -75,7 +75,7 @@ export function PluginSelector({ selected, onSelect }: Props) {
                 }}
               />
             </div>
-            <div style={{ fontSize: "9px", color: "#666" }}>
+            <div style={{ fontSize: "9px", color: "var(--text-muted)" }}>
               {plugin.description}
             </div>
             <div
@@ -108,7 +108,7 @@ export function PluginSelector({ selected, onSelect }: Props) {
             style={{
               padding: "20px",
               textAlign: "center",
-              color: "#444",
+              color: "var(--text-faint)",
               fontSize: "11px",
             }}
           >

@@ -17,7 +17,7 @@ export function StatusBar() {
         <span
           style={{
             ...styles.statusIndicator,
-            backgroundColor: isCapturing || isLoading ? "var(--accent)" : "#666",
+            backgroundColor: isCapturing || isLoading ? "var(--accent)" : "var(--text-muted)",
           }}
         />
         {isLoading ? "LOADING..." : isCapturing ? "CAPTURING" : "IDLE"}

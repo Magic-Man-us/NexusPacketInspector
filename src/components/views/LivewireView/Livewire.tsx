@@ -119,7 +119,7 @@ export function Livewire() {
                       flexShrink: 0,
                     }}
                   />
-                  <span style={{ fontSize: "10px", fontWeight: 700, color: isSelected ? "#00ff9f" : "#ccc" }}>
+                  <span style={{ fontSize: "10px", fontWeight: 700, color: isSelected ? "#00ff9f" : "var(--text-primary)" }}>
                     {stream.protocol}
                   </span>
                   {isEncrypted && (
@@ -127,11 +127,11 @@ export function Livewire() {
                       ENCRYPTED
                     </span>
                   )}
-                  <span style={{ fontSize: "9px", color: "#666", marginLeft: "auto" }}>
+                  <span style={{ fontSize: "9px", color: "var(--text-muted)", marginLeft: "auto" }}>
                     {stream.packets.length} pkts
                   </span>
                 </div>
-                <div style={{ fontSize: "9px", color: "#888", fontFamily: "monospace" }}>
+                <div style={{ fontSize: "9px", color: "var(--text-secondary)", fontFamily: "monospace" }}>
                   {stream.srcIP} → {stream.dstIP}
                 </div>
               </div>
@@ -143,7 +143,7 @@ export function Livewire() {
       {/* Right panel — Content display */}
       <div style={styles.livewireContentArea}>
         {!selectedStreamKey || !reassembled ? (
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: "#444", fontSize: "12px" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: "var(--text-faint)", fontSize: "12px" }}>
             Select a stream to view reconstructed content
           </div>
         ) : (
@@ -241,7 +241,7 @@ function RawView({ reassembled, direction }: { reassembled: ReassembledStream; d
         ? reassembled.serverText
         : reassembled.clientText + reassembled.serverText;
 
-  if (!text) return <div style={{ color: "#444", fontSize: "11px" }}>No payload data</div>;
+  if (!text) return <div style={{ color: "var(--text-faint)", fontSize: "11px" }}>No payload data</div>;
 
   return <pre style={styles.livewireCodeBlock}>{text}</pre>;
 }
@@ -254,7 +254,7 @@ function HexView({ reassembled, direction }: { reassembled: ReassembledStream; d
         ? reassembled.serverPayload
         : new Uint8Array([...reassembled.clientPayload, ...reassembled.serverPayload]);
 
-  if (bytes.length === 0) return <div style={{ color: "#444", fontSize: "11px" }}>No payload data</div>;
+  if (bytes.length === 0) return <div style={{ color: "var(--text-faint)", fontSize: "11px" }}>No payload data</div>;
 
   return <pre style={styles.livewireCodeBlock}>{formatHexDump(bytes)}</pre>;
 }
@@ -296,7 +296,7 @@ function HttpRenderer({ exchanges, direction }: { exchanges: HttpExchange[]; dir
                 </span>
                 <span style={{ color: "#ff6b00", fontWeight: 700 }}>{ex.request.method}</span>
                 <span style={{ color: "#e0e0e0" }}>{ex.request.path}</span>
-                <span style={{ color: "#666" }}>{ex.request.version}</span>
+                <span style={{ color: "var(--text-muted)" }}>{ex.request.version}</span>
               </div>
               <div style={styles.livewireCardBody}>
                 {Object.keys(ex.request.headers).length > 0 && (
@@ -321,7 +321,7 @@ function HttpRenderer({ exchanges, direction }: { exchanges: HttpExchange[]; dir
                   RESPONSE
                 </span>
                 <span style={{ fontWeight: 700 }}>{ex.response.status}</span>
-                <span style={{ color: "#888" }}>{ex.response.statusText}</span>
+                <span style={{ color: "var(--text-secondary)" }}>{ex.response.statusText}</span>
               </div>
               <div style={styles.livewireCardBody}>
                 {Object.keys(ex.response.headers).length > 0 && (
@@ -336,7 +336,7 @@ function HttpRenderer({ exchanges, direction }: { exchanges: HttpExchange[]; dir
         </React.Fragment>
       ))}
       {exchanges.length === 0 && (
-        <div style={{ color: "#444", fontSize: "11px" }}>No HTTP exchanges detected</div>
+        <div style={{ color: "var(--text-faint)", fontSize: "11px" }}>No HTTP exchanges detected</div>
       )}
     </>
   );
@@ -352,8 +352,8 @@ function HeaderList({ headers }: { headers: Record<string, string> }) {
       {shown.map(([k, v]) => (
         <div key={k} style={{ padding: "1px 0" }}>
           <span style={{ color: "#00b8ff" }}>{k}</span>
-          <span style={{ color: "#666" }}>: </span>
-          <span style={{ color: "#888" }}>{v}</span>
+          <span style={{ color: "var(--text-muted)" }}>: </span>
+          <span style={{ color: "var(--text-secondary)" }}>{v}</span>
         </div>
       ))}
       {entries.length > 3 && (
@@ -415,13 +415,13 @@ function FtpRenderer({ commands, direction }: { commands: FtpCommand[]; directio
             </span>
           ) : (
             <span>
-              <span style={{ color: "#666" }}>{"<"}</span>{" "}
+              <span style={{ color: "var(--text-muted)" }}>{"<"}</span>{" "}
               <span style={{ color: "#00ff9f" }}>{cmd.line}</span>
             </span>
           )}
         </div>
       ))}
-      {filtered.length === 0 && <span style={{ color: "#444" }}>No FTP commands</span>}
+      {filtered.length === 0 && <span style={{ color: "var(--text-faint)" }}>No FTP commands</span>}
     </div>
   );
 }
@@ -460,7 +460,7 @@ function MqttRenderer({ messages }: { messages: MqttMsg[] }) {
             >
               {msg.type}
             </span>
-            {msg.topic && <span style={{ color: "#888", fontSize: "9px" }}>{msg.topic}</span>}
+            {msg.topic && <span style={{ color: "var(--text-secondary)", fontSize: "9px" }}>{msg.topic}</span>}
           </div>
           {msg.payload && (
             <div style={styles.livewireCardBody}>
@@ -514,7 +514,7 @@ function DnsRenderer({ queries }: { queries: DnsQuery[] }) {
           </div>
         </div>
       ))}
-      {queries.length === 0 && <div style={{ color: "#444" }}>No DNS queries detected</div>}
+      {queries.length === 0 && <div style={{ color: "var(--text-faint)" }}>No DNS queries detected</div>}
     </div>
   );
 }
