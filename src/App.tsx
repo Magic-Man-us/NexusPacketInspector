@@ -16,7 +16,8 @@ import { ServiceMap } from "./components/views/ServiceMapView/ServiceMap";
 import { Statistics } from "./components/views/StatisticsView/Statistics";
 import { PluginsView } from "./components/views/PluginsView/PluginsView";
 import { usePluginEvents } from "./hooks/usePluginEvents";
-import { globalStyles } from "./styles/globalStyles";
+import { PacketSidebar } from "./components/shared/PacketSidebar";
+import { globalStyles, noiseBackground } from "./styles/globalStyles";
 import { styles } from "./styles/components";
 
 export default function App() {
@@ -32,6 +33,18 @@ export default function App() {
   return (
     <div style={styles.container}>
       <style>{globalStyles(visualEffects)}</style>
+
+      {/* Static noise texture */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          backgroundImage: noiseBackground,
+          backgroundRepeat: "repeat",
+          pointerEvents: "none",
+          zIndex: 1,
+        }}
+      />
 
       {/* Visual effects overlays */}
       {visualEffects.grid && (
@@ -73,7 +86,9 @@ export default function App() {
 
       <NavTabs />
 
-      <div style={styles.mainContent}>
+      <div style={{ ...styles.mainContent, flexDirection: "row" }}>
+        <PacketSidebar />
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0, overflow: "hidden" }}>
         {activeView === "packets" && <PacketListView />}
         {activeView === "structure" && <PacketStructure />}
         {activeView === "routetrace" && <RouteTrace />}
@@ -84,6 +99,7 @@ export default function App() {
         {activeView === "services" && <ServiceMap />}
         {activeView === "statistics" && <Statistics />}
         {activeView === "plugins" && <PluginsView />}
+        </div>
       </div>
 
       <StatusBar />

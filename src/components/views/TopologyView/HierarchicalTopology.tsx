@@ -3,6 +3,7 @@ import * as d3 from "d3";
 import { styles } from "../../../styles/components";
 import { usePacketStore } from "../../../hooks/usePacketStore";
 import { EmptyState } from "../../shared/EmptyState";
+import { DraggablePanel } from "../../shared/DraggablePanel";
 
 interface HierarchyNode {
   name: string;
@@ -161,15 +162,14 @@ export function HierarchicalTopology() {
           <svg ref={svgRef} />
         )}
       </div>
-      <div style={styles.topologyLegend}>
-        <span style={{ color: "#ffd600" }}>&#x25CF;</span> Root
-        <span style={{ color: "#00b8ff", marginLeft: 12 }}>&#x25CF;</span>{" "}
-        Category
-        <span style={{ color: "#00ff9f", marginLeft: 12 }}>&#x25CF;</span>{" "}
-        Subnet
-        <span style={{ color: "#ff6b00", marginLeft: 12 }}>&#x25CF;</span>{" "}
-        Host
-      </div>
+      <DraggablePanel title="LEGEND" defaultCorner="bottom-left" width={140}>
+        <div style={{ fontSize: "9px", color: "#888", display: "flex", flexDirection: "column", gap: "4px" }}>
+          <div><span style={{ color: "#ffd600" }}>&#x25CF;</span> Root</div>
+          <div><span style={{ color: "#00b8ff" }}>&#x25CF;</span> Category</div>
+          <div><span style={{ color: "#00ff9f" }}>&#x25CF;</span> Subnet</div>
+          <div><span style={{ color: "#ff6b00" }}>&#x25CF;</span> Host</div>
+        </div>
+      </DraggablePanel>
     </div>
   );
 }

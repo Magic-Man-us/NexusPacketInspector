@@ -4,6 +4,7 @@ import { styles } from "../../../styles/components";
 import { PROTOCOL_COLORS } from "../../../styles/theme";
 import { usePacketStore } from "../../../hooks/usePacketStore";
 import { EmptyState } from "../../shared/EmptyState";
+import { DraggablePanel } from "../../shared/DraggablePanel";
 import type { StreamData, RouteHop } from "../../../types/stream";
 
 interface TopologyNode {
@@ -472,8 +473,7 @@ export function RouteTrace() {
         )}
       </div>
 
-      <div style={styles.routeLegend}>
-        <div style={styles.legendTitle}>NODE TYPES</div>
+      <DraggablePanel title="NODE TYPES" defaultCorner="bottom-left" width={160}>
         <div style={styles.legendItem}>
           <span style={{ ...styles.legendShape, background: "#00ff9f" }}>
             &#x25A0;
@@ -498,7 +498,7 @@ export function RouteTrace() {
           </span>{" "}
           Transit
         </div>
-      </div>
+      </DraggablePanel>
     </div>
   );
 }

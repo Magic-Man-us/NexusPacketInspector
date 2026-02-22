@@ -3,7 +3,7 @@ import React from "react";
 export const styles: Record<string, React.CSSProperties> = {
   container: { fontFamily: "'Share Tech Mono', monospace", backgroundColor: '#0a0f0a', color: '#e0e0e0', height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative' },
   gridOverlay: { position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(0,255,159,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,159,0.02) 1px, transparent 1px)', backgroundSize: '40px 40px', pointerEvents: 'none', zIndex: 1 },
-  scanline: { position: 'absolute', left: 0, right: 0, height: '8px', background: 'linear-gradient(to bottom, transparent, rgba(0,255,159,0.15), rgba(0,255,159,0.3), rgba(0,255,159,0.15), transparent)', animation: 'scanline 4s linear infinite', pointerEvents: 'none', zIndex: 1000 },
+  scanline: { position: 'absolute', left: 0, right: 0, height: '80px', background: 'linear-gradient(to bottom, transparent, rgba(0,255,159,0.03), rgba(0,255,159,0.06), rgba(0,255,159,0.03), transparent)', animation: 'scanline 8s linear infinite', pointerEvents: 'none', zIndex: 1000 },
   crtOverlay: { position: 'absolute', inset: 0, background: 'repeating-linear-gradient(0deg, rgba(0,0,0,0.1) 0px, rgba(0,0,0,0.1) 1px, transparent 1px, transparent 2px)', pointerEvents: 'none', zIndex: 1, animation: 'flicker 0.15s infinite' },
 
   header: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 16px', borderBottom: '1px solid rgba(0,255,159,0.2)', backgroundColor: 'rgba(10,15,10,0.95)', zIndex: 10, flexShrink: 0 },

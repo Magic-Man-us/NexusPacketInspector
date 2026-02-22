@@ -68,12 +68,12 @@ interface PacketStore {
 const defaultStats: PacketStatistics = { total: 0, protocols: {}, ips: {}, ports: {} };
 
 const defaultEffects: VisualEffects = {
-  scanline: true,
-  scanlineSpeed: 4,
-  crt: true,
-  crtIntensity: 0.1,
-  grid: true,
-  gridOpacity: 0.02,
+  scanline: false,
+  scanlineSpeed: 8,
+  crt: false,
+  crtIntensity: 0.05,
+  grid: false,
+  gridOpacity: 0.015,
 };
 
 export const usePacketStore = create<PacketStore>((set, get) => ({

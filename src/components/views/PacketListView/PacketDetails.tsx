@@ -1,10 +1,13 @@
+import { useState } from "react";
 import { usePacketStore } from "../../../hooks/usePacketStore";
 import { styles } from "../../../styles/components";
 import { PROTOCOL_COLORS } from "../../../styles/theme";
 import { formatTCPFlags } from "../../../lib/formatters";
+import { HexViewer } from "../../shared/HexViewer";
 
 export function PacketDetails() {
   const packet = usePacketStore((s) => s.selectedPacket);
+  const [showHex, setShowHex] = useState(false);
 
   if (!packet) {
     return (
@@ -55,6 +58,30 @@ export function PacketDetails() {
           </div>
         )}
       </div>
+
+      {/* Hex viewer toggle */}
+      <button
+        onClick={() => setShowHex(!showHex)}
+        style={{
+          width: "100%",
+          padding: "6px",
+          border: "1px solid rgba(0,255,159,0.2)",
+          borderRadius: "4px",
+          background: showHex ? "rgba(0,255,159,0.1)" : "transparent",
+          color: showHex ? "#00ff9f" : "#666",
+          fontFamily: "'Orbitron'",
+          fontSize: "9px",
+          cursor: "pointer",
+          marginBottom: "8px",
+        }}
+      >
+        {showHex ? "HIDE" : "SHOW"} HEX DUMP
+      </button>
+      {showHex && (
+        <div style={{ ...styles.detailsSection, overflow: "auto" }}>
+          <HexViewer packet={packet} />
+        </div>
+      )}
     </div>
   );
 }
