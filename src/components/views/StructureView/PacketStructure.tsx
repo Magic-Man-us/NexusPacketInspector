@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { usePacketStore } from "../../../hooks/usePacketStore";
 import { styles } from "../../../styles/components";
 import { PROTOCOL_COLORS, LAYER_COLORS } from "../../../styles/theme";
@@ -13,14 +13,54 @@ interface FieldDef {
   active?: boolean;
 }
 
-interface ActiveField extends FieldDef {
+export interface ActiveField extends FieldDef {
   layer: string;
+}
+
+export interface PopoverAnchor {
+  top: number;
+  left: number;
+  right: number;
+  bottom: number;
+  width: number;
+  height: number;
 }
 
 export function PacketStructure() {
   const packet = usePacketStore((s) => s.selectedPacket);
-  const [selectedField, setSelectedField] = useState<ActiveField | null>(null);
   const [hoveredField, setHoveredField] = useState<ActiveField | null>(null);
+  const [anchor, setAnchor] = useState<PopoverAnchor | null>(null);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const cancelClose = useCallback(() => {
+    if (closeTimer.current) {
+      clearTimeout(closeTimer.current);
+      closeTimer.current = null;
+    }
+  }, []);
+
+  const scheduleClose = useCallback(() => {
+    cancelClose();
+    closeTimer.current = setTimeout(() => {
+      setHoveredField(null);
+      setAnchor(null);
+    }, 100);
+  }, [cancelClose]);
+
+  const handleFieldHover = useCallback((field: FieldDef, layer: string, e: React.MouseEvent) => {
+    cancelClose();
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    setAnchor({ top: rect.top, left: rect.left, right: rect.right, bottom: rect.bottom, width: rect.width, height: rect.height });
+    setHoveredField({ ...field, layer });
+  }, [cancelClose]);
+
+  const handlePopoverEnter = useCallback(() => {
+    cancelClose();
+  }, [cancelClose]);
+
+  const handlePopoverLeave = useCallback(() => {
+    scheduleClose();
+  }, [scheduleClose]);
 
   if (!packet) {
     return (
@@ -97,32 +137,24 @@ export function PacketStructure() {
   const renderFieldBlock = (field: FieldDef, layer: string, index: number) => {
     const colors = LAYER_COLORS[layer as keyof typeof LAYER_COLORS];
     const minWidth = Math.max(60, (field.bits / 32) * 280);
-    const isSelected = selectedField?.name === field.name && selectedField?.layer === layer;
     const isHovered = hoveredField?.name === field.name && hoveredField?.layer === layer;
 
     return (
       <div
         key={`${layer}-${index}`}
-        onClick={() => {
-          if (selectedField?.name === field.name && selectedField?.layer === layer) {
-            setSelectedField(null);
-          } else {
-            setSelectedField({ ...field, layer });
-          }
-        }}
-        onMouseEnter={() => setHoveredField({ ...field, layer })}
-        onMouseLeave={() => setHoveredField(null)}
+        onMouseEnter={(e) => handleFieldHover(field, layer, e)}
+        onMouseLeave={scheduleClose}
         style={{
           minWidth: `${minWidth}px`,
           flex: field.bits >= 32 ? "1 1 100%" : `0 0 ${minWidth}px`,
           padding: "8px 10px",
-          backgroundColor: isSelected ? colors.border : colors.bg,
+          backgroundColor: isHovered ? colors.border : colors.bg,
           border: `1px solid ${colors.border}`,
           borderRadius: "4px",
           cursor: "pointer",
           transition: "all 0.15s ease",
           transform: isHovered ? "translateY(-2px)" : "none",
-          boxShadow: isHovered || isSelected ? `0 4px 12px ${colors.border}40` : "none",
+          boxShadow: isHovered ? `0 4px 12px ${colors.border}40` : "none",
           position: "relative" as const,
           overflow: "hidden" as const,
         }}
@@ -143,7 +175,7 @@ export function PacketStructure() {
         <div
           style={{
             fontSize: "8px",
-            color: isSelected ? "#000" : colors.text,
+            color: isHovered ? "#000" : colors.text,
             fontFamily: "'Orbitron', sans-serif",
             fontWeight: 700,
             marginBottom: "4px",
@@ -156,7 +188,7 @@ export function PacketStructure() {
         <div
           style={{
             fontSize: "11px",
-            color: isSelected ? "#000" : "#fff",
+            color: isHovered ? "#000" : "#fff",
             fontFamily: "'JetBrains Mono', monospace",
             wordBreak: "break-all" as const,
           }}
@@ -166,7 +198,7 @@ export function PacketStructure() {
         <div
           style={{
             fontSize: "7px",
-            color: isSelected ? "#333" : "#555",
+            color: isHovered ? "#333" : "#555",
             marginTop: "4px",
           }}
         >
@@ -235,7 +267,7 @@ export function PacketStructure() {
 
   return (
     <div style={styles.structureContainer}>
-      <div style={{ display: "flex", flexDirection: "column" as const, flex: 1, minHeight: 0, position: "relative" as const }}>
+      <div style={{ display: "flex", flex: 1, minHeight: 0 }}>
         {/* Main structure view */}
         <div style={{ flex: 1, overflowY: "auto" as const, padding: "20px" }}>
           {/* Packet summary */}
@@ -285,9 +317,14 @@ export function PacketStructure() {
           {packet.udp && renderLayer("UDP HEADER (Layer 4)", udpFields, "udp", "\u2B21")}
           {renderLayer("PAYLOAD (Layer 5-7)", payloadFields, "payload", "\u25A3")}
         </div>
-
-        <FieldEncyclopediaPanel field={selectedField} onClose={() => setSelectedField(null)} />
       </div>
+
+      <FieldEncyclopediaPanel
+        field={hoveredField}
+        anchor={anchor}
+        onMouseEnter={handlePopoverEnter}
+        onMouseLeave={handlePopoverLeave}
+      />
     </div>
   );
 }

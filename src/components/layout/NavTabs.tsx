@@ -14,6 +14,7 @@ const tabs: { id: ViewId; label: string; icon: string }[] = [
   { id: "topology", label: "TOPOLOGY", icon: "◎" },
   { id: "services", label: "SERVICES", icon: "⚙" },
   { id: "plugins", label: "PLUGINS", icon: "⚡" },
+  { id: "stats", label: "STATS", icon: "◈" },
 ];
 
 export function NavTabs() {

@@ -1,109 +1,115 @@
+import { useMemo } from "react";
 import { LAYER_COLORS } from "../../../styles/theme";
 import { getFieldEncyclopedia } from "../../../data/fieldEncyclopedia";
-
-interface FieldDef {
-  name: string;
-  value: string | number;
-  bits: number;
-  desc: string;
-  isFlag?: boolean;
-  active?: boolean;
-}
-
-interface ActiveField extends FieldDef {
-  layer: string;
-}
+import type { ActiveField, PopoverAnchor } from "./PacketStructure";
 
 interface FieldEncyclopediaPanelProps {
   field: ActiveField | null;
-  onClose: () => void;
+  anchor: PopoverAnchor | null;
+  onMouseEnter: () => void;
+  onMouseLeave: () => void;
 }
 
-export function FieldEncyclopediaPanel({ field, onClose }: FieldEncyclopediaPanelProps) {
+const POPOVER_WIDTH = 380;
+const POPOVER_MAX_HEIGHT = 420;
+
+export function FieldEncyclopediaPanel({ field, anchor, onMouseEnter, onMouseLeave }: FieldEncyclopediaPanelProps) {
   const entry = field ? getFieldEncyclopedia(field.layer, field.name) : null;
   const colors = field
     ? LAYER_COLORS[field.layer as keyof typeof LAYER_COLORS]
     : { border: "#555", text: "#555", bg: "transparent" };
 
+  const position = useMemo(() => {
+    if (!anchor) return { top: 0, left: 0 };
+    const spaceRight = window.innerWidth - anchor.right;
+    const spaceLeft = anchor.left;
+
+    let left: number;
+    if (spaceRight >= POPOVER_WIDTH + 12) {
+      left = anchor.right + 8;
+    } else if (spaceLeft >= POPOVER_WIDTH + 12) {
+      left = anchor.left - POPOVER_WIDTH - 8;
+    } else {
+      left = Math.max(8, (window.innerWidth - POPOVER_WIDTH) / 2);
+    }
+
+    let top = anchor.top;
+    if (top + POPOVER_MAX_HEIGHT > window.innerHeight - 8) {
+      top = Math.max(8, window.innerHeight - POPOVER_MAX_HEIGHT - 8);
+    }
+
+    return { top, left };
+  }, [anchor]);
+
+  if (!field || !anchor) return null;
+
   return (
     <div
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
       style={{
-        position: "absolute",
-        bottom: 0,
-        left: 0,
-        right: 0,
-        maxHeight: "50%",
+        position: "fixed",
+        top: `${position.top}px`,
+        left: `${position.left}px`,
+        width: `${POPOVER_WIDTH}px`,
+        maxHeight: `${POPOVER_MAX_HEIGHT}px`,
         backgroundColor: "rgba(10, 15, 10, 0.98)",
         backdropFilter: "blur(8px)",
+        border: `1px solid ${colors.border}60`,
         borderTop: `2px solid ${colors.border}`,
-        transform: field ? "translateY(0)" : "translateY(100%)",
-        transition: "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+        borderRadius: "8px",
         display: "flex",
         flexDirection: "column" as const,
-        zIndex: 10,
+        zIndex: 9999,
+        boxShadow: `0 8px 32px rgba(0,0,0,0.6), 0 0 1px ${colors.border}40`,
+        animation: "encyclopediaFadeIn 0.15s ease-out",
       }}
     >
+      <style>{`
+        @keyframes encyclopediaFadeIn {
+          from { opacity: 0; transform: translateY(4px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
+
       {/* Header bar */}
       <div
         style={{
           display: "flex",
           alignItems: "center",
-          padding: "10px 16px",
+          padding: "8px 12px",
           borderBottom: `1px solid ${colors.border}30`,
           flexShrink: 0,
         }}
       >
-        <button
-          onClick={onClose}
-          style={{
-            background: "none",
-            border: `1px solid ${colors.border}50`,
-            color: colors.text,
-            width: "24px",
-            height: "24px",
-            borderRadius: "4px",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: "14px",
-            lineHeight: 1,
-            marginRight: "12px",
-            flexShrink: 0,
-          }}
-        >
-          {"\u2715"}
-        </button>
         <span
           style={{
             fontFamily: "'Orbitron', sans-serif",
-            fontSize: "10px",
+            fontSize: "8px",
             fontWeight: 700,
-            color: "#888",
+            color: "#666",
             letterSpacing: "1.5px",
           }}
         >
           FIELD ENCYCLOPEDIA
         </span>
-        {field && (
-          <span
-            style={{
-              marginLeft: "12px",
-              padding: "2px 10px",
-              backgroundColor: colors.bg,
-              border: `1px solid ${colors.border}`,
-              borderRadius: "4px",
-              fontSize: "9px",
-              fontFamily: "'Orbitron', sans-serif",
-              fontWeight: 700,
-              color: colors.text,
-              textTransform: "uppercase" as const,
-              letterSpacing: "1px",
-            }}
-          >
-            {field.layer}
-          </span>
-        )}
+        <span
+          style={{
+            marginLeft: "auto",
+            padding: "2px 8px",
+            backgroundColor: colors.bg,
+            border: `1px solid ${colors.border}`,
+            borderRadius: "4px",
+            fontSize: "8px",
+            fontFamily: "'Orbitron', sans-serif",
+            fontWeight: 700,
+            color: colors.text,
+            textTransform: "uppercase" as const,
+            letterSpacing: "1px",
+          }}
+        >
+          {field.layer}
+        </span>
       </div>
 
       {/* Scrollable content */}
@@ -111,121 +117,111 @@ export function FieldEncyclopediaPanel({ field, onClose }: FieldEncyclopediaPane
         style={{
           flex: 1,
           overflowY: "auto" as const,
-          padding: "16px 20px 20px",
+          padding: "12px 14px 14px",
         }}
       >
-        {field && (
+        {/* Field identity */}
+        <div style={{ marginBottom: "14px" }}>
+          <div
+            style={{
+              fontSize: "14px",
+              fontWeight: 700,
+              color: colors.text,
+              fontFamily: "'Orbitron', sans-serif",
+              marginBottom: "4px",
+            }}
+          >
+            {field.name}
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" as const }}>
+            <span
+              style={{
+                fontSize: "12px",
+                fontFamily: "'JetBrains Mono', monospace",
+                color: "#fff",
+                wordBreak: "break-all" as const,
+              }}
+            >
+              {String(field.value)}
+            </span>
+            <span
+              style={{
+                padding: "2px 6px",
+                backgroundColor: "rgba(0,255,159,0.1)",
+                borderRadius: "3px",
+                fontSize: "9px",
+                color: "#00ff9f",
+                fontFamily: "'Share Tech Mono', monospace",
+              }}
+            >
+              {field.bits}b / {Math.ceil(field.bits / 8)}B
+            </span>
+          </div>
+        </div>
+
+        {entry ? (
           <>
-            {/* Field identity */}
-            <div style={{ marginBottom: "20px" }}>
-              <div
-                style={{
-                  fontSize: "16px",
-                  fontWeight: 700,
-                  color: colors.text,
-                  fontFamily: "'Orbitron', sans-serif",
-                  marginBottom: "6px",
-                }}
-              >
-                {field.name}
+            <Section title="OVERVIEW" color={colors.border}>
+              <p style={bodyTextStyle}>{entry.overview}</p>
+            </Section>
+
+            <Section title="SIZE RATIONALE" color={colors.border}>
+              <p style={bodyTextStyle}>{entry.sizeRationale}</p>
+            </Section>
+
+            <Section title="HOW IT WORKS" color={colors.border}>
+              <p style={bodyTextStyle}>{entry.howItWorks}</p>
+            </Section>
+
+            <Section title="COMMON VALUES" color={colors.border}>
+              <div style={{ display: "flex", flexDirection: "column" as const, gap: "3px" }}>
+                {entry.commonValues.map((cv, i) => (
+                  <span
+                    key={i}
+                    style={{
+                      padding: "3px 8px",
+                      backgroundColor: `${colors.border}15`,
+                      border: `1px solid ${colors.border}25`,
+                      borderRadius: "3px",
+                      fontSize: "9px",
+                      color: "#ccc",
+                      fontFamily: "'Share Tech Mono', monospace",
+                      lineHeight: "1.4",
+                    }}
+                  >
+                    {cv}
+                  </span>
+                ))}
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" as const }}>
-                <span
-                  style={{
-                    fontSize: "13px",
-                    fontFamily: "'JetBrains Mono', monospace",
-                    color: "#fff",
-                    wordBreak: "break-all" as const,
-                  }}
-                >
-                  {String(field.value)}
-                </span>
-                <span
-                  style={{
-                    padding: "3px 8px",
-                    backgroundColor: "rgba(0,255,159,0.1)",
-                    borderRadius: "4px",
-                    fontSize: "10px",
-                    color: "#00ff9f",
-                    fontFamily: "'Share Tech Mono', monospace",
-                  }}
-                >
-                  {field.bits} bits / {Math.ceil(field.bits / 8)} bytes
-                </span>
-              </div>
-            </div>
+            </Section>
 
-            {entry ? (
-              <>
-                {/* Overview */}
-                <Section title="OVERVIEW" color={colors.border}>
-                  <p style={bodyTextStyle}>{entry.overview}</p>
-                </Section>
-
-                {/* Size Rationale */}
-                <Section title="SIZE RATIONALE" color={colors.border}>
-                  <p style={bodyTextStyle}>{entry.sizeRationale}</p>
-                </Section>
-
-                {/* How It Works */}
-                <Section title="HOW IT WORKS" color={colors.border}>
-                  <p style={bodyTextStyle}>{entry.howItWorks}</p>
-                </Section>
-
-                {/* Common Values */}
-                <Section title="COMMON VALUES" color={colors.border}>
-                  <div style={{ display: "flex", flexWrap: "wrap" as const, gap: "6px" }}>
-                    {entry.commonValues.map((cv, i) => (
-                      <span
-                        key={i}
-                        style={{
-                          padding: "4px 10px",
-                          backgroundColor: `${colors.border}15`,
-                          border: `1px solid ${colors.border}30`,
-                          borderRadius: "4px",
-                          fontSize: "10px",
-                          color: "#ccc",
-                          fontFamily: "'Share Tech Mono', monospace",
-                          lineHeight: "1.4",
-                        }}
-                      >
-                        {cv}
-                      </span>
-                    ))}
-                  </div>
-                </Section>
-
-                {/* RFC Reference */}
-                <Section title="RFC REFERENCE" color={colors.border}>
-                  <p style={{ ...bodyTextStyle, color: "#00b8ff" }}>{entry.rfcReference}</p>
-                </Section>
-              </>
-            ) : (
-              <div style={{ color: "#555", fontSize: "11px", fontStyle: "italic" }}>
-                No encyclopedia entry available for this field.
-              </div>
-            )}
-
-            {/* Binary representation for numeric values */}
-            {typeof field.value === "number" && (
-              <Section title="BINARY" color={colors.border}>
-                <div
-                  style={{
-                    fontFamily: "'JetBrains Mono', monospace",
-                    fontSize: "11px",
-                    color: "#ff6b00",
-                    wordBreak: "break-all" as const,
-                    backgroundColor: "rgba(255,107,0,0.1)",
-                    padding: "8px 10px",
-                    borderRadius: "4px",
-                    letterSpacing: "1px",
-                  }}
-                >
-                  {field.value.toString(2).padStart(field.bits, "0")}
-                </div>
-              </Section>
-            )}
+            <Section title="RFC REFERENCE" color={colors.border}>
+              <p style={{ ...bodyTextStyle, color: "#00b8ff" }}>{entry.rfcReference}</p>
+            </Section>
           </>
+        ) : (
+          <div style={{ color: "#555", fontSize: "11px", fontStyle: "italic" }}>
+            No encyclopedia entry available for this field.
+          </div>
+        )}
+
+        {typeof field.value === "number" && (
+          <Section title="BINARY" color={colors.border}>
+            <div
+              style={{
+                fontFamily: "'JetBrains Mono', monospace",
+                fontSize: "10px",
+                color: "#ff6b00",
+                wordBreak: "break-all" as const,
+                backgroundColor: "rgba(255,107,0,0.1)",
+                padding: "6px 8px",
+                borderRadius: "3px",
+                letterSpacing: "1px",
+              }}
+            >
+              {field.value.toString(2).padStart(field.bits, "0")}
+            </div>
+          </Section>
         )}
       </div>
     </div>
@@ -233,9 +229,9 @@ export function FieldEncyclopediaPanel({ field, onClose }: FieldEncyclopediaPane
 }
 
 const bodyTextStyle: React.CSSProperties = {
-  fontSize: "11px",
+  fontSize: "10px",
   color: "#bbb",
-  lineHeight: "1.6",
+  lineHeight: "1.5",
   fontFamily: "'Share Tech Mono', monospace",
   margin: 0,
 };
@@ -250,15 +246,15 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <div style={{ marginBottom: "16px" }}>
+    <div style={{ marginBottom: "12px" }}>
       <div
         style={{
-          fontSize: "9px",
+          fontSize: "8px",
           fontFamily: "'Orbitron', sans-serif",
           fontWeight: 700,
           color: color,
           letterSpacing: "1.5px",
-          marginBottom: "6px",
+          marginBottom: "4px",
           opacity: 0.8,
         }}
       >

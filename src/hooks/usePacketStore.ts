@@ -4,7 +4,7 @@ import { StreamData } from "../types/stream";
 import { PacketStatistics, DashboardStats } from "../types/statistics";
 import { STREAM_COLORS } from "../styles/theme";
 
-export type ViewId = "dashboard" | "packets" | "structure" | "routetrace" | "matrix" | "sankey" | "sequence" | "topology" | "services" | "plugins" | "livewire";
+export type ViewId = "dashboard" | "packets" | "structure" | "routetrace" | "matrix" | "sankey" | "sequence" | "topology" | "services" | "plugins" | "livewire" | "stats";
 
 export type AppMode = "demo" | "pcap";
 

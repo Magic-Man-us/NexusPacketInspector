@@ -16,6 +16,7 @@ import { ServiceMap } from "./components/views/ServiceMapView/ServiceMap";
 import { PluginsView } from "./components/views/PluginsView/PluginsView";
 import { Dashboard } from "./components/views/DashboardView/Dashboard";
 import { Livewire } from "./components/views/LivewireView/Livewire";
+import { Stats } from "./components/views/StatsView/Stats";
 import { usePluginEvents } from "./hooks/usePluginEvents";
 import { PacketSidebar } from "./components/shared/PacketSidebar";
 import { globalStyles, noiseBackground } from "./styles/globalStyles";
@@ -101,6 +102,7 @@ export default function App() {
         {activeView === "services" && <ServiceMap />}
         {activeView === "plugins" && <PluginsView />}
         {activeView === "livewire" && <Livewire />}
+        {activeView === "stats" && <Stats />}
         </div>
       </div>
 
