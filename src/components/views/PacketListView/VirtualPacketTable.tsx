@@ -13,7 +13,13 @@ interface Props {
 export function VirtualPacketTable({ packets }: Props) {
   const selectedPacket = usePacketStore((s) => s.selectedPacket);
   const setSelectedPacket = usePacketStore((s) => s.setSelectedPacket);
-  const streams = usePacketStore((s) => s.streams);
+  const streamColors = usePacketStore((s) => {
+    const colors: Record<string, string | undefined> = {};
+    for (const key in s.streams) {
+      colors[key] = s.streams[key].color;
+    }
+    return colors;
+  });
   const parentRef = useRef<HTMLDivElement>(null);
 
   const virtualizer = useVirtualizer({
@@ -26,10 +32,10 @@ export function VirtualPacketTable({ packets }: Props) {
   // Auto-scroll to bottom when new packets arrive in demo mode
   const mode = usePacketStore((s) => s.mode);
   useEffect(() => {
-    if (mode === "demo" && parentRef.current) {
-      parentRef.current.scrollTop = parentRef.current.scrollHeight;
+    if (mode === "demo" && packets.length > 0) {
+      virtualizer.scrollToIndex(packets.length - 1, { align: "end" });
     }
-  }, [packets.length, mode]);
+  }, [packets.length, mode, virtualizer]);
 
   return (
     <div style={styles.packetList}>
@@ -78,7 +84,7 @@ export function VirtualPacketTable({ packets }: Props) {
                         ? "rgba(0,255,159,0.15)"
                         : "transparent",
                     borderLeft: `3px solid ${
-                      streams[pkt.streamKey]?.color ||
+                      streamColors[pkt.streamKey] ||
                       PROTOCOL_COLORS[pkt.protocol] ||
                       "#00ff9f"
                     }`,

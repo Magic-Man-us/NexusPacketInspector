@@ -311,7 +311,7 @@ export function RouteTrace() {
       node.attr("transform", (d) => `translate(${d.x},${d.y})`);
     });
 
-    setTimeout(() => {
+    const fitTimer = setTimeout(() => {
       const gNode = g.node();
       if (!gNode) return;
       const bounds = gNode.getBBox();
@@ -333,6 +333,7 @@ export function RouteTrace() {
     }, 300);
 
     return () => {
+      clearTimeout(fitTimer);
       simulation.stop();
       simulationRef.current = null;
       linkSelRef.current = null;
@@ -520,7 +521,7 @@ export function RouteTrace() {
     });
 
     // Auto-fit
-    setTimeout(() => {
+    const fitTimer = setTimeout(() => {
       const gNode = g.node();
       if (!gNode) return;
       const bounds = gNode.getBBox();
@@ -533,6 +534,10 @@ export function RouteTrace() {
           .translate(-bounds.x - bounds.width / 2, -bounds.y - bounds.height / 2)
       );
     }, 100);
+
+    return () => {
+      clearTimeout(fitTimer);
+    };
   }, [topologyKey, viewMode, selectedStream]);
 
   // Highlight effect — updates existing D3 selections without rebuilding

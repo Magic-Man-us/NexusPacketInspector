@@ -178,6 +178,12 @@ export function SankeyDiagram() {
         .attr("font-family", "monospace")
         .text(name.length > 15 ? name.substring(0, 15) + "..." : name);
     });
+    return () => {
+      d3.select(svgRef.current).selectAll("*").remove();
+      if (tooltipRef.current) {
+        tooltipRef.current.style.display = "none";
+      }
+    };
   }, [flowArray]);
 
   return (

@@ -1,6 +1,6 @@
 import { usePacketStore } from "./hooks/usePacketStore";
 import { useDemoCapture } from "./hooks/useDemoCapture";
-import { useTauriCapture } from "./hooks/useTauriCapture";
+import { useTauriListener } from "./hooks/useTauriCapture";
 import { Header } from "./components/layout/Header";
 import { NavTabs } from "./components/layout/NavTabs";
 import { StatusBar } from "./components/layout/StatusBar";
@@ -30,7 +30,7 @@ export default function App() {
 
   // Initialize hooks
   useDemoCapture();
-  useTauriCapture();
+  useTauriListener();
   usePluginEvents();
 
   return (

@@ -48,15 +48,19 @@ export function useDemoCapture() {
       updateDashboardStats(newPacket);
 
       // Update stream with route data from demo packet
-      const store = usePacketStore.getState();
       const key = newPacket.streamKey;
-      const existing = store.streams[key];
-      if (existing && !existing.route && newPacket.route) {
-        usePacketStore.setState({
-          streams: {
-            ...store.streams,
-            [key]: { ...existing, route: newPacket.route },
-          },
+      if (newPacket.route) {
+        usePacketStore.setState((state) => {
+          const existing = state.streams[key];
+          if (existing && !existing.route) {
+            return {
+              streams: {
+                ...state.streams,
+                [key]: { ...existing, route: newPacket.route },
+              },
+            };
+          }
+          return state;
         });
       }
       updateStream(newPacket);

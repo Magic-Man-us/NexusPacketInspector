@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { usePacketStore } from "../../../hooks/usePacketStore";
 import { styles } from "../../../styles/components";
 import { PROTOCOL_COLORS, LAYER_COLORS } from "../../../styles/theme";
@@ -37,6 +37,13 @@ export function PacketStructure() {
       clearTimeout(closeTimer.current);
       closeTimer.current = null;
     }
+  }, []);
+
+  // Clear timer on unmount
+  useEffect(() => {
+    return () => {
+      if (closeTimer.current) clearTimeout(closeTimer.current);
+    };
   }, []);
 
   const scheduleClose = useCallback(() => {

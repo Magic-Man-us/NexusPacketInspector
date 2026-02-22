@@ -4,17 +4,11 @@ const STORAGE_KEY = "nexus-mobile-ack";
 const MOBILE_QUERY = "(max-width: 768px)";
 
 export function MobileWarning() {
-  const [isMobile, setIsMobile] = useState(false);
-  const [dismissed, setDismissed] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => window.matchMedia(MOBILE_QUERY).matches);
+  const [dismissed, setDismissed] = useState(() => !!localStorage.getItem(STORAGE_KEY));
 
   useEffect(() => {
-    if (localStorage.getItem(STORAGE_KEY)) {
-      setDismissed(true);
-    }
-
     const mql = window.matchMedia(MOBILE_QUERY);
-    setIsMobile(mql.matches);
-
     const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
     mql.addEventListener("change", handler);
     return () => mql.removeEventListener("change", handler);

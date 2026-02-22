@@ -75,7 +75,7 @@ export function HierarchicalTopology() {
   }, [packets]);
 
   useEffect(() => {
-    if (!svgRef.current || !containerRef.current || packets.length === 0)
+    if (!svgRef.current || !containerRef.current || !hierarchy.children?.length)
       return;
 
     const container = containerRef.current;
@@ -148,7 +148,7 @@ export function HierarchicalTopology() {
           ? d.data.name.substring(0, 20) + "..."
           : d.data.name
       );
-  }, [hierarchy, packets]);
+  }, [hierarchy]);
 
   return (
     <div style={styles.topologyContainer}>

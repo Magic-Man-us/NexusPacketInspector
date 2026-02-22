@@ -15,17 +15,18 @@ export function usePluginEvents() {
   const mergeEnrichments = usePluginStore((s) => s.mergeEnrichments);
 
   useEffect(() => {
+    let cancelled = false;
     let unlistenProgress: (() => void) | undefined;
     let unlistenComplete: (() => void) | undefined;
 
     const setup = async () => {
       try {
-        // Load available plugins
         const plugins = await listPlugins();
+        if (cancelled) return;
         setPlugins(plugins);
 
-        // Load any existing enrichments
         const enrichments = await getEnrichments();
+        if (cancelled) return;
         if (enrichments.length > 0) {
           mergeEnrichments(enrichments);
         }
@@ -34,17 +35,21 @@ export function usePluginEvents() {
       }
 
       try {
-        unlistenProgress = await onPluginProgress((progress) => {
+        const unlProgress = await onPluginProgress((progress) => {
           addProgress(progress);
         });
+        if (cancelled) { unlProgress(); return; }
+        unlistenProgress = unlProgress;
 
-        unlistenComplete = await onPluginComplete((result) => {
+        const unlComplete = await onPluginComplete((result) => {
           setResult(result.pluginName, result);
           setRunningPlugin(null);
           if (result.enrichments.length > 0) {
             mergeEnrichments(result.enrichments);
           }
         });
+        if (cancelled) { unlComplete(); return; }
+        unlistenComplete = unlComplete;
       } catch {
         // Not in Tauri runtime — skip
       }
@@ -53,6 +58,7 @@ export function usePluginEvents() {
     setup();
 
     return () => {
+      cancelled = true;
       unlistenProgress?.();
       unlistenComplete?.();
     };

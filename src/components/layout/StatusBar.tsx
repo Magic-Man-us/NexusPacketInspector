@@ -4,12 +4,11 @@ import { styles } from "../../styles/components";
 
 export function StatusBar() {
   const isCapturing = usePacketStore((s) => s.isCapturing);
-  const packets = usePacketStore((s) => s.packets);
-  const streams = usePacketStore((s) => s.streams);
+  const packetCount = usePacketStore((s) => s.packets.length);
+  const streamCount = usePacketStore((s) => Object.keys(s.streams).length);
   const mode = usePacketStore((s) => s.mode);
   const isLoading = usePacketStore((s) => s.isLoading);
   const filteredPackets = useFilteredPackets();
-  const streamCount = Object.keys(streams).length;
 
   return (
     <footer style={styles.statusBar}>

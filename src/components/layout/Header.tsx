@@ -1,5 +1,5 @@
 import { usePacketStore } from "../../hooks/usePacketStore";
-import { useTauriCapture } from "../../hooks/useTauriCapture";
+import { usePcapActions } from "../../hooks/useTauriCapture";
 import { styles } from "../../styles/components";
 
 export function Header() {
@@ -8,7 +8,7 @@ export function Header() {
   const filter = usePacketStore((s) => s.filter);
   const setFilter = usePacketStore((s) => s.setFilter);
   const stats = usePacketStore((s) => s.stats);
-  const streams = usePacketStore((s) => s.streams);
+  const streamCount = usePacketStore((s) => Object.keys(s.streams).length);
   const showSettings = usePacketStore((s) => s.showSettings);
   const setShowSettings = usePacketStore((s) => s.setShowSettings);
   const mode = usePacketStore((s) => s.mode);
@@ -16,15 +16,13 @@ export function Header() {
   const clearPackets = usePacketStore((s) => s.clearPackets);
   const resetStats = usePacketStore((s) => s.resetStats);
   const resetStreams = usePacketStore((s) => s.resetStreams);
-  const { openPcapFile } = useTauriCapture();
+  const { openPcapFile } = usePcapActions();
 
   const clearCapture = () => {
     clearPackets();
     resetStats();
     resetStreams();
   };
-
-  const streamCount = Object.keys(streams).length;
 
   return (
     <header style={styles.header}>
