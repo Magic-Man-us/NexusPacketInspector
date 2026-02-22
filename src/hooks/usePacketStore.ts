@@ -67,7 +67,19 @@ interface PacketStore {
   setLoading: (loading: boolean, progress?: number) => void;
 }
 
-const defaultStats: PacketStatistics = { total: 0, protocols: {}, ips: {}, ports: {} };
+const defaultStats: PacketStatistics = {
+  total: 0, protocols: {}, ips: {}, ports: {},
+  srcIps: {}, dstIps: {},
+  tcpCount: 0, udpCount: 0, tcpBytes: 0, udpBytes: 0, totalBytes: 0,
+  minSize: Infinity, maxSize: 0,
+  synCount: 0, finCount: 0, rstCount: 0, ackCount: 0, pshCount: 0,
+  retransmissions: 0, seenSeqCount: 0,
+  ttlBuckets: {}, conversations: {},
+  firstTimestamp: 0, lastTimestamp: 0,
+};
+
+// Module-level Set for retransmission tracking (avoids serialization in store)
+let seenSeqs = new Set<string>();
 
 const defaultDashboardStats: DashboardStats = {
   packetSizes: [],
@@ -109,25 +121,99 @@ export const usePacketStore = create<PacketStore>((set, get) => ({
 
   stats: defaultStats,
   updateStats: (packet) =>
-    set((state) => ({
+    set((state) => {
+      const s = state.stats;
+
+      // TCP/UDP counting
+      let tcpCount = s.tcpCount;
+      let udpCount = s.udpCount;
+      let tcpBytes = s.tcpBytes;
+      let udpBytes = s.udpBytes;
+      let synCount = s.synCount;
+      let finCount = s.finCount;
+      let rstCount = s.rstCount;
+      let ackCount = s.ackCount;
+      let pshCount = s.pshCount;
+      let retransmissions = s.retransmissions;
+      let seenSeqCount = s.seenSeqCount;
+
+      if (packet.isUdp) {
+        udpCount++;
+        udpBytes += packet.length;
+      } else if (packet.tcp) {
+        tcpCount++;
+        tcpBytes += packet.length;
+        if (packet.tcp.flags) {
+          if (packet.tcp.flags.syn) synCount++;
+          if (packet.tcp.flags.fin) finCount++;
+          if (packet.tcp.flags.rst) rstCount++;
+          if (packet.tcp.flags.ack) ackCount++;
+          if (packet.tcp.flags.psh) pshCount++;
+        }
+        const seqKey = `${packet.ip.srcIp}:${packet.srcPort}-${packet.tcp.sequenceNumber}`;
+        if (seenSeqs.has(seqKey)) {
+          retransmissions++;
+        } else {
+          seenSeqs.add(seqKey);
+          seenSeqCount++;
+        }
+      }
+
+      // Conversations
+      const convKey = [packet.ip.srcIp, packet.ip.dstIp].sort().join(" <-> ");
+      const conversations = { ...s.conversations };
+      if (!conversations[convKey]) conversations[convKey] = { packets: 0, bytes: 0 };
+      conversations[convKey] = {
+        packets: conversations[convKey].packets + 1,
+        bytes: conversations[convKey].bytes + packet.length,
+      };
+
+      // TTL buckets
+      const bucketBase = Math.floor(packet.ip.ttl / 16) * 16;
+      const ttlKey = `${bucketBase}-${bucketBase + 15}`;
+      const ttlBuckets = { ...s.ttlBuckets };
+      ttlBuckets[ttlKey] = (ttlBuckets[ttlKey] || 0) + 1;
+
+      return {
+        stats: {
+          total: s.total + 1,
+          protocols: { ...s.protocols, [packet.protocol]: (s.protocols[packet.protocol] || 0) + 1 },
+          ips: {
+            ...s.ips,
+            [packet.ip.srcIp]: (s.ips[packet.ip.srcIp] || 0) + 1,
+            [packet.ip.dstIp]: (s.ips[packet.ip.dstIp] || 0) + 1,
+          },
+          ports: { ...s.ports, [packet.dstPort]: (s.ports[packet.dstPort] || 0) + 1 },
+          srcIps: { ...s.srcIps, [packet.ip.srcIp]: (s.srcIps[packet.ip.srcIp] || 0) + 1 },
+          dstIps: { ...s.dstIps, [packet.ip.dstIp]: (s.dstIps[packet.ip.dstIp] || 0) + 1 },
+          tcpCount, udpCount, tcpBytes, udpBytes,
+          totalBytes: s.totalBytes + packet.length,
+          minSize: Math.min(s.minSize === Infinity ? packet.length : s.minSize, packet.length),
+          maxSize: Math.max(s.maxSize, packet.length),
+          synCount, finCount, rstCount, ackCount, pshCount,
+          retransmissions, seenSeqCount,
+          ttlBuckets,
+          conversations,
+          firstTimestamp: s.firstTimestamp === 0 ? packet.time : s.firstTimestamp,
+          lastTimestamp: packet.time,
+        },
+      };
+    }),
+  resetStats: () => {
+    seenSeqs = new Set<string>();
+    set({
       stats: {
-        total: state.stats.total + 1,
-        protocols: {
-          ...state.stats.protocols,
-          [packet.protocol]: (state.stats.protocols[packet.protocol] || 0) + 1,
-        },
-        ips: {
-          ...state.stats.ips,
-          [packet.ip.srcIp]: (state.stats.ips[packet.ip.srcIp] || 0) + 1,
-          [packet.ip.dstIp]: (state.stats.ips[packet.ip.dstIp] || 0) + 1,
-        },
-        ports: {
-          ...state.stats.ports,
-          [packet.dstPort]: (state.stats.ports[packet.dstPort] || 0) + 1,
-        },
+        total: 0, protocols: {}, ips: {}, ports: {},
+        srcIps: {}, dstIps: {},
+        tcpCount: 0, udpCount: 0, tcpBytes: 0, udpBytes: 0, totalBytes: 0,
+        minSize: Infinity, maxSize: 0,
+        synCount: 0, finCount: 0, rstCount: 0, ackCount: 0, pshCount: 0,
+        retransmissions: 0, seenSeqCount: 0,
+        ttlBuckets: {}, conversations: {},
+        firstTimestamp: 0, lastTimestamp: 0,
       },
-    })),
-  resetStats: () => set({ stats: { total: 0, protocols: {}, ips: {}, ports: {} } }),
+    });
+  },
 
   streams: {},
   updateStream: (packet) =>

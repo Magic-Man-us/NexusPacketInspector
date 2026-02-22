@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef } from "react";
 import * as d3 from "d3";
 import { styles } from "../../../styles/components";
 import { usePacketStore } from "../../../hooks/usePacketStore";
+import { useContainerSize } from "../../../hooks/useContainerSize";
 import { EmptyState } from "../../shared/EmptyState";
 import { DraggablePanel } from "../../shared/DraggablePanel";
 
@@ -23,6 +24,7 @@ export function HierarchicalTopology() {
 
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const { width: containerWidth, height: containerHeight } = useContainerSize(containerRef);
 
   const hierarchy = useMemo<HierarchyNode>(() => {
     const subnets: Record<string, SubnetInfo> = {};
@@ -78,12 +80,11 @@ export function HierarchicalTopology() {
   }, [packets]);
 
   useEffect(() => {
-    if (!svgRef.current || !containerRef.current || !hierarchy.children?.length)
+    if (!svgRef.current || !hierarchy.children?.length || containerWidth === 0 || containerHeight === 0)
       return;
 
-    const container = containerRef.current;
-    const width = container.clientWidth;
-    const height = container.clientHeight;
+    const width = containerWidth;
+    const height = containerHeight;
 
     d3.select(svgRef.current).selectAll("*").remove();
 
@@ -157,7 +158,7 @@ export function HierarchicalTopology() {
         d3.select(svgRef.current).on(".zoom", null);
       }
     };
-  }, [hierarchy]);
+  }, [hierarchy, containerWidth, containerHeight]);
 
   return (
     <div style={styles.topologyContainer}>

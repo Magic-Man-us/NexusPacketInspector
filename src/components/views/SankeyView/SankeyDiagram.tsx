@@ -3,6 +3,7 @@ import * as d3 from "d3";
 import { styles } from "../../../styles/components";
 import { PROTOCOL_COLORS } from "../../../styles/theme";
 import { usePacketStore } from "../../../hooks/usePacketStore";
+import { useContainerSize } from "../../../hooks/useContainerSize";
 import { EmptyState } from "../../shared/EmptyState";
 import { formatBytes, PORT_SERVICE_NAMES } from "../../../lib/formatters";
 
@@ -21,6 +22,7 @@ export function SankeyDiagram() {
   const containerRef = useRef<HTMLDivElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
   const [groupBy, setGroupBy] = useState<GroupBy>("ip");
+  const { width: containerWidth, height: containerHeight } = useContainerSize(containerRef);
 
   const flowArray = useMemo(() => {
     const flows: Record<string, Flow> = {};
@@ -51,12 +53,11 @@ export function SankeyDiagram() {
   }, [packets, groupBy]);
 
   useEffect(() => {
-    if (!svgRef.current || !containerRef.current || flowArray.length === 0)
+    if (!svgRef.current || flowArray.length === 0 || containerWidth === 0 || containerHeight === 0)
       return;
 
-    const container = containerRef.current;
-    const width = container.clientWidth;
-    const height = container.clientHeight;
+    const width = containerWidth;
+    const height = containerHeight;
     const margin = { top: 20, right: 150, bottom: 20, left: 150 };
 
     d3.select(svgRef.current).selectAll("*").remove();
@@ -184,7 +185,7 @@ export function SankeyDiagram() {
         tooltipRef.current.style.display = "none";
       }
     };
-  }, [flowArray]);
+  }, [flowArray, containerWidth, containerHeight]);
 
   return (
     <div style={styles.sankeyContainer}>

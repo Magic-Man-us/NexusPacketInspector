@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useMemo } from "react";
 import * as d3 from "d3";
 import { usePacketStore } from "../../../hooks/usePacketStore";
+import { useContainerSize } from "../../../hooks/useContainerSize";
 import { PROTOCOL_COLORS } from "../../../styles/theme";
 import { formatBytes, PORT_SERVICE_NAMES } from "../../../lib/formatters";
 
@@ -152,6 +153,7 @@ function PacketsTimeline() {
   const timestamps = usePacketStore((s) => s.dashboardStats.timestamps);
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const { width: containerWidth } = useContainerSize(containerRef);
 
   const ppsData = useMemo(() => {
     if (timestamps.length < 2) return [];
@@ -167,8 +169,8 @@ function PacketsTimeline() {
   }, [timestamps]);
 
   useEffect(() => {
-    if (!svgRef.current || !containerRef.current || ppsData.length === 0) return;
-    const w = containerRef.current.clientWidth;
+    if (!svgRef.current || containerWidth === 0 || ppsData.length === 0) return;
+    const w = containerWidth;
     const h = 120;
 
     d3.select(svgRef.current).selectAll("*").remove();
@@ -199,7 +201,7 @@ function PacketsTimeline() {
       .attr("fill", "none")
       .attr("stroke", "#00ff9f")
       .attr("stroke-width", 1.5);
-  }, [ppsData]);
+  }, [ppsData, containerWidth]);
 
   const currentPps = ppsData.length > 0 ? ppsData[ppsData.length - 1] : 0;
 
@@ -415,88 +417,35 @@ const statRow: React.CSSProperties = {
 function StatisticsSection() {
   const stats = usePacketStore((s) => s.stats);
   const streams = usePacketStore((s) => s.streams);
-  const packets = usePacketStore((s) => s.packets);
   const dashboardStats = usePacketStore((s) => s.dashboardStats);
 
   const computed = useMemo(() => {
-    const sizes = packets.map((p) => p.length);
-    const totalBytes = sizes.reduce((a, b) => a + b, 0);
-    const avgSize = sizes.length > 0 ? totalBytes / sizes.length : 0;
-    const minSize = sizes.length > 0 ? sizes.reduce((m, v) => v < m ? v : m, sizes[0]) : 0;
-    const maxSize = sizes.length > 0 ? sizes.reduce((m, v) => v > m ? v : m, sizes[0]) : 0;
+    const totalBytes = stats.totalBytes;
+    const avgSize = stats.total > 0 ? totalBytes / stats.total : 0;
+    const minSize = stats.minSize === Infinity ? 0 : stats.minSize;
+    const maxSize = stats.maxSize;
+
+    // Approximate median from last 200 packet sizes
+    const sizes = dashboardStats.packetSizes;
     const medianSize = sizes.length > 0
       ? [...sizes].sort((a, b) => a - b)[Math.floor(sizes.length / 2)]
       : 0;
 
-    const timestamps = packets.map((p) => p.time);
-    const durationMs = timestamps.length >= 2
-      ? timestamps[timestamps.length - 1] - timestamps[0]
+    const durationMs = stats.firstTimestamp > 0 && stats.lastTimestamp > stats.firstTimestamp
+      ? stats.lastTimestamp - stats.firstTimestamp
       : 0;
     const durationSec = durationMs / 1000;
     const throughputBps = durationSec > 0 ? totalBytes / durationSec : 0;
-    const pps = durationSec > 0 ? packets.length / durationSec : 0;
+    const pps = durationSec > 0 ? stats.total / durationSec : 0;
 
-    let tcpCount = 0;
-    let udpCount = 0;
-    let tcpBytes = 0;
-    let udpBytes = 0;
-    let synCount = 0;
-    let finCount = 0;
-    let rstCount = 0;
-    let ackCount = 0;
-    let pshCount = 0;
-    let retransmissions = 0;
-
-    const seenSeqs = new Set<string>();
-    packets.forEach((p) => {
-      if (p.isUdp) {
-        udpCount++;
-        udpBytes += p.length;
-      } else if (p.tcp) {
-        tcpCount++;
-        tcpBytes += p.length;
-        if (p.tcp.flags) {
-          if (p.tcp.flags.syn) synCount++;
-          if (p.tcp.flags.fin) finCount++;
-          if (p.tcp.flags.rst) rstCount++;
-          if (p.tcp.flags.ack) ackCount++;
-          if (p.tcp.flags.psh) pshCount++;
-        }
-        if (p.tcp) {
-          const seqKey = `${p.ip.srcIp}:${p.srcPort}-${p.tcp.sequenceNumber}`;
-          if (seenSeqs.has(seqKey)) retransmissions++;
-          else seenSeqs.add(seqKey);
-        }
-      }
-    });
-
-    const srcIps: Record<string, number> = {};
-    const dstIps: Record<string, number> = {};
-    const conversations: Record<string, { packets: number; bytes: number }> = {};
-    packets.forEach((p) => {
-      srcIps[p.ip.srcIp] = (srcIps[p.ip.srcIp] || 0) + 1;
-      dstIps[p.ip.dstIp] = (dstIps[p.ip.dstIp] || 0) + 1;
-      const convKey = [p.ip.srcIp, p.ip.dstIp].sort().join(" <-> ");
-      if (!conversations[convKey]) conversations[convKey] = { packets: 0, bytes: 0 };
-      conversations[convKey].packets++;
-      conversations[convKey].bytes += p.length;
-    });
-
-    const topSrcIps = Object.entries(srcIps).sort((a, b) => b[1] - a[1]).slice(0, 8);
-    const topDstIps = Object.entries(dstIps).sort((a, b) => b[1] - a[1]).slice(0, 8);
-    const topConversations = Object.entries(conversations)
+    const topSrcIps = Object.entries(stats.srcIps).sort((a, b) => b[1] - a[1]).slice(0, 8);
+    const topDstIps = Object.entries(stats.dstIps).sort((a, b) => b[1] - a[1]).slice(0, 8);
+    const topConversations = Object.entries(stats.conversations)
       .sort((a, b) => b[1].bytes - a[1].bytes)
       .slice(0, 8);
-
     const topPorts = Object.entries(stats.ports)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 10);
-
-    const ttlBuckets: Record<string, number> = {};
-    packets.forEach((p) => {
-      const bucket = `${Math.floor(p.ip.ttl / 16) * 16}-${Math.floor(p.ip.ttl / 16) * 16 + 15}`;
-      ttlBuckets[bucket] = (ttlBuckets[bucket] || 0) + 1;
-    });
 
     const streamEntries = Object.values(streams);
     const avgStreamDuration = streamEntries.length > 0
@@ -509,13 +458,10 @@ function StatisticsSection() {
     return {
       totalBytes, avgSize, minSize, maxSize, medianSize,
       throughputBps, pps, durationSec,
-      tcpCount, udpCount, tcpBytes, udpBytes,
-      synCount, finCount, rstCount, ackCount, pshCount, retransmissions,
       topSrcIps, topDstIps, topConversations, topPorts,
-      ttlBuckets,
       avgStreamDuration, avgStreamPackets,
     };
-  }, [packets, streams, stats]);
+  }, [stats, streams, dashboardStats]);
 
   const protocolData = Object.entries(stats.protocols)
     .sort((a, b) => b[1] - a[1])
@@ -536,7 +482,7 @@ function StatisticsSection() {
       <div style={{ gridColumn: "1 / -1", display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: "10px" }}>
         {[
           { value: stats.total.toLocaleString(), label: "TOTAL PACKETS" },
-          { value: formatBytes(computed.totalBytes), label: "TOTAL BYTES" },
+          { value: formatBytes(stats.totalBytes), label: "TOTAL BYTES" },
           { value: `${formatBytes(computed.throughputBps)}/s`, label: "THROUGHPUT" },
           { value: computed.pps.toFixed(1), label: "PACKETS/SEC" },
           { value: Object.keys(streams).length.toString(), label: "STREAMS" },
@@ -557,7 +503,7 @@ function StatisticsSection() {
           { label: "Median", value: `${computed.medianSize} B` },
           { label: "Minimum", value: `${computed.minSize} B` },
           { label: "Maximum", value: `${computed.maxSize} B` },
-          { label: "Std Dev", value: `${packets.length > 1 ? Math.sqrt(packets.reduce((a, p) => a + (p.length - computed.avgSize) ** 2, 0) / packets.length).toFixed(0) : 0} B` },
+          { label: "Std Dev", value: `${dashboardStats.packetSizes.length > 1 ? Math.sqrt(dashboardStats.packetSizes.reduce((a, sz) => a + (sz - computed.avgSize) ** 2, 0) / dashboardStats.packetSizes.length).toFixed(0) : 0} B` },
         ].map((row) => (
           <div key={row.label} style={statRow}>
             <span style={{ color: "var(--text-secondary)" }}>{row.label}</span>
@@ -569,11 +515,11 @@ function StatisticsSection() {
       <div style={cardStyle}>
         <div style={cardTitle}>TRANSPORT LAYER</div>
         {[
-          { label: "TCP Packets", value: computed.tcpCount.toLocaleString(), color: "#00ff9f" },
-          { label: "UDP Packets", value: computed.udpCount.toLocaleString(), color: "#00b8ff" },
-          { label: "TCP Bytes", value: formatBytes(computed.tcpBytes), color: "#00ff9f" },
-          { label: "UDP Bytes", value: formatBytes(computed.udpBytes), color: "#00b8ff" },
-          { label: "TCP Ratio", value: `${stats.total > 0 ? ((computed.tcpCount / stats.total) * 100).toFixed(1) : 0}%`, color: "var(--text-secondary)" },
+          { label: "TCP Packets", value: stats.tcpCount.toLocaleString(), color: "#00ff9f" },
+          { label: "UDP Packets", value: stats.udpCount.toLocaleString(), color: "#00b8ff" },
+          { label: "TCP Bytes", value: formatBytes(stats.tcpBytes), color: "#00ff9f" },
+          { label: "UDP Bytes", value: formatBytes(stats.udpBytes), color: "#00b8ff" },
+          { label: "TCP Ratio", value: `${stats.total > 0 ? ((stats.tcpCount / stats.total) * 100).toFixed(1) : 0}%`, color: "var(--text-secondary)" },
         ].map((row) => (
           <div key={row.label} style={statRow}>
             <span style={{ color: "var(--text-secondary)" }}>{row.label}</span>
@@ -581,7 +527,7 @@ function StatisticsSection() {
           </div>
         ))}
         <div style={{ marginTop: "8px", height: "8px", borderRadius: "4px", overflow: "hidden", display: "flex", backgroundColor: "rgba(0,0,0,0.3)" }}>
-          <div style={{ width: `${stats.total > 0 ? (computed.tcpCount / stats.total) * 100 : 50}%`, backgroundColor: "#00ff9f", transition: "width 0.3s" }} />
+          <div style={{ width: `${stats.total > 0 ? (stats.tcpCount / stats.total) * 100 : 50}%`, backgroundColor: "#00ff9f", transition: "width 0.3s" }} />
           <div style={{ flex: 1, backgroundColor: "#00b8ff" }} />
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: "8px", color: "var(--text-dim)", marginTop: "2px" }}>
@@ -593,14 +539,14 @@ function StatisticsSection() {
       <div style={cardStyle}>
         <div style={cardTitle}>TCP FLAGS</div>
         {[
-          { label: "SYN", value: computed.synCount, color: "#00ff9f" },
-          { label: "ACK", value: computed.ackCount, color: "#00b8ff" },
-          { label: "FIN", value: computed.finCount, color: "#ffd600" },
-          { label: "RST", value: computed.rstCount, color: "#ff3366" },
-          { label: "PSH", value: computed.pshCount, color: "#ff6b00" },
-          { label: "Est. Retransmit", value: computed.retransmissions, color: "#ff00ff" },
+          { label: "SYN", value: stats.synCount, color: "#00ff9f" },
+          { label: "ACK", value: stats.ackCount, color: "#00b8ff" },
+          { label: "FIN", value: stats.finCount, color: "#ffd600" },
+          { label: "RST", value: stats.rstCount, color: "#ff3366" },
+          { label: "PSH", value: stats.pshCount, color: "#ff6b00" },
+          { label: "Est. Retransmit", value: stats.retransmissions, color: "#ff00ff" },
         ].map((row) => {
-          const max = Math.max(computed.synCount, computed.ackCount, computed.finCount, computed.rstCount, computed.pshCount, computed.retransmissions, 1);
+          const max = Math.max(stats.synCount, stats.ackCount, stats.finCount, stats.rstCount, stats.pshCount, stats.retransmissions, 1);
           return (
             <div key={row.label} style={{ ...statRow, alignItems: "center" }}>
               <span style={{ color: row.color, width: "90px" }}>{row.label}</span>
@@ -732,8 +678,8 @@ function StatisticsSection() {
       <div style={cardStyle}>
         <div style={cardTitle}>TTL DISTRIBUTION</div>
         {(() => {
-          const ttlMax = Math.max(...Object.values(computed.ttlBuckets), 1);
-          return Object.entries(computed.ttlBuckets)
+          const ttlMax = Math.max(...Object.values(stats.ttlBuckets), 1);
+          return Object.entries(stats.ttlBuckets)
             .sort((a, b) => parseInt(a[0]) - parseInt(b[0]))
             .map(([bucket, count]) => (
               <div key={bucket} style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "3px" }}>
@@ -753,7 +699,7 @@ function StatisticsSection() {
           { label: "RST Flags Detected", value: dashboardStats.anomalies.rstCount, color: dashboardStats.anomalies.rstCount > 20 ? "#ff3366" : dashboardStats.anomalies.rstCount > 5 ? "#ffd600" : "#00ff9f" },
           { label: "Oversized Packets (>1500B)", value: dashboardStats.anomalies.oversizedCount, color: dashboardStats.anomalies.oversizedCount > 10 ? "#ff3366" : dashboardStats.anomalies.oversizedCount > 3 ? "#ffd600" : "#00ff9f" },
           { label: "Unusual Ports", value: dashboardStats.anomalies.unusualPortCount, color: dashboardStats.anomalies.unusualPortCount > 30 ? "#ff3366" : dashboardStats.anomalies.unusualPortCount > 10 ? "#ffd600" : "#00ff9f" },
-          { label: "Est. Retransmissions", value: computed.retransmissions, color: computed.retransmissions > 20 ? "#ff3366" : computed.retransmissions > 5 ? "#ffd600" : "#00ff9f" },
+          { label: "Est. Retransmissions", value: stats.retransmissions, color: stats.retransmissions > 20 ? "#ff3366" : stats.retransmissions > 5 ? "#ffd600" : "#00ff9f" },
         ].map((row) => (
           <div key={row.label} style={{ ...statRow, alignItems: "center" }}>
             <span style={{ color: "var(--text-secondary)", flex: 1 }}>{row.label}</span>

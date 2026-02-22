@@ -3,6 +3,7 @@ import * as d3 from "d3";
 import { styles } from "../../../styles/components";
 import { PROTOCOL_COLORS } from "../../../styles/theme";
 import { usePacketStore } from "../../../hooks/usePacketStore";
+import { useContainerSize } from "../../../hooks/useContainerSize";
 import { EmptyState } from "../../shared/EmptyState";
 import { DraggablePanel } from "../../shared/DraggablePanel";
 import type { StreamData, RouteHop } from "../../../types/stream";
@@ -48,6 +49,7 @@ export function RouteTrace() {
   const nodeSelRef = useRef<d3.Selection<SVGGElement, TopologyNode, SVGGElement, unknown> | null>(null);
   const [selectedStream, setSelectedStream] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>("graph");
+  const { width: containerWidth, height: containerHeight } = useContainerSize(containerRef);
 
   const sortedStreams = useMemo(() => {
     return Object.entries(streams)
@@ -153,12 +155,11 @@ export function RouteTrace() {
 
   // Init effect — rebuilds only when graph structure changes
   useEffect(() => {
-    if (!svgRef.current || !containerRef.current || viewMode !== "graph") return;
-    if (topology.nodes.length === 0) return;
+    if (!svgRef.current || viewMode !== "graph") return;
+    if (topology.nodes.length === 0 || containerWidth === 0 || containerHeight === 0) return;
 
-    const container = containerRef.current;
-    const width = container.clientWidth;
-    const height = container.clientHeight;
+    const width = containerWidth;
+    const height = containerHeight;
 
     d3.select(svgRef.current).selectAll("*").remove();
 
@@ -340,16 +341,15 @@ export function RouteTrace() {
       linkSelRef.current = null;
       nodeSelRef.current = null;
     };
-  }, [topologyKey, viewMode]);
+  }, [topologyKey, viewMode, containerWidth, containerHeight]);
 
   // Hierarchical layout effect
   useEffect(() => {
-    if (!svgRef.current || !containerRef.current || viewMode !== "hierarchical") return;
-    if (topology.nodes.length === 0) return;
+    if (!svgRef.current || viewMode !== "hierarchical") return;
+    if (topology.nodes.length === 0 || containerWidth === 0 || containerHeight === 0) return;
 
-    const container = containerRef.current;
-    const width = container.clientWidth;
-    const height = container.clientHeight;
+    const width = containerWidth;
+    const height = containerHeight;
     const margin = { top: 40, right: 60, bottom: 40, left: 60 };
 
     d3.select(svgRef.current).selectAll("*").remove();
@@ -540,7 +540,7 @@ export function RouteTrace() {
       clearTimeout(fitTimer);
       if (svgRef.current) d3.select(svgRef.current).on(".zoom", null);
     };
-  }, [topologyKey, viewMode, selectedStream]);
+  }, [topologyKey, viewMode, selectedStream, containerWidth, containerHeight]);
 
   // Highlight effect — updates existing D3 selections without rebuilding
   useEffect(() => {

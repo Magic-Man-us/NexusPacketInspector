@@ -38,10 +38,18 @@ function ensureAnimStyles() {
 
 let animRefCount = 0;
 
+const MAX_VISIBLE_PACKETS = 100;
+
 export function SequenceTimeline() {
   const streams = usePacketStore((s) => s.streams);
   const setSelectedPacket = usePacketStore((s) => s.setSelectedPacket);
   const [selectedStream, setSelectedStream] = useState<string | null>(null);
+  const [packetPage, setPacketPage] = useState(0);
+
+  // Reset page when stream changes
+  useEffect(() => {
+    setPacketPage(0);
+  }, [selectedStream]);
 
   useEffect(() => {
     animRefCount++;
@@ -105,7 +113,58 @@ export function SequenceTimeline() {
             message="Select a stream to view sequence"
           />
         ) : (
-          <FlowDiagram stream={streamData} onSelectPacket={setSelectedPacket} />
+          <>
+            {streamData.packets.length > MAX_VISIBLE_PACKETS && (() => {
+              const totalPackets = streamData.packets.length;
+              const totalPages = Math.ceil(totalPackets / MAX_VISIBLE_PACKETS);
+              const startIdx = packetPage * MAX_VISIBLE_PACKETS;
+              const endIdx = Math.min(startIdx + MAX_VISIBLE_PACKETS, totalPackets);
+              return (
+                <div style={{
+                  display: "flex", alignItems: "center", justifyContent: "center", gap: "12px",
+                  padding: "6px 12px", borderBottom: "1px solid rgba(0,255,159,0.15)",
+                  backgroundColor: "rgba(0,0,0,0.2)", fontSize: "10px", flexShrink: 0,
+                }}>
+                  <button
+                    onClick={() => setPacketPage((p) => Math.max(0, p - 1))}
+                    disabled={packetPage === 0}
+                    style={{
+                      background: "none", border: "1px solid rgba(0,255,159,0.3)", borderRadius: "3px",
+                      color: packetPage === 0 ? "var(--text-faint)" : "#00ff9f", cursor: packetPage === 0 ? "default" : "pointer",
+                      padding: "2px 8px", fontSize: "9px", fontFamily: "'Orbitron'",
+                    }}
+                  >
+                    PREV
+                  </button>
+                  <span style={{ color: "var(--text-secondary)", fontFamily: "monospace" }}>
+                    Packets {startIdx + 1}&ndash;{endIdx} of {totalPackets}
+                  </span>
+                  <button
+                    onClick={() => setPacketPage((p) => Math.min(totalPages - 1, p + 1))}
+                    disabled={packetPage >= totalPages - 1}
+                    style={{
+                      background: "none", border: "1px solid rgba(0,255,159,0.3)", borderRadius: "3px",
+                      color: packetPage >= totalPages - 1 ? "var(--text-faint)" : "#00ff9f",
+                      cursor: packetPage >= totalPages - 1 ? "default" : "pointer",
+                      padding: "2px 8px", fontSize: "9px", fontFamily: "'Orbitron'",
+                    }}
+                  >
+                    NEXT
+                  </button>
+                </div>
+              );
+            })()}
+            <FlowDiagram
+              stream={{
+                ...streamData,
+                packets: streamData.packets.slice(
+                  packetPage * MAX_VISIBLE_PACKETS,
+                  (packetPage + 1) * MAX_VISIBLE_PACKETS
+                ),
+              }}
+              onSelectPacket={setSelectedPacket}
+            />
+          </>
         )}
       </div>
     </div>
