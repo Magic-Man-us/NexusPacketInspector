@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { usePacketStore } from "./usePacketStore";
-import { generatePacket, getStreamKey, DemoPacket, StreamInfo } from "../lib/demo-mode";
+import { generatePacket, getStreamKey, DemoPacket, StreamInfo, resetConversationState } from "../lib/demo-mode";
 
 export function useDemoCapture() {
   const isCapturing = usePacketStore((s) => s.isCapturing);
@@ -68,6 +68,7 @@ export function useDemoCapture() {
   const resetDemo = () => {
     packetIdRef.current = 0;
     existingStreamsRef.current = [];
+    resetConversationState();
   };
 
   return { resetDemo };

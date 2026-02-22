@@ -17,6 +17,7 @@ import { Statistics } from "./components/views/StatisticsView/Statistics";
 import { PluginsView } from "./components/views/PluginsView/PluginsView";
 import { Dashboard } from "./components/views/DashboardView/Dashboard";
 import { HexDumpView } from "./components/views/HexDumpView/HexDumpView";
+import { Livewire } from "./components/views/LivewireView/Livewire";
 import { usePluginEvents } from "./hooks/usePluginEvents";
 import { PacketSidebar } from "./components/shared/PacketSidebar";
 import { globalStyles, noiseBackground } from "./styles/globalStyles";
@@ -103,6 +104,7 @@ export default function App() {
         {activeView === "services" && <ServiceMap />}
         {activeView === "statistics" && <Statistics />}
         {activeView === "plugins" && <PluginsView />}
+        {activeView === "livewire" && <Livewire />}
         </div>
       </div>
 

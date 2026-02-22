@@ -197,4 +197,19 @@ export const styles: Record<string, React.CSSProperties> = {
   sliderValue: { width: '36px', fontSize: '9px', color: '#00ff9f', textAlign: 'right', fontFamily: 'monospace' },
   presetButtons: { display: 'flex', gap: '6px', marginTop: '8px' },
   presetButton: { flex: 1, padding: '8px 4px', border: '1px solid rgba(0,255,159,0.3)', borderRadius: '4px', background: 'rgba(0,255,159,0.05)', color: '#00ff9f', fontFamily: "'Orbitron'", fontSize: '8px', fontWeight: 700, cursor: 'pointer', transition: 'all 0.15s' },
+
+  // Livewire view
+  livewireContainer: { display: 'flex', flex: 1, minHeight: 0 },
+  livewireStreamPanel: { width: '280px', borderRight: '1px solid rgba(0,255,159,0.1)', display: 'flex', flexDirection: 'column', flexShrink: 0 },
+  livewireContentArea: { flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' },
+  livewireContentHeader: { display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 14px', borderBottom: '1px solid rgba(0,255,159,0.1)', flexShrink: 0, flexWrap: 'wrap' },
+  livewireProtocolBadge: { padding: '3px 10px', borderRadius: '3px', fontFamily: "'Orbitron'", fontSize: '9px', fontWeight: 700 },
+  livewireStats: { fontSize: '9px', color: '#666', marginLeft: 'auto' },
+  livewireBody: { flex: 1, overflowY: 'auto', padding: '14px' },
+  livewireCodeBlock: { fontFamily: "'Share Tech Mono', monospace", fontSize: '11px', lineHeight: '1.6', whiteSpace: 'pre-wrap', wordBreak: 'break-all', color: '#e0e0e0', background: 'rgba(0,0,0,0.3)', borderRadius: '4px', padding: '12px', border: '1px solid rgba(255,255,255,0.05)' },
+  livewireCard: { border: '1px solid rgba(255,255,255,0.08)', borderRadius: '6px', marginBottom: '12px', overflow: 'hidden' },
+  livewireCardHeader: { display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', fontSize: '10px', fontWeight: 700 },
+  livewireCardBody: { padding: '12px', fontSize: '11px', fontFamily: "'Share Tech Mono', monospace", lineHeight: '1.5' },
+  livewireEncrypted: { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: '12px', color: '#666' },
+  livewireTerminal: { fontFamily: "'Share Tech Mono', monospace", fontSize: '11px', lineHeight: '1.6', whiteSpace: 'pre-wrap', color: '#00ff9f', background: '#0a0a0a', borderRadius: '4px', padding: '14px', border: '1px solid rgba(0,255,159,0.15)', minHeight: '200px' },
 };

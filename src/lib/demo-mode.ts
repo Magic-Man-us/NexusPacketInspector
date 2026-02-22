@@ -1,5 +1,10 @@
 import { ParsedPacket } from "../types/packet";
 import { RouteHop } from "../types/stream";
+import {
+  ENCRYPTED_PROTOCOLS,
+  getTemplateForProtocol,
+  type ProtocolTemplate,
+} from "./protocol-templates";
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // NEXUS PACKET ANALYZER - Demo Mode Packet Generation
@@ -59,6 +64,126 @@ function randomHex(bytes: number): string {
       .padStart(2, "0")
       .toUpperCase()
   ).join("");
+}
+
+// ---------------------------------------------------------------------------
+// Stateful conversation tracking for realistic payloads
+// ---------------------------------------------------------------------------
+
+interface StreamConversationState {
+  template: ProtocolTemplate;
+  messageIndex: number;
+  byteOffset: number;
+  initiatorIP: string; // the srcIP of the first packet in this stream
+}
+
+const streamConversations = new Map<string, StreamConversationState>();
+const MAX_CONVERSATIONS = 50;
+
+export function resetConversationState(): void {
+  streamConversations.clear();
+}
+
+function asciiToHex(text: string): string {
+  let hex = "";
+  for (let i = 0; i < text.length; i++) {
+    hex += text.charCodeAt(i).toString(16).padStart(2, "0").toUpperCase();
+  }
+  return hex;
+}
+
+function getConversationPayload(
+  streamKey: string,
+  protocol: string,
+  srcIp: string,
+  fragmentSize: number
+): { hex: string; length: number } | null {
+  if (ENCRYPTED_PROTOCOLS.has(protocol)) return null;
+
+  let state = streamConversations.get(streamKey);
+
+  if (!state) {
+    const template = getTemplateForProtocol(protocol);
+    if (!template) return null;
+
+    // Evict oldest if at capacity
+    if (streamConversations.size >= MAX_CONVERSATIONS) {
+      const firstKey = streamConversations.keys().next().value;
+      if (firstKey !== undefined) streamConversations.delete(firstKey);
+    }
+
+    state = {
+      template,
+      messageIndex: 0,
+      byteOffset: 0,
+      initiatorIP: srcIp,
+    };
+    streamConversations.set(streamKey, state);
+  }
+
+  // Find the next message matching this packet's direction
+  const direction = srcIp === state.initiatorIP ? "client" : "server";
+  let msg = state.template[state.messageIndex];
+
+  // If current message direction doesn't match, try to advance to find one that does
+  if (msg && msg.direction !== direction) {
+    // Check if the next message matches
+    for (let i = state.messageIndex + 1; i < state.template.length; i++) {
+      if (state.template[i].direction === direction) {
+        state.messageIndex = i;
+        state.byteOffset = 0;
+        msg = state.template[i];
+        break;
+      }
+    }
+    // If still no match, just use whatever message we're on
+    if (msg.direction !== direction) {
+      msg = state.template[state.messageIndex];
+    }
+  }
+
+  if (!msg) {
+    // Template exhausted — loop back
+    state.messageIndex = 0;
+    state.byteOffset = 0;
+    msg = state.template[0];
+    if (!msg) return null;
+  }
+
+  const content = msg.content;
+  const remaining = content.length - state.byteOffset;
+
+  if (remaining <= 0) {
+    // Advance to next message
+    state.messageIndex++;
+    state.byteOffset = 0;
+    if (state.messageIndex >= state.template.length) {
+      state.messageIndex = 0;
+    }
+    const nextMsg = state.template[state.messageIndex];
+    if (!nextMsg) return null;
+    const slice = nextMsg.content.slice(0, fragmentSize);
+    state.byteOffset = slice.length;
+    if (state.byteOffset >= nextMsg.content.length) {
+      state.messageIndex++;
+      state.byteOffset = 0;
+    }
+    return { hex: asciiToHex(slice), length: slice.length };
+  }
+
+  const slice = content.slice(
+    state.byteOffset,
+    state.byteOffset + fragmentSize
+  );
+  state.byteOffset += slice.length;
+
+  // If we consumed the entire message, advance
+  if (state.byteOffset >= content.length) {
+    state.messageIndex++;
+    state.byteOffset = 0;
+  }
+
+  return { hex: asciiToHex(slice), length: slice.length };
 }
 
 function randomMAC(): string {
@@ -232,12 +357,33 @@ export function generatePacket(
   }
 
   const isUdp = ["UDP", "DNS", "DHCP", "NTP", "SNMP", "SIP"].includes(protocol);
-  const payloadLength = Math.floor(Math.random() * 1000) + 20;
+  const basePayloadLength = Math.floor(Math.random() * 1000) + 20;
   const tcpHeaderLength = 20 + Math.floor(Math.random() * 4) * 4;
   const ipHeaderLength = 20;
+  const ttl = Math.floor(Math.random() * 64) + 32;
+
+  // Compute stream key early so we can look up conversation state
+  const tempStreamKey = [srcIp, dstIp].sort().join(":") + "-" +
+    [srcPort, dstPort].sort((a, b) => a - b).join(":");
+
+  // Try to get realistic conversation payload for unencrypted protocols
+  const fragmentSize = Math.floor(Math.random() * 200) + 40;
+  const conversationPayload = getConversationPayload(
+    tempStreamKey,
+    protocol,
+    srcIp,
+    fragmentSize
+  );
+
+  const payloadLength = conversationPayload
+    ? conversationPayload.length
+    : basePayloadLength;
+  const payloadHex = conversationPayload
+    ? conversationPayload.hex
+    : randomHex(Math.min(basePayloadLength, 64));
+
   const totalLength =
     14 + ipHeaderLength + (isUdp ? 8 : tcpHeaderLength) + payloadLength;
-  const ttl = Math.floor(Math.random() * 64) + 32;
 
   const tcpFlags = {
     urg: Math.random() > 0.95,
@@ -306,7 +452,7 @@ export function generatePacket(
         },
     payload: {
       length: payloadLength,
-      data: randomHex(Math.min(payloadLength, 64)),
+      data: payloadHex,
       preview: generatePayloadPreview(protocol),
     },
     route: generateRoute(srcIp, dstIp, ttl),

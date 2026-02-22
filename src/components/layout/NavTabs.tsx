@@ -6,6 +6,7 @@ const tabs: { id: ViewId; label: string; icon: string }[] = [
   { id: "packets", label: "PACKETS", icon: "☰" },
   { id: "structure", label: "STRUCTURE", icon: "⬢" },
   { id: "hexdump", label: "HEX DUMP", icon: "⬡" },
+  { id: "livewire", label: "LIVEWIRE", icon: "↯" },
   { id: "routetrace", label: "ROUTE TRACE", icon: "⟿" },
   { id: "matrix", label: "MATRIX", icon: "▦" },
   { id: "sankey", label: "SANKEY", icon: "⥤" },
