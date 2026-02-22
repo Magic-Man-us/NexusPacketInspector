@@ -153,7 +153,7 @@ export function Dashboard() {
         padding: "20px",
         overflow: "auto",
         display: "grid",
-        gridTemplateColumns: "repeat(3, 1fr)",
+        gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
         gap: "14px",
         alignContent: "start",
       }}
@@ -177,18 +177,17 @@ export function Dashboard() {
               borderBottomColor: isHovered ? card.accent : "var(--border-strong)",
               borderLeftColor: isHovered ? card.accent : "var(--border-strong)",
               borderRadius: "6px",
-              padding: "24px",
+              padding: "20px",
               cursor: "pointer",
               textAlign: "left",
               display: "flex",
               flexDirection: "column",
-              gap: "12px",
+              gap: "10px",
               transition: "all 0.25s ease",
-              transform: isHovered ? "translateY(-4px)" : "none",
+              transform: isHovered ? "translateY(-3px)" : "none",
               boxShadow: isHovered
                 ? `0 8px 24px ${card.accent}22, 0 0 12px ${card.accent}18`
                 : "none",
-              minHeight: isHovered ? "160px" : "120px",
             }}
           >
             <div
@@ -200,7 +199,7 @@ export function Dashboard() {
             >
               <span
                 style={{
-                  fontSize: "24px",
+                  fontSize: "22px",
                   lineHeight: 1,
                   color: card.accent,
                   filter: isHovered ? `drop-shadow(0 0 6px ${card.accent})` : "none",
@@ -212,7 +211,7 @@ export function Dashboard() {
               <span
                 style={{
                   fontFamily: "'Orbitron'",
-                  fontSize: "13px",
+                  fontSize: "12px",
                   fontWeight: 800,
                   letterSpacing: "1.5px",
                   color: isHovered ? card.accent : "var(--text-primary)",
@@ -225,30 +224,29 @@ export function Dashboard() {
             <p
               style={{
                 margin: 0,
-                fontSize: "12px",
-                fontWeight: 500,
-                lineHeight: "1.6",
+                fontSize: "11px",
+                fontWeight: 600,
+                lineHeight: "1.5",
                 color: isHovered ? "var(--text-primary)" : "var(--text-secondary)",
                 transition: "color 0.25s ease",
               }}
             >
               {card.description}
             </p>
-            {isHovered && (
-              <p
-                style={{
-                  margin: 0,
-                  fontSize: "11px",
-                  fontWeight: 500,
-                  lineHeight: "1.6",
-                  color: "var(--text-muted)",
-                  borderTop: `1px solid ${card.accent}22`,
-                  paddingTop: "10px",
-                }}
-              >
-                {card.detail}
-              </p>
-            )}
+            <p
+              style={{
+                margin: 0,
+                fontSize: "10px",
+                fontWeight: 500,
+                lineHeight: "1.5",
+                color: isHovered ? "var(--text-secondary)" : "var(--text-muted)",
+                borderTop: `1px solid ${card.accent}22`,
+                paddingTop: "8px",
+                transition: "color 0.25s ease",
+              }}
+            >
+              {card.detail}
+            </p>
           </button>
         );
       })}
