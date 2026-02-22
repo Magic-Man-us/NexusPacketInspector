@@ -90,7 +90,7 @@ export const usePacketStore = create<PacketStore>((set, get) => ({
   addPackets: (newPackets) =>
     set((state) => ({
       packets: state.mode === "demo"
-        ? [...state.packets.slice(-500), ...newPackets]
+        ? [...state.packets, ...newPackets].slice(-500)
         : [...state.packets, ...newPackets],
     })),
   clearPackets: () => set({ packets: [], selectedPacket: null }),
@@ -127,7 +127,7 @@ export const usePacketStore = create<PacketStore>((set, get) => ({
         },
       },
     })),
-  resetStats: () => set({ stats: defaultStats }),
+  resetStats: () => set({ stats: { total: 0, protocols: {}, ips: {}, ports: {} } }),
 
   streams: {},
   updateStream: (packet) =>
@@ -175,13 +175,20 @@ export const usePacketStore = create<PacketStore>((set, get) => ({
       const anomalies = { ...state.dashboardStats.anomalies };
       if (packet.tcp?.flags.rst) anomalies.rstCount++;
       if (packet.length > 1500) anomalies.oversizedCount++;
-      const commonPorts = new Set([20, 21, 22, 23, 25, 53, 67, 68, 80, 110, 123, 143, 161, 389, 443, 465, 587, 993, 995, 1883, 3306, 3389, 5060, 5432, 8080, 8443]);
+      const commonPorts = new Set([20, 21, 22, 23, 25, 53, 67, 68, 80, 110, 123, 143, 161, 162, 389, 443, 465, 587, 993, 995, 1883, 3306, 3389, 5060, 5432, 5900, 8080, 8443]);
       if (packet.dstPort > 0 && packet.dstPort < 49152 && !commonPorts.has(packet.dstPort)) anomalies.unusualPortCount++;
       const bytesPerProtocol = { ...state.dashboardStats.bytesPerProtocol };
       bytesPerProtocol[packet.protocol] = (bytesPerProtocol[packet.protocol] || 0) + packet.length;
       return { dashboardStats: { packetSizes: sizes, timestamps, anomalies, bytesPerProtocol } };
     }),
-  resetDashboardStats: () => set({ dashboardStats: defaultDashboardStats }),
+  resetDashboardStats: () => set({
+    dashboardStats: {
+      packetSizes: [],
+      timestamps: [],
+      anomalies: { rstCount: 0, oversizedCount: 0, unusualPortCount: 0 },
+      bytesPerProtocol: {},
+    },
+  }),
 
   showSettings: false,
   setShowSettings: (show) => set({ showSettings: show }),

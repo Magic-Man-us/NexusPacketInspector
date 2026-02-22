@@ -1,7 +1,7 @@
 import React from "react";
 
 export const styles: Record<string, React.CSSProperties> = {
-  container: { fontFamily: "'Share Tech Mono', monospace", backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)', fontWeight: 'var(--font-weight)' as unknown as number, height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative' },
+  container: { fontFamily: "'Share Tech Mono', monospace", backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)', fontWeight: 'var(--font-weight)' as any, height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative' },
 
   header: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 16px', borderBottom: '1px solid var(--border-strong)', backgroundColor: 'var(--header-bg)', zIndex: 10, flexShrink: 0 },
   logoSection: { display: 'flex', alignItems: 'center', gap: '10px' },
@@ -125,7 +125,7 @@ export const styles: Record<string, React.CSSProperties> = {
   packetList: { flex: 1, display: 'flex', flexDirection: 'column', borderRight: '1px solid var(--border)', minWidth: 0 },
   tableHeader: { display: 'flex', padding: '8px 10px', backgroundColor: 'var(--bg-surface)', borderBottom: '1px solid var(--border-strong)', fontFamily: "'Orbitron'", fontSize: '9px', fontWeight: 800, color: 'var(--accent)', flexShrink: 0 },
   tableBody: { flex: 1, overflowY: 'auto', minHeight: 0 },
-  tableRow: { display: 'flex', padding: '6px 10px', borderBottom: '1px solid rgba(255,255,255,0.03)', cursor: 'pointer', fontSize: '11px', fontWeight: 'var(--font-weight)' as unknown as number },
+  tableRow: { display: 'flex', padding: '6px 10px', borderBottom: '1px solid rgba(255,255,255,0.03)', cursor: 'pointer', fontSize: '11px', fontWeight: 'var(--font-weight)' as any },
   tableCell: { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', paddingRight: '6px' },
   flag: { display: 'inline-block', padding: '1px 4px', backgroundColor: 'rgba(255,107,0,0.2)', borderRadius: '2px', fontSize: '8px', color: '#ff6b00' },
 
@@ -133,7 +133,7 @@ export const styles: Record<string, React.CSSProperties> = {
   detailsHeader: { fontFamily: "'Orbitron'", fontSize: '11px', fontWeight: 800, color: 'var(--accent)', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' },
   detailsSection: { marginBottom: '12px', padding: '10px', backgroundColor: 'rgba(var(--accent-rgb),0.02)', borderRadius: '4px', border: '1px solid var(--border)' },
   sectionTitle: { fontFamily: "'Orbitron'", fontSize: '9px', fontWeight: 800, color: 'var(--accent)', marginBottom: '8px' },
-  detailRow: { display: 'flex', justifyContent: 'space-between', padding: '3px 0', fontSize: '11px', fontWeight: 'var(--font-weight)' as unknown as number, borderBottom: '1px solid rgba(255,255,255,0.03)' },
+  detailRow: { display: 'flex', justifyContent: 'space-between', padding: '3px 0', fontSize: '11px', fontWeight: 'var(--font-weight)' as any, borderBottom: '1px solid rgba(255,255,255,0.03)' },
 
   structureContainer: { flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0 },
 
@@ -167,10 +167,10 @@ export const styles: Record<string, React.CSSProperties> = {
   livewireProtocolBadge: { padding: '3px 10px', borderRadius: '3px', fontFamily: "'Orbitron'", fontSize: '9px', fontWeight: 800 },
   livewireStats: { fontSize: '9px', color: 'var(--text-muted)', marginLeft: 'auto' },
   livewireBody: { flex: 1, overflowY: 'auto', padding: '14px' },
-  livewireCodeBlock: { fontFamily: "'Share Tech Mono', monospace", fontSize: '12px', lineHeight: '1.6', fontWeight: 'var(--font-weight)' as unknown as number, whiteSpace: 'pre-wrap', wordBreak: 'break-all', color: 'var(--text-primary)', background: 'var(--bg-console)', borderRadius: '4px', padding: '12px', border: '1px solid rgba(255,255,255,0.05)' },
+  livewireCodeBlock: { fontFamily: "'Share Tech Mono', monospace", fontSize: '12px', lineHeight: '1.6', fontWeight: 'var(--font-weight)' as any, whiteSpace: 'pre-wrap', wordBreak: 'break-all', color: 'var(--text-primary)', background: 'var(--bg-console)', borderRadius: '4px', padding: '12px', border: '1px solid rgba(255,255,255,0.05)' },
   livewireCard: { border: '1px solid rgba(255,255,255,0.08)', borderRadius: '6px', marginBottom: '12px', overflow: 'hidden' },
   livewireCardHeader: { display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', fontSize: '11px', fontWeight: 800 },
-  livewireCardBody: { padding: '12px', fontSize: '12px', fontFamily: "'Share Tech Mono', monospace", fontWeight: 'var(--font-weight)' as unknown as number, lineHeight: '1.5' },
+  livewireCardBody: { padding: '12px', fontSize: '12px', fontFamily: "'Share Tech Mono', monospace", fontWeight: 'var(--font-weight)' as any, lineHeight: '1.5' },
   livewireEncrypted: { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: '12px', color: 'var(--text-muted)' },
-  livewireTerminal: { fontFamily: "'Share Tech Mono', monospace", fontSize: '12px', lineHeight: '1.6', fontWeight: 'var(--font-weight)' as unknown as number, whiteSpace: 'pre-wrap', color: 'var(--accent)', background: 'var(--bg-console)', borderRadius: '4px', padding: '14px', border: '1px solid rgba(var(--accent-rgb),0.15)', minHeight: '200px' },
+  livewireTerminal: { fontFamily: "'Share Tech Mono', monospace", fontSize: '12px', lineHeight: '1.6', fontWeight: 'var(--font-weight)' as any, whiteSpace: 'pre-wrap', color: 'var(--accent)', background: 'var(--bg-console)', borderRadius: '4px', padding: '14px', border: '1px solid rgba(var(--accent-rgb),0.15)', minHeight: '200px' },
 };

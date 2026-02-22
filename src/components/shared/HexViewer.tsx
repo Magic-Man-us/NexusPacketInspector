@@ -6,7 +6,7 @@ interface Props {
   packet: ParsedPacket;
 }
 
-type LayerKey = "ethernet" | "ip" | "tcp" | "payload";
+type LayerKey = "ethernet" | "ip" | "tcp" | "udp" | "payload";
 
 interface ByteRegion {
   start: number;
@@ -82,7 +82,7 @@ function hexFromPacket(packet: ParsedPacket): { bytes: number[]; regions: ByteRe
     bytes.push((u.length >> 8) & 0xff, u.length & 0xff);
     const udpCk = parseInt(u.checksum.replace("0x", ""), 16) || 0;
     bytes.push((udpCk >> 8) & 0xff, udpCk & 0xff);
-    regions.push({ start: transportStart, end: bytes.length, layer: "tcp", label: "UDP" });
+    regions.push({ start: transportStart, end: bytes.length, layer: "udp", label: "UDP" });
   }
 
   // Payload
@@ -111,6 +111,7 @@ const layerColors: Record<LayerKey, { bg: string; text: string }> = {
   ethernet: { bg: "rgba(255,214,0,0.12)", text: "#ffd600" },
   ip: { bg: "rgba(0,184,255,0.12)", text: "#00b8ff" },
   tcp: { bg: "rgba(0,255,159,0.12)", text: "#00ff9f" },
+  udp: { bg: "rgba(255,214,0,0.12)", text: "#ffd600" },
   payload: { bg: "rgba(255,107,0,0.12)", text: "#ff6b00" },
 };
 

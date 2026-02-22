@@ -84,6 +84,12 @@ export function DraggablePanel({
   const [dragging, setDragging] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   const dragOffset = useRef({ x: 0, y: 0 });
+  const dragCleanupRef = useRef<(() => void) | null>(null);
+
+  // Clean up drag listeners on unmount
+  useEffect(() => {
+    return () => { dragCleanupRef.current?.(); };
+  }, []);
 
   // Initialize position once mounted
   useEffect(() => {
@@ -117,9 +123,14 @@ export function DraggablePanel({
         });
       };
 
-      const onUp = (ev: MouseEvent) => {
+      const cleanup = () => {
         document.removeEventListener("mousemove", onMove);
         document.removeEventListener("mouseup", onUp);
+        dragCleanupRef.current = null;
+      };
+
+      const onUp = (ev: MouseEvent) => {
+        cleanup();
         setDragging(false);
 
         if (!panelRef.current) return;
@@ -147,6 +158,7 @@ export function DraggablePanel({
         }
       };
 
+      dragCleanupRef.current = cleanup;
       document.addEventListener("mousemove", onMove);
       document.addEventListener("mouseup", onUp);
     },

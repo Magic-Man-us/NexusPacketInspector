@@ -41,7 +41,13 @@ export function SequenceTimeline() {
   const setSelectedPacket = usePacketStore((s) => s.setSelectedPacket);
   const [selectedStream, setSelectedStream] = useState<string | null>(null);
 
-  useEffect(() => { ensureAnimStyles(); }, []);
+  useEffect(() => {
+    ensureAnimStyles();
+    return () => {
+      const el = document.getElementById(ANIM_STYLE_ID);
+      if (el) el.remove();
+    };
+  }, []);
 
   const sortedStreams = useMemo(() => {
     return Object.entries(streams)

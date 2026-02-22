@@ -239,7 +239,7 @@ function RawView({ reassembled, direction }: { reassembled: ReassembledStream; d
       ? reassembled.clientText
       : direction === "server"
         ? reassembled.serverText
-        : reassembled.clientText + reassembled.serverText;
+        : `${reassembled.clientText}\n--- SERVER ---\n${reassembled.serverText}`;
 
   if (!text) return <div style={{ color: "var(--text-faint)", fontSize: "11px" }}>No payload data</div>;
 

@@ -17,13 +17,14 @@ export function useTauriListener() {
 
     (async () => {
       const { listen } = await import("@tauri-apps/api/event");
-      const { addPackets, updateStats, updateStream } = usePacketStore.getState();
+      const { addPackets, updateStats, updateStream, updateDashboardStats } = usePacketStore.getState();
       const unlisten = await listen<ParsedPacket[]>("packets-chunk", (event) => {
         const packets = event.payload;
         addPackets(packets);
         for (const pkt of packets) {
           updateStats(pkt);
           updateStream(pkt);
+          updateDashboardStats(pkt);
         }
       });
 
@@ -50,6 +51,7 @@ export function usePcapActions() {
   const setLoading = usePacketStore((s) => s.setLoading);
   const resetStats = usePacketStore((s) => s.resetStats);
   const resetStreams = usePacketStore((s) => s.resetStreams);
+  const resetDashboardStats = usePacketStore((s) => s.resetDashboardStats);
 
   const openPcapFile = useCallback(async () => {
     if (!isTauri) {
@@ -74,6 +76,7 @@ export function usePcapActions() {
     clearPackets();
     resetStats();
     resetStreams();
+    resetDashboardStats();
     setMode("pcap");
     setLoading(true);
 
@@ -85,7 +88,7 @@ export function usePcapActions() {
     } finally {
       setLoading(false);
     }
-  }, [clearPackets, resetStats, resetStreams, setMode, setLoading]);
+  }, [clearPackets, resetStats, resetStreams, resetDashboardStats, setMode, setLoading]);
 
   const applyFilter = useCallback(async (filterText: string) => {
     if (!isTauri) return [];

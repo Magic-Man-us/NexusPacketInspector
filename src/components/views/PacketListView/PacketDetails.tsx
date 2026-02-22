@@ -42,7 +42,7 @@ export function PacketDetails() {
         </div>
       </div>
       <div style={styles.detailsSection}>
-        <div style={styles.sectionTitle}>{"\u2B21"} {packet.tcp ? "TCP" : "UDP"}</div>
+        <div style={styles.sectionTitle}>{"\u2B21"} {packet.tcp ? "TCP" : packet.udp ? "UDP" : packet.protocol}</div>
         <div style={styles.detailRow}>
           <span>Src Port</span>
           <span>{packet.srcPort}</span>

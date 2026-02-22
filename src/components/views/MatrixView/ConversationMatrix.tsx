@@ -15,6 +15,7 @@ interface Conversation {
 interface MatrixData {
   conversations: Conversation[];
   ips: string[];
+  convLookup: Map<string, Conversation>;
 }
 
 type SortBy = "packets" | "bytes";
@@ -48,9 +49,14 @@ export function ConversationMatrix() {
     ];
     ips.sort((a, b) => (stats.ips[b] || 0) - (stats.ips[a] || 0));
 
+    const convList = Object.values(conversations);
+    const convLookup = new Map<string, Conversation>();
+    convList.forEach((c) => convLookup.set(`${c.src}|${c.dst}`, c));
+
     return {
-      conversations: Object.values(conversations),
+      conversations: convList,
       ips: ips.slice(0, 15),
+      convLookup,
     };
   }, [packets, stats]);
 
@@ -105,9 +111,7 @@ export function ConversationMatrix() {
                 {srcIp.split(".").slice(-2).join(".")}
               </div>
               {matrixData.ips.map((dstIp) => {
-                const conv = matrixData.conversations.find(
-                  (c) => c.src === srcIp && c.dst === dstIp
-                );
+                const conv = matrixData.convLookup.get(`${srcIp}|${dstIp}`);
                 const value = conv
                   ? sortBy === "packets"
                     ? conv.packets

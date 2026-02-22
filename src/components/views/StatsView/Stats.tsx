@@ -422,8 +422,8 @@ function StatisticsSection() {
     const sizes = packets.map((p) => p.length);
     const totalBytes = sizes.reduce((a, b) => a + b, 0);
     const avgSize = sizes.length > 0 ? totalBytes / sizes.length : 0;
-    const minSize = sizes.length > 0 ? Math.min(...sizes) : 0;
-    const maxSize = sizes.length > 0 ? Math.max(...sizes) : 0;
+    const minSize = sizes.length > 0 ? sizes.reduce((m, v) => v < m ? v : m, sizes[0]) : 0;
+    const maxSize = sizes.length > 0 ? sizes.reduce((m, v) => v > m ? v : m, sizes[0]) : 0;
     const medianSize = sizes.length > 0
       ? [...sizes].sort((a, b) => a - b)[Math.floor(sizes.length / 2)]
       : 0;

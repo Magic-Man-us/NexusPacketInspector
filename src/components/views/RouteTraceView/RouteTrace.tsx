@@ -29,6 +29,14 @@ interface TopologyLink {
 
 type ViewMode = "graph" | "hierarchical" | "list";
 
+const NODE_COLORS: Record<string, string> = {
+  endpoint: "#00ff9f",
+  gateway: "#ffd600",
+  isp: "#00b8ff",
+  transit: "#ff6b00",
+  "dest-gateway": "#ff00ff",
+};
+
 export function RouteTrace() {
   const packets = usePacketStore((s) => s.packets);
   const streams = usePacketStore((s) => s.streams);
@@ -143,14 +151,6 @@ export function RouteTrace() {
     return `${nk}|${lk}`;
   }, [topology]);
 
-  const nodeColors: Record<string, string> = {
-    endpoint: "#00ff9f",
-    gateway: "#ffd600",
-    isp: "#00b8ff",
-    transit: "#ff6b00",
-    "dest-gateway": "#ff00ff",
-  };
-
   // Init effect — rebuilds only when graph structure changes
   useEffect(() => {
     if (!svgRef.current || !containerRef.current || viewMode !== "graph") return;
@@ -256,7 +256,7 @@ export function RouteTrace() {
 
     node.each(function (d) {
       const el = d3.select(this);
-      const color = nodeColors[d.type] || "#00ff9f";
+      const color = NODE_COLORS[d.type] || "#00ff9f";
 
       if (d.type === "endpoint") {
         el.append("rect")
@@ -487,7 +487,7 @@ export function RouteTrace() {
 
     nodeG.each(function (d) {
       const el = d3.select(this);
-      const color = nodeColors[d.type] || "#00ff9f";
+      const color = NODE_COLORS[d.type] || "#00ff9f";
       const isHighlighted = selectedStream && d.streams.includes(selectedStream);
       const opacity = selectedStream ? (isHighlighted ? 1 : 0.2) : 1;
 

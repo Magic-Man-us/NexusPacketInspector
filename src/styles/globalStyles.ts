@@ -16,6 +16,10 @@ export const globalStyles = (effects: VisualEffects): string => {
   .nav-tab-active-glow {
     animation: navGlow 2s ease-in-out infinite;
   }
+  @keyframes encyclopediaFadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
   ::-webkit-scrollbar { width: 6px; height: 6px; }
   ::-webkit-scrollbar-track { background: var(--bg-primary); }
   ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 3px; }

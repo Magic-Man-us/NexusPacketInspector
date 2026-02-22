@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useCallback } from "react";
+import { useState, useMemo, useRef, useCallback, useEffect } from "react";
 import { usePacketStore } from "../../hooks/usePacketStore";
 import { PROTOCOL_COLORS } from "../../styles/theme";
 import { HexViewer } from "./HexViewer";
@@ -60,7 +60,13 @@ export function PacketSidebar() {
   const [dragging, setDragging] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   const dragOffset = useRef({ x: 0, y: 0 });
+  const dragCleanupRef = useRef<(() => void) | null>(null);
   const recentPackets = useMemo(() => packets.slice(-100), [packets]);
+
+  // Clean up drag listeners on unmount
+  useEffect(() => {
+    return () => { dragCleanupRef.current?.(); };
+  }, []);
 
   // --- Drag logic (viewport-based fixed positioning) ---
   // useCallback must be before any early returns to satisfy React hooks rules
@@ -83,9 +89,14 @@ export function PacketSidebar() {
       });
     };
 
-    const onUp = (ev: MouseEvent) => {
+    const cleanup = () => {
       document.removeEventListener("mousemove", onMove);
       document.removeEventListener("mouseup", onUp);
+      dragCleanupRef.current = null;
+    };
+
+    const onUp = (ev: MouseEvent) => {
+      cleanup();
       setDragging(false);
 
       const finalX = ev.clientX - dragOffset.current.x;
@@ -96,6 +107,7 @@ export function PacketSidebar() {
       }
     };
 
+    dragCleanupRef.current = cleanup;
     document.addEventListener("mousemove", onMove);
     document.addEventListener("mouseup", onUp);
   }, []);

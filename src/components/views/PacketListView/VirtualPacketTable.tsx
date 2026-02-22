@@ -1,5 +1,6 @@
 import { useRef, useEffect } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
+import { useShallow } from "zustand/react/shallow";
 import { ParsedPacket } from "../../../types/packet";
 import { usePacketStore } from "../../../hooks/usePacketStore";
 import { styles } from "../../../styles/components";
@@ -13,13 +14,15 @@ interface Props {
 export function VirtualPacketTable({ packets }: Props) {
   const selectedPacket = usePacketStore((s) => s.selectedPacket);
   const setSelectedPacket = usePacketStore((s) => s.setSelectedPacket);
-  const streamColors = usePacketStore((s) => {
-    const colors: Record<string, string | undefined> = {};
-    for (const key in s.streams) {
-      colors[key] = s.streams[key].color;
-    }
-    return colors;
-  });
+  const streamColors = usePacketStore(
+    useShallow((s) => {
+      const colors: Record<string, string | undefined> = {};
+      for (const key in s.streams) {
+        colors[key] = s.streams[key].color;
+      }
+      return colors;
+    })
+  );
   const parentRef = useRef<HTMLDivElement>(null);
 
   const virtualizer = useVirtualizer({
@@ -31,11 +34,13 @@ export function VirtualPacketTable({ packets }: Props) {
 
   // Auto-scroll to bottom when new packets arrive in demo mode
   const mode = usePacketStore((s) => s.mode);
+  const virtualizerRef = useRef(virtualizer);
+  virtualizerRef.current = virtualizer;
   useEffect(() => {
     if (mode === "demo" && packets.length > 0) {
-      virtualizer.scrollToIndex(packets.length - 1, { align: "end" });
+      virtualizerRef.current.scrollToIndex(packets.length - 1, { align: "end" });
     }
-  }, [packets.length, mode, virtualizer]);
+  }, [packets.length, mode]);
 
   return (
     <div style={styles.packetList}>

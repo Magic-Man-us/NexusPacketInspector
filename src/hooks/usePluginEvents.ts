@@ -35,20 +35,24 @@ export function usePluginEvents() {
       }
 
       try {
-        const unlProgress = await onPluginProgress((progress) => {
-          addProgress(progress);
-        });
-        if (cancelled) { unlProgress(); return; }
+        const [unlProgress, unlComplete] = await Promise.all([
+          onPluginProgress((progress) => {
+            addProgress(progress);
+          }),
+          onPluginComplete((result) => {
+            setResult(result.pluginName, result);
+            setRunningPlugin(null);
+            if (result.enrichments.length > 0) {
+              mergeEnrichments(result.enrichments);
+            }
+          }),
+        ]);
+        if (cancelled) {
+          unlProgress();
+          unlComplete();
+          return;
+        }
         unlistenProgress = unlProgress;
-
-        const unlComplete = await onPluginComplete((result) => {
-          setResult(result.pluginName, result);
-          setRunningPlugin(null);
-          if (result.enrichments.length > 0) {
-            mergeEnrichments(result.enrichments);
-          }
-        });
-        if (cancelled) { unlComplete(); return; }
         unlistenComplete = unlComplete;
       } catch {
         // Not in Tauri runtime — skip

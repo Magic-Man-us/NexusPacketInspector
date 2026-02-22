@@ -148,6 +148,12 @@ export function HierarchicalTopology() {
           ? d.data.name.substring(0, 20) + "..."
           : d.data.name
       );
+
+    return () => {
+      if (svgRef.current) {
+        d3.select(svgRef.current).on(".zoom", null);
+      }
+    };
   }, [hierarchy]);
 
   return (
