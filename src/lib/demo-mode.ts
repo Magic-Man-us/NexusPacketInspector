@@ -326,7 +326,10 @@ export function generatePacket(
   id: number,
   existingStreams: StreamInfo[] = []
 ): DemoPacket {
-  const reuseStream = existingStreams.length > 0 && Math.random() > 0.3;
+  // Scale reuse probability with pool size so early packets create diverse streams
+  // With 1 stream: ~15% reuse, 5 streams: ~50%, 10+: ~70%
+  const reuseChance = Math.min(0.7, existingStreams.length / 14);
+  const reuseStream = existingStreams.length > 0 && Math.random() < reuseChance;
   let protocol: string;
   let srcIp: string;
   let dstIp: string;
