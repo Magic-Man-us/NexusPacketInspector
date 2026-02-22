@@ -27,7 +27,7 @@ jobs:
 
       - run: npm ci
 
-      - run: npx vite build --base /Nexus/
+      - run: npx vite build --base /
 
       - uses: actions/upload-pages-artifact@v3
         with:

@@ -2,7 +2,7 @@
 
 A high-performance network packet analyzer built with **Tauri v2**, **React**, **D3.js**, and **Rust**. Analyze PCAP files with real-time visualizations across 10 interactive views — or explore the demo mode with simulated network traffic.
 
-[**Live Demo**](https://magic-man-us.github.io/Nexus/) (demo mode — no install required)
+[**Live Demo**](https://nexus.mimsec.com/) (demo mode — no install required)
 
 ## Features
 
