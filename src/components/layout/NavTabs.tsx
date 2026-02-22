@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { usePacketStore, ViewId } from "../../hooks/usePacketStore";
 import { styles } from "../../styles/components";
 
@@ -18,22 +19,45 @@ const tabs: { id: ViewId; label: string; icon: string }[] = [
 export function NavTabs() {
   const activeView = usePacketStore((s) => s.activeView);
   const setActiveView = usePacketStore((s) => s.setActiveView);
+  const [hoveredTab, setHoveredTab] = useState<ViewId | null>(null);
 
   return (
     <nav style={styles.nav}>
-      {tabs.map((tab) => (
-        <button
-          key={tab.id}
-          onClick={() => setActiveView(tab.id)}
-          style={{
-            ...styles.navTab,
-            ...(activeView === tab.id ? styles.navTabActive : {}),
-          }}
-        >
-          <span style={styles.navIcon}>{tab.icon}</span>
-          {tab.label}
-        </button>
-      ))}
+      {tabs.map((tab, index) => {
+        const isActive = activeView === tab.id;
+        const isHovered = hoveredTab === tab.id && !isActive;
+
+        // Build style without color — color is handled by CSS classes + !important
+        const buttonStyle: React.CSSProperties = {
+          ...styles.navTab,
+          ...(isHovered ? styles.navTabHover : {}),
+          ...(isActive ? styles.navTabActive : {}),
+        };
+
+        return (
+          <span key={tab.id} style={{ display: 'contents' }}>
+            {index > 0 && <div style={styles.navSeparator} />}
+            <button
+              onClick={() => setActiveView(tab.id)}
+              onMouseEnter={() => setHoveredTab(tab.id)}
+              onMouseLeave={() => setHoveredTab(null)}
+              className={isActive ? "nav-tab-active-glow nav-tab-active" : undefined}
+              style={buttonStyle}
+            >
+              <span
+                style={{
+                  ...styles.navIcon,
+                  ...(isHovered ? styles.navIconHover : {}),
+                  ...(isActive ? styles.navIconActive : {}),
+                }}
+              >
+                {tab.icon}
+              </span>
+              {tab.label}
+            </button>
+          </span>
+        );
+      })}
     </nav>
   );
 }

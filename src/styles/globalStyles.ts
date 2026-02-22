@@ -14,7 +14,14 @@ export const globalStyles = (effects: VisualEffects): string => `
   .scanline-effect {
     animation: scanline ${effects.scanlineSpeed}s linear infinite;
   }
-  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  @keyframes navGlow {
+    0%, 100% { box-shadow: 0 2px 8px rgba(0,255,159,0.3), inset 0 -2px 6px rgba(0,255,159,0.1); }
+    50% { box-shadow: 0 2px 14px rgba(0,255,159,0.5), inset 0 -2px 10px rgba(0,255,159,0.15); }
+  }
+  .nav-tab-active-glow {
+    animation: navGlow 2s ease-in-out infinite;
+  }
+::-webkit-scrollbar { width: 6px; height: 6px; }
   ::-webkit-scrollbar-track { background: #0a0f0a; }
   ::-webkit-scrollbar-thumb { background: #00ff9f; border-radius: 3px; }
 `;

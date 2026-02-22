@@ -25,10 +25,14 @@ export const styles: Record<string, React.CSSProperties> = {
   statValue: { fontFamily: "'Orbitron'", fontSize: '16px', fontWeight: 700, color: '#00ff9f' },
   statLabel: { fontSize: '8px', color: '#666' },
 
-  nav: { display: 'flex', borderBottom: '1px solid rgba(0,255,159,0.1)', backgroundColor: 'rgba(10,15,10,0.8)', flexShrink: 0, overflowX: 'auto' },
-  navTab: { padding: '10px 14px', background: 'transparent', border: 'none', borderBottom: '2px solid transparent', color: '#666', fontFamily: "'Orbitron'", fontSize: '9px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px', whiteSpace: 'nowrap' },
-  navTabActive: { color: '#00ff9f', borderBottomColor: '#00ff9f' },
-  navIcon: { fontSize: '11px' },
+  nav: { display: 'flex', gap: '2px', padding: '0 8px', borderBottom: '1px solid rgba(0,255,159,0.1)', backgroundColor: 'rgba(10,15,10,0.9)', backdropFilter: 'blur(8px)', flexShrink: 0, overflowX: 'auto', alignItems: 'stretch' },
+  navTab: { padding: '10px 16px', backgroundColor: 'transparent', border: 'none', borderBottomWidth: '2px', borderBottomStyle: 'solid', borderBottomColor: 'transparent', color: '#555', fontFamily: "'Orbitron'", fontSize: '9px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap', transition: 'all 0.25s ease', letterSpacing: '0.5px' },
+  navTabHover: { color: '#00ff9f', backgroundColor: 'rgba(0,255,159,0.06)', textShadow: '0 0 8px rgba(0,255,159,0.4)', borderBottomColor: 'rgba(0,255,159,0.3)' },
+  navTabActive: { color: '#00ff9f', borderBottomColor: '#00ff9f', backgroundColor: 'rgba(0,255,159,0.08)', textShadow: '0 0 12px rgba(0,255,159,0.6)', boxShadow: '0 2px 8px rgba(0,255,159,0.3)' },
+  navIcon: { fontSize: '11px', transition: 'all 0.25s ease' },
+  navIconHover: { filter: 'drop-shadow(0 0 4px rgba(0,255,159,0.5))', transform: 'scale(1.15)' },
+  navIconActive: { filter: 'drop-shadow(0 0 6px rgba(0,255,159,0.7))' },
+  navSeparator: { width: '1px', alignSelf: 'center', height: '16px', backgroundColor: 'rgba(255,255,255,0.08)', flexShrink: 0 },
 
   mainContent: { flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', minHeight: 0 },
   splitView: { display: 'flex', flex: 1, minHeight: 0 },
