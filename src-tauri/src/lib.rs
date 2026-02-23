@@ -5,12 +5,14 @@ mod plugins;
 mod state;
 
 use plugins::nmap::plugin::NmapPlugin;
+use plugins::tshark::plugin::TsharkPlugin;
 use plugins::registry::PluginRegistry;
 pub use state::AppState;
 
 pub fn run() {
     let mut registry = PluginRegistry::new();
     registry.register(Box::new(NmapPlugin::new()));
+    registry.register(Box::new(TsharkPlugin::new()));
 
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())

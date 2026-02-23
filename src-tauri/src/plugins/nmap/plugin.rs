@@ -9,8 +9,8 @@ use tokio_util::sync::CancellationToken;
 use super::parser::parse_nmap_xml;
 use super::profiles::get_profiles;
 use crate::plugins::traits::{
-    PacketEnrichment, Plugin, PluginCapability, PluginError, PluginProgress, PluginResult,
-    PluginStatus,
+    PacketEnrichment, Plugin, PluginCapability, PluginCategory, PluginError, PluginProgress,
+    PluginResult, PluginStatus,
 };
 
 pub struct NmapPlugin;
@@ -45,6 +45,10 @@ impl Plugin for NmapPlugin {
 
     fn description(&self) -> &str {
         "Network exploration and security auditing tool"
+    }
+
+    fn category(&self) -> PluginCategory {
+        PluginCategory::NetworkScanning
     }
 
     fn capabilities(&self) -> Vec<PluginCapability> {

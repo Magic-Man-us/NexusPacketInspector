@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { PluginSelector } from "./PluginSelector";
 import { NmapPanel } from "./NmapPanel";
+import { TsharkPanel } from "./TsharkPanel";
 
 export function PluginsView() {
   const [selectedPlugin, setSelectedPlugin] = useState<string | null>("nmap");
@@ -10,7 +11,8 @@ export function PluginsView() {
       <PluginSelector selected={selectedPlugin} onSelect={setSelectedPlugin} />
       <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
         {selectedPlugin === "nmap" && <NmapPanel />}
-        {selectedPlugin && selectedPlugin !== "nmap" && (
+        {selectedPlugin === "tshark" && <TsharkPanel />}
+        {selectedPlugin && selectedPlugin !== "nmap" && selectedPlugin !== "tshark" && (
           <div
             style={{
               flex: 1,
@@ -21,7 +23,7 @@ export function PluginsView() {
               fontSize: "11px",
             }}
           >
-            Plugin "{selectedPlugin}" has no dedicated UI panel yet
+            Plugin &quot;{selectedPlugin}&quot; has no dedicated UI panel yet
           </div>
         )}
         {!selectedPlugin && (

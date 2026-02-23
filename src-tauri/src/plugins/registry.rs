@@ -28,6 +28,7 @@ impl PluginRegistry {
             .map(|p| PluginInfo {
                 name: p.name().to_string(),
                 description: p.description().to_string(),
+                category: p.category(),
                 capabilities: p.capabilities(),
                 available: p.is_available(),
             })

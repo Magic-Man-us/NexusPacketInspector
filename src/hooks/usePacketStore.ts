@@ -65,6 +65,10 @@ interface PacketStore {
   updateDashboardStats: (packet: ParsedPacket) => void;
   resetDashboardStats: () => void;
 
+  // PCAP file path (for plugins like tshark)
+  pcapFilePath: string | null;
+  setPcapFilePath: (path: string | null) => void;
+
   // Loading
   isLoading: boolean;
   loadProgress: number;
@@ -109,7 +113,7 @@ export const usePacketStore = create<PacketStore>((set, get) => ({
         ? [...state.packets, ...newPackets].slice(-500)
         : [...state.packets, ...newPackets],
     })),
-  clearPackets: () => set({ packets: [], selectedPacket: null }),
+  clearPackets: () => set({ packets: [], selectedPacket: null, pcapFilePath: null }),
 
   selectedPacket: null,
   setSelectedPacket: (packet) => set({ selectedPacket: packet, highlightedByteRange: null }),
@@ -287,6 +291,9 @@ export const usePacketStore = create<PacketStore>((set, get) => ({
   setShowSettings: (show) => set({ showSettings: show }),
   visualEffects: defaultEffects,
   setVisualEffects: (effects) => set({ visualEffects: effects }),
+
+  pcapFilePath: null,
+  setPcapFilePath: (path) => set({ pcapFilePath: path }),
 
   isLoading: false,
   loadProgress: 0,

@@ -52,6 +52,7 @@ export function usePcapActions() {
   const resetStats = usePacketStore((s) => s.resetStats);
   const resetStreams = usePacketStore((s) => s.resetStreams);
   const resetDashboardStats = usePacketStore((s) => s.resetDashboardStats);
+  const setPcapFilePath = usePacketStore((s) => s.setPcapFilePath);
 
   const openPcapFile = useCallback(async () => {
     if (!isTauri) {
@@ -82,13 +83,14 @@ export function usePcapActions() {
 
     try {
       const count = await invoke<number>("open_pcap", { path });
+      setPcapFilePath(path);
       console.log(`Loaded ${count} packets from PCAP`);
     } catch (err) {
       console.error("Failed to open PCAP:", err);
     } finally {
       setLoading(false);
     }
-  }, [clearPackets, resetStats, resetStreams, resetDashboardStats, setMode, setLoading]);
+  }, [clearPackets, resetStats, resetStreams, resetDashboardStats, setMode, setLoading, setPcapFilePath]);
 
   const applyFilter = useCallback(async (filterText: string) => {
     if (!isTauri) return [];

@@ -37,14 +37,14 @@ export function NmapPanel() {
       console.error("Scan failed:", err);
     }
     setRunningPlugin(null);
-  }, [target, profileId, customFlags]);
+  }, [target, profileId, customFlags, clearProgress, setRunningPlugin]);
 
   const handleCancel = useCallback(async () => {
     try {
       await cancelPlugin("nmap");
     } catch {}
     setRunningPlugin(null);
-  }, []);
+  }, [setRunningPlugin]);
 
   const scanData = result?.data as NmapScanResult | undefined;
 
@@ -61,10 +61,13 @@ export function NmapPanel() {
           gap: "12px",
         }}
       >
-        <div style={{ fontSize: "36px", color: "var(--text-faint)" }}>!</div>
-        <div style={{ fontSize: "13px" }}>NMAP is not installed</div>
-        <div style={{ fontSize: "10px", color: "var(--text-faint)" }}>
-          Install nmap to enable network scanning
+        <div style={{ fontSize: "32px", color: "var(--text-faint)" }}>&#9888;</div>
+        <div style={{ fontFamily: "'Orbitron'", fontSize: "12px", color: "var(--text-secondary)" }}>
+          NMAP NOT INSTALLED
+        </div>
+        <div style={{ fontSize: "10px", color: "var(--text-faint)", maxWidth: "280px", textAlign: "center", lineHeight: "1.5" }}>
+          Install nmap to enable network scanning capabilities.
+          Visit nmap.org for installation instructions.
         </div>
       </div>
     );
@@ -79,11 +82,33 @@ export function NmapPanel() {
         overflow: "hidden",
       }}
     >
+      {/* Title bar */}
+      <div
+        style={{
+          padding: "10px 14px",
+          borderBottom: "1px solid var(--border)",
+          fontFamily: "'Orbitron'",
+          fontSize: "11px",
+          color: "var(--accent)",
+          letterSpacing: "1px",
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
+        }}
+      >
+        NMAP SCANNER
+        {isRunning && (
+          <span style={{ fontSize: "8px", color: "#00ffff", animation: "nmapPulse 1.5s ease-in-out infinite" }}>
+            RUNNING
+          </span>
+        )}
+      </div>
+
       {/* Controls */}
       <div
         style={{
           padding: "14px",
-          borderBottom: "1px solid rgba(0,255,159,0.1)",
+          borderBottom: "1px solid var(--border)",
           flexShrink: 0,
         }}
       >
@@ -96,6 +121,7 @@ export function NmapPanel() {
                 color: "var(--text-muted)",
                 marginBottom: "4px",
                 fontFamily: "'Orbitron'",
+                letterSpacing: "0.5px",
               }}
             >
               TARGET
@@ -108,11 +134,11 @@ export function NmapPanel() {
               disabled={isRunning}
               style={{
                 width: "100%",
-                background: "rgba(0,255,159,0.05)",
-                border: "1px solid rgba(0,255,159,0.3)",
+                background: "var(--bg-surface)",
+                border: "1px solid var(--border-strong)",
                 borderRadius: "4px",
                 padding: "8px",
-                color: "#00ff9f",
+                color: "var(--accent)",
                 fontFamily: "'Share Tech Mono', monospace",
                 fontSize: "12px",
                 outline: "none",
@@ -128,6 +154,7 @@ export function NmapPanel() {
                 color: "var(--text-muted)",
                 marginBottom: "4px",
                 fontFamily: "'Orbitron'",
+                letterSpacing: "0.5px",
               }}
             >
               PROFILE
@@ -137,11 +164,11 @@ export function NmapPanel() {
               onChange={(e) => setProfileId(e.target.value)}
               disabled={isRunning}
               style={{
-                background: "rgba(0,255,159,0.05)",
-                border: "1px solid rgba(0,255,159,0.3)",
+                background: "var(--bg-surface)",
+                border: "1px solid var(--border-strong)",
                 borderRadius: "4px",
                 padding: "8px",
-                color: "#00ff9f",
+                color: "var(--accent)",
                 fontFamily: "'Share Tech Mono', monospace",
                 fontSize: "11px",
                 outline: "none",
@@ -149,7 +176,7 @@ export function NmapPanel() {
               }}
             >
               {profiles.map((p) => (
-                <option key={p.id} value={p.id} style={{ background: "#0a0f0a" }}>
+                <option key={p.id} value={p.id} style={{ background: "var(--bg-primary)" }}>
                   {p.name}
                 </option>
               ))}
@@ -179,8 +206,8 @@ export function NmapPanel() {
                 padding: "8px 18px",
                 border: "none",
                 borderRadius: "4px",
-                background: "#00ff9f",
-                color: "#0a0f0a",
+                background: "var(--accent)",
+                color: "var(--bg-primary)",
                 fontFamily: "'Orbitron'",
                 fontSize: "10px",
                 fontWeight: 700,
@@ -201,11 +228,11 @@ export function NmapPanel() {
               disabled={isRunning}
               style={{
                 width: "100%",
-                background: "rgba(0,255,159,0.05)",
-                border: "1px solid rgba(0,255,159,0.3)",
+                background: "var(--bg-surface)",
+                border: "1px solid var(--border-strong)",
                 borderRadius: "4px",
                 padding: "8px",
-                color: "#00ff9f",
+                color: "var(--accent)",
                 fontFamily: "'Share Tech Mono', monospace",
                 fontSize: "11px",
                 outline: "none",
@@ -224,18 +251,19 @@ export function NmapPanel() {
             <div
               style={{
                 marginBottom: "12px",
-                padding: "10px",
-                backgroundColor: "rgba(0,255,159,0.03)",
+                padding: "10px 14px",
+                backgroundColor: "var(--bg-surface)",
                 borderRadius: "4px",
-                border: "1px solid rgba(0,255,159,0.1)",
+                border: "1px solid var(--border)",
               }}
             >
               <div
                 style={{
                   fontFamily: "'Orbitron'",
                   fontSize: "10px",
-                  color: "#00ff9f",
+                  color: "var(--accent)",
                   marginBottom: "6px",
+                  letterSpacing: "0.5px",
                 }}
               >
                 SCAN SUMMARY
@@ -257,7 +285,6 @@ export function NmapPanel() {
               )}
             </div>
 
-            {/* Hosts table */}
             {scanData.hosts
               .filter((h) => h.status === "up")
               .map((host, i) => (
@@ -289,13 +316,20 @@ export function NmapPanel() {
               gap: "8px",
             }}
           >
-            <div style={{ fontSize: "36px", color: "var(--text-faint)" }}>&#9906;</div>
+            <div style={{ fontSize: "32px" }}>&#9906;</div>
             <div style={{ fontSize: "11px" }}>
               Enter a target and click SCAN to begin
             </div>
           </div>
         ) : null}
       </div>
+
+      <style>{`
+        @keyframes nmapPulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.4; }
+        }
+      `}</style>
     </div>
   );
 }
@@ -307,16 +341,23 @@ function HostCard({ host }: { host: NmapHost }) {
     <div
       style={{
         marginBottom: "12px",
-        backgroundColor: "rgba(0,255,159,0.03)",
-        border: "1px solid rgba(0,255,159,0.1)",
+        backgroundColor: "var(--bg-surface)",
+        border: "1px solid var(--border)",
         borderRadius: "6px",
         overflow: "hidden",
+        transition: "border-color 0.2s",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.borderColor = "var(--border-strong)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.borderColor = "var(--border)";
       }}
     >
       <div
         style={{
           padding: "10px 14px",
-          borderBottom: "1px solid rgba(0,255,159,0.1)",
+          borderBottom: "1px solid var(--border)",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
@@ -327,7 +368,7 @@ function HostCard({ host }: { host: NmapHost }) {
             style={{
               fontFamily: "'Share Tech Mono', monospace",
               fontSize: "13px",
-              color: "#00ff9f",
+              color: "var(--accent)",
             }}
           >
             {host.address}
@@ -349,8 +390,8 @@ function HostCard({ host }: { host: NmapHost }) {
               fontSize: "9px",
               padding: "2px 8px",
               borderRadius: "3px",
-              backgroundColor: "rgba(0,255,159,0.15)",
-              color: "#00ff9f",
+              backgroundColor: "rgba(var(--accent-rgb),0.15)",
+              color: "var(--accent)",
             }}
           >
             {openPorts.length} open
@@ -359,7 +400,7 @@ function HostCard({ host }: { host: NmapHost }) {
       </div>
 
       {openPorts.length > 0 && (
-        <div style={{ padding: "0" }}>
+        <div>
           <div
             style={{
               display: "flex",
@@ -367,7 +408,8 @@ function HostCard({ host }: { host: NmapHost }) {
               fontSize: "8px",
               color: "var(--text-muted)",
               fontFamily: "'Orbitron'",
-              borderBottom: "1px solid rgba(255,255,255,0.05)",
+              borderBottom: "1px solid rgba(255,255,255,0.04)",
+              letterSpacing: "0.5px",
             }}
           >
             <span style={{ width: "70px" }}>PORT</span>
@@ -382,7 +424,8 @@ function HostCard({ host }: { host: NmapHost }) {
                 display: "flex",
                 padding: "6px 14px",
                 fontSize: "10px",
-                borderBottom: "1px solid rgba(255,255,255,0.03)",
+                borderBottom: "1px solid rgba(255,255,255,0.02)",
+                backgroundColor: i % 2 === 0 ? "transparent" : "rgba(255,255,255,0.01)",
               }}
             >
               <span
@@ -394,21 +437,14 @@ function HostCard({ host }: { host: NmapHost }) {
               >
                 {port.portId}/{port.protocol}
               </span>
-              <span
-                style={{
-                  width: "50px",
-                  color: port.state === "open" ? "#00ff9f" : "#ff3366",
-                }}
-              >
+              <span style={{ width: "50px", color: port.state === "open" ? "#00ff9f" : "#ff3366" }}>
                 {port.state}
               </span>
               <span style={{ width: "100px", color: "#00b8ff" }}>
                 {port.serviceName || "-"}
               </span>
               <span style={{ flex: 1, color: "var(--text-secondary)" }}>
-                {[port.serviceProduct, port.serviceVersion]
-                  .filter(Boolean)
-                  .join(" ") || "-"}
+                {[port.serviceProduct, port.serviceVersion].filter(Boolean).join(" ") || "-"}
               </span>
             </div>
           ))}

@@ -5,12 +5,27 @@ use tokio_util::sync::CancellationToken;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+pub enum PluginCategory {
+    NetworkScanning,
+    PacketAnalysis,
+    TrafficMonitoring,
+    IntrusionDetection,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub enum PluginCapability {
     HostDiscovery,
     PortScan,
     ServiceDetection,
     VulnScan,
     OsDetection,
+    PacketAnalysis,
+    DisplayFilter,
+    ProtocolStats,
+    ExpertInfo,
+    ConversationStats,
+    StreamFollow,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -27,6 +42,7 @@ pub enum PluginStatus {
 pub struct PluginInfo {
     pub name: String,
     pub description: String,
+    pub category: PluginCategory,
     pub capabilities: Vec<PluginCapability>,
     pub available: bool,
 }
@@ -88,6 +104,7 @@ impl std::error::Error for PluginError {}
 pub trait Plugin: Send + Sync {
     fn name(&self) -> &str;
     fn description(&self) -> &str;
+    fn category(&self) -> PluginCategory;
     fn capabilities(&self) -> Vec<PluginCapability>;
     fn is_available(&self) -> bool;
     fn default_params(&self) -> serde_json::Value;
