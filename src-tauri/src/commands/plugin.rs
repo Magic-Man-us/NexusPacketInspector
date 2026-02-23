@@ -68,8 +68,12 @@ pub async fn run_plugin(
     // Execute plugin — `plugin` borrows from the cloned Arc, not from State<'_>
     let result = plugin
         .execute(params, cancel.clone(), progress_tx)
-        .await
-        .map_err(|e| e.to_string())?;
+        .await;
+
+    // Always remove the cancel token regardless of success or failure
+    state.plugin_cancels.write().remove(&name);
+
+    let result = result.map_err(|e| e.to_string())?;
 
     // Store result and enrichments (quick synchronous state access after .await)
     {
@@ -82,9 +86,6 @@ pub async fn run_plugin(
             enrichments.insert(e.ip.clone(), e.clone());
         }
     }
-
-    // Remove cancel token
-    state.plugin_cancels.write().remove(&name);
 
     let _ = app.emit("plugin-complete", &result);
 
