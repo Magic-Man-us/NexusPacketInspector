@@ -115,3 +115,10 @@ pub trait Plugin: Send + Sync {
         progress_tx: tokio::sync::mpsc::Sender<PluginProgress>,
     ) -> Result<PluginResult, PluginError>;
 }
+
+pub fn timestamp_now() -> String {
+    let duration = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap_or_default();
+    format!("{}", duration.as_secs())
+}

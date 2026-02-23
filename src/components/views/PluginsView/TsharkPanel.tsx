@@ -27,6 +27,7 @@ export function TsharkPanel() {
   const runningPlugin = usePluginStore((s) => s.runningPlugin);
   const setRunningPlugin = usePluginStore((s) => s.setRunningPlugin);
   const clearProgress = usePluginStore((s) => s.clearProgress);
+  const setResult = usePluginStore((s) => s.setResult);
   const result = usePluginStore((s) => s.results["tshark"]);
   const plugins = usePluginStore((s) => s.plugins);
   const pcapFilePath = usePacketStore((s) => s.pcapFilePath);
@@ -46,7 +47,7 @@ export function TsharkPanel() {
     clearProgress();
     setRunningPlugin("tshark");
     try {
-      await runPlugin("tshark", {
+      const pluginResult = await runPlugin("tshark", {
         pcapPath: pcapFilePath,
         mode: activeMode,
         displayFilter,
@@ -55,11 +56,13 @@ export function TsharkPanel() {
         streamIndex,
         limit,
       });
+      setResult("tshark", pluginResult);
     } catch (err) {
       console.error("tshark analysis failed:", err);
+    } finally {
+      setRunningPlugin(null);
     }
-    setRunningPlugin(null);
-  }, [pcapFilePath, activeMode, displayFilter, convType, streamProto, streamIndex, limit, clearProgress, setRunningPlugin]);
+  }, [pcapFilePath, activeMode, displayFilter, convType, streamProto, streamIndex, limit, clearProgress, setRunningPlugin, setResult]);
 
   const handleCancel = useCallback(async () => {
     try {

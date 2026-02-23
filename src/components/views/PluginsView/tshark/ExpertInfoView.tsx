@@ -29,7 +29,13 @@ export function ExpertInfoView({ entries }: Props) {
   const counts = useMemo(() => {
     const c: Record<string, number> = {};
     for (const e of entries) {
-      const key = e.severity;
+      // Normalize "Warning" → "Warn" to match filter keys
+      const sev = e.severity.toLowerCase();
+      let key = e.severity;
+      if (sev === "warning") key = "Warn";
+      else if (sev === "error") key = "Error";
+      else if (sev === "note") key = "Note";
+      else if (sev === "chat") key = "Chat";
       c[key] = (c[key] || 0) + e.count;
     }
     return c;

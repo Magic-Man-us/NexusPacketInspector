@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use tauri::{AppHandle, Emitter, State};
 use tokio_util::sync::CancellationToken;
 
@@ -34,8 +36,11 @@ pub async fn run_plugin(
     name: String,
     params: serde_json::Value,
 ) -> Result<PluginResult, String> {
-    let plugin = state
-        .plugin_registry
+    // Clone the Arc<PluginRegistry> so we don't hold State<'_> across .await
+    let registry = Arc::clone(&state.plugin_registry);
+
+    // Validate plugin exists and is available (synchronous, borrows registry not state)
+    let plugin = registry
         .get(&name)
         .ok_or_else(|| format!("Plugin '{}' not found", name))?;
 
@@ -43,6 +48,7 @@ pub async fn run_plugin(
         return Err(format!("Plugin '{}' is not available (CLI tool not installed)", name));
     }
 
+    // Set up cancellation token (quick synchronous state access)
     let cancel = CancellationToken::new();
     state
         .plugin_cancels
@@ -59,12 +65,13 @@ pub async fn run_plugin(
         }
     });
 
+    // Execute plugin — `plugin` borrows from the cloned Arc, not from State<'_>
     let result = plugin
         .execute(params, cancel.clone(), progress_tx)
         .await
         .map_err(|e| e.to_string())?;
 
-    // Store result and enrichments
+    // Store result and enrichments (quick synchronous state access after .await)
     {
         let mut results = state.plugin_results.write();
         results.insert(name.clone(), result.clone());

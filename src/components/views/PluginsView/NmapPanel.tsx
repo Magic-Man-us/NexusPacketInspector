@@ -8,6 +8,8 @@ export function NmapPanel() {
   const runningPlugin = usePluginStore((s) => s.runningPlugin);
   const setRunningPlugin = usePluginStore((s) => s.setRunningPlugin);
   const clearProgress = usePluginStore((s) => s.clearProgress);
+  const setResult = usePluginStore((s) => s.setResult);
+  const mergeEnrichments = usePluginStore((s) => s.mergeEnrichments);
   const result = usePluginStore((s) => s.results["nmap"]);
   const plugins = usePluginStore((s) => s.plugins);
 
@@ -32,12 +34,17 @@ export function NmapPanel() {
     clearProgress();
     setRunningPlugin("nmap");
     try {
-      await runPlugin("nmap", { target, profile: profileId, customFlags });
+      const pluginResult = await runPlugin("nmap", { target, profile: profileId, customFlags });
+      setResult("nmap", pluginResult);
+      if (pluginResult.enrichments.length > 0) {
+        mergeEnrichments(pluginResult.enrichments);
+      }
     } catch (err) {
       console.error("Scan failed:", err);
+    } finally {
+      setRunningPlugin(null);
     }
-    setRunningPlugin(null);
-  }, [target, profileId, customFlags, clearProgress, setRunningPlugin]);
+  }, [target, profileId, customFlags, clearProgress, setRunningPlugin, setResult, mergeEnrichments]);
 
   const handleCancel = useCallback(async () => {
     try {

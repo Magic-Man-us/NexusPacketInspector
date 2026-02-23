@@ -9,8 +9,8 @@ use tokio_util::sync::CancellationToken;
 use super::parser::parse_nmap_xml;
 use super::profiles::get_profiles;
 use crate::plugins::traits::{
-    PacketEnrichment, Plugin, PluginCapability, PluginCategory, PluginError, PluginProgress,
-    PluginResult, PluginStatus,
+    timestamp_now, PacketEnrichment, Plugin, PluginCapability, PluginCategory, PluginError,
+    PluginProgress, PluginResult, PluginStatus,
 };
 
 pub struct NmapPlugin;
@@ -129,7 +129,7 @@ impl Plugin for NmapPlugin {
 
         args.push(target.clone());
 
-        let started_at = chrono_now();
+        let started_at = timestamp_now();
 
         let _ = progress_tx
             .send(PluginProgress {
@@ -203,7 +203,7 @@ impl Plugin for NmapPlugin {
 
         let _ = stderr_handle.await;
 
-        let completed_at = chrono_now();
+        let completed_at = timestamp_now();
 
         if !wait_result.success() && output_str.is_empty() {
             return Err(PluginError::ExecutionFailed(format!(
@@ -286,12 +286,4 @@ impl Plugin for NmapPlugin {
             enrichments,
         })
     }
-}
-
-fn chrono_now() -> String {
-    // Simple timestamp without chrono dependency
-    let duration = std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .unwrap_or_default();
-    format!("{}", duration.as_secs())
 }

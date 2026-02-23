@@ -9,8 +9,8 @@ use super::modes::build_command;
 use super::parser::{parse_conversations, parse_expert_info, parse_follow_stream, parse_protocol_hierarchy};
 use super::types::{TsharkAnalysisMode, TsharkData, TsharkResult};
 use crate::plugins::traits::{
-    Plugin, PluginCapability, PluginCategory, PluginError, PluginProgress, PluginResult,
-    PluginStatus,
+    timestamp_now, Plugin, PluginCapability, PluginCategory, PluginError, PluginProgress,
+    PluginResult, PluginStatus,
 };
 
 pub struct TsharkPlugin;
@@ -133,7 +133,7 @@ impl Plugin for TsharkPlugin {
 
         let cmd = build_command(&mode, &pcap_path, &params);
 
-        let started_at = chrono_now();
+        let started_at = timestamp_now();
 
         let _ = progress_tx
             .send(PluginProgress {
@@ -214,7 +214,7 @@ impl Plugin for TsharkPlugin {
         let output_str = String::from_utf8_lossy(&output_bytes).to_string();
         let _ = stderr_handle.await;
 
-        let completed_at = chrono_now();
+        let completed_at = timestamp_now();
 
         if !wait_result.success() && output_str.is_empty() {
             return Err(PluginError::ExecutionFailed(format!(
@@ -259,7 +259,11 @@ impl Plugin for TsharkPlugin {
                     let count = stream.segments.len();
                     (TsharkData::Stream(stream), count)
                 }
-                _ => unreachable!(),
+                _ => {
+                    return Err(PluginError::ExecutionFailed(
+                        format!("Unexpected non-JSON mode: {:?}", mode),
+                    ));
+                }
             }
         };
 
@@ -271,8 +275,8 @@ impl Plugin for TsharkPlugin {
         };
 
         let summary = format!(
-            "tshark {} analysis: {} items from {}",
-            mode_str, packet_count, pcap_path
+            "tshark {:?} analysis: {} items from {}",
+            mode, packet_count, pcap_path
         );
 
         let _ = progress_tx
@@ -293,11 +297,4 @@ impl Plugin for TsharkPlugin {
             enrichments: vec![],
         })
     }
-}
-
-fn chrono_now() -> String {
-    let duration = std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .unwrap_or_default();
-    format!("{}", duration.as_secs())
 }

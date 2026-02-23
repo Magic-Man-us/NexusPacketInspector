@@ -147,9 +147,9 @@ pub fn parse_conversations(output: &str) -> Result<Vec<ConversationEntry>, Plugi
     for line in output.lines() {
         let trimmed = line.trim();
 
-        // Skip until we pass the header separator
+        // Skip the header line containing "<->" (e.g. "Address A <-> Address B ...")
         if trimmed.contains("<->") && !in_data {
-            in_data = false; // This is the header line
+            in_data = true;
             continue;
         }
         if trimmed.starts_with("Filter:") || trimmed.starts_with("===") {
@@ -243,7 +243,7 @@ pub fn parse_follow_stream(output: &str) -> Result<StreamData, PluginError> {
             continue;
         }
 
-        if line.starts_with("Stream:") || line.contains("stream") {
+        if line.starts_with("Stream:") {
             if let Some(idx) = line.split_whitespace().last() {
                 stream_index = idx.parse().unwrap_or(0);
             }

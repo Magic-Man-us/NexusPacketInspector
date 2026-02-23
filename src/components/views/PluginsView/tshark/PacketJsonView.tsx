@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { LAYER_COLORS } from "../../../../styles/theme";
 
 interface Props {
@@ -93,14 +93,14 @@ function PacketItem({ index, data }: { index: number; data: unknown }) {
 function JsonTree({ value, depth, keyPath }: { value: unknown; depth: number; keyPath: string }) {
   const [collapsed, setCollapsed] = useState(depth > 2);
 
-  const getLayerColor = useCallback((key: string) => {
+  const getLayerColor = (key: string) => {
     const parts = key.toLowerCase().split(".");
     for (const part of parts) {
       const layerKey = LAYER_KEYS[part];
       if (layerKey && LAYER_COLORS[layerKey]) return LAYER_COLORS[layerKey].text;
     }
     return null;
-  }, []);
+  };
 
   if (value === null || value === undefined) {
     return <span style={{ color: "var(--text-dim)" }}>null</span>;
