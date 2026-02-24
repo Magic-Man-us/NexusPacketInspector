@@ -18,19 +18,9 @@ function ensureAnimStyles() {
       92%  { opacity: 1; }
       100% { offset-distance: 100%; opacity: 0; }
     }
-    @keyframes flowPulseLeft {
-      0%   { offset-distance: 100%; opacity: 0; }
-      8%   { opacity: 1; }
-      92%  { opacity: 1; }
-      100% { offset-distance: 0%; opacity: 0; }
-    }
     @keyframes streamDashRight {
       from { stroke-dashoffset: 24; }
       to   { stroke-dashoffset: 0; }
-    }
-    @keyframes streamDashLeft {
-      from { stroke-dashoffset: 0; }
-      to   { stroke-dashoffset: 24; }
     }
   `;
   document.head.appendChild(style);
@@ -321,8 +311,10 @@ function FlowDiagram({ stream, onSelectPacket }: FlowDiagramProps) {
             const x2 = isForward ? lineXDst : lineXSrc;
             const arrowSize = 8;
             const pathD = `M ${x1} ${y} L ${x2} ${y}`;
-            const dashAnim = isForward ? "streamDashRight" : "streamDashLeft";
-            const pulseAnim = isForward ? "flowPulseRight" : "flowPulseLeft";
+            // Path direction (M x1 L x2) already handles forward vs reverse,
+            // so always animate forward along the path.
+            const dashAnim = "streamDashRight";
+            const pulseAnim = "flowPulseRight";
             // Stagger each row so streams feel organic
             const stagger = (i * 0.25) % 1.6;
 
