@@ -309,7 +309,6 @@ function FlowDiagram({ stream, onSelectPacket }: FlowDiagramProps) {
             const y = i * ROW_HEIGHT + LINE_Y_OFFSET;
             const x1 = isForward ? lineXSrc : lineXDst;
             const x2 = isForward ? lineXDst : lineXSrc;
-            const arrowSize = 8;
             const pathD = `M ${x1} ${y} L ${x2} ${y}`;
             // Path direction (M x1 L x2) already handles forward vs reverse,
             // so always animate forward along the path.
@@ -317,6 +316,22 @@ function FlowDiagram({ stream, onSelectPacket }: FlowDiagramProps) {
             const pulseAnim = "flowPulseRight";
             // Stagger each row so streams feel organic
             const stagger = (i * 0.25) % 1.6;
+
+            // Scale visual weight by packet size (log scale, 0.4–1.0)
+            // Tiny ACKs ~54B → 0.4, large data ~1500B → 1.0
+            const sz = Math.max(40, Math.min(pkt.length, 1500));
+            const scale = 0.4 + 0.6 * (Math.log(sz) - Math.log(40)) / (Math.log(1500) - Math.log(40));
+            const arrowSize = 5 + 5 * scale;
+            const arrowHalf = 3 + 4 * scale;
+            const riverWidth = 1 + 2.5 * scale;
+            const coreWidth = 0.5 + 1 * scale;
+            const gradWidth = 1.5 + 2.5 * scale;
+            const leadR = 2 + 3 * scale;
+            const colorR = 1.5 + 3 * scale;
+            const glowR = 5 + 10 * scale;
+            const wave2LeadR = 1.5 + 2 * scale;
+            const wave2ColorR = 1 + 2 * scale;
+            const wave2GlowR = 3 + 8 * scale;
 
             return (
               <g key={i}>
@@ -332,8 +347,8 @@ function FlowDiagram({ stream, onSelectPacket }: FlowDiagramProps) {
                 <path
                   d={pathD}
                   stroke={stream.color}
-                  strokeWidth="2"
-                  strokeOpacity="0.35"
+                  strokeWidth={riverWidth}
+                  strokeOpacity={0.2 + 0.25 * scale}
                   strokeDasharray="12 12"
                   fill="none"
                   filter="url(#streamGlow)"
@@ -346,8 +361,8 @@ function FlowDiagram({ stream, onSelectPacket }: FlowDiagramProps) {
                 <path
                   d={pathD}
                   stroke={stream.color}
-                  strokeWidth="1"
-                  strokeOpacity="0.6"
+                  strokeWidth={coreWidth}
+                  strokeOpacity={0.3 + 0.4 * scale}
                   strokeDasharray="4 20"
                   fill="none"
                   style={{
@@ -359,7 +374,7 @@ function FlowDiagram({ stream, onSelectPacket }: FlowDiagramProps) {
                 <path
                   d={pathD}
                   stroke={isForward ? "url(#flowGradRight)" : "url(#flowGradLeft)"}
-                  strokeWidth="2.5"
+                  strokeWidth={gradWidth}
                   fill="none"
                   strokeOpacity="0.25"
                 />
@@ -367,14 +382,14 @@ function FlowDiagram({ stream, onSelectPacket }: FlowDiagramProps) {
                 {/* 5) Arrowhead */}
                 {isForward ? (
                   <polygon
-                    points={`${x2},${y} ${x2 - arrowSize},${y - 5} ${x2 - arrowSize},${y + 5}`}
+                    points={`${x2},${y} ${x2 - arrowSize},${y - arrowHalf} ${x2 - arrowSize},${y + arrowHalf}`}
                     fill={stream.color}
                     opacity="0.85"
                     filter="url(#pulseGlow)"
                   />
                 ) : (
                   <polygon
-                    points={`${x2},${y} ${x2 + arrowSize},${y - 5} ${x2 + arrowSize},${y + 5}`}
+                    points={`${x2},${y} ${x2 + arrowSize},${y - arrowHalf} ${x2 + arrowSize},${y + arrowHalf}`}
                     fill={stream.color}
                     opacity="0.85"
                     filter="url(#pulseGlow)"
@@ -383,7 +398,7 @@ function FlowDiagram({ stream, onSelectPacket }: FlowDiagramProps) {
 
                 {/* 6) Lead pulse — bright dot traveling the line */}
                 <circle
-                  r="3.5"
+                  r={leadR}
                   fill="#fff"
                   filter="url(#leadGlow)"
                   opacity="0"
@@ -396,7 +411,7 @@ function FlowDiagram({ stream, onSelectPacket }: FlowDiagramProps) {
 
                 {/* 7) Core colored pulse — slightly behind the white lead */}
                 <circle
-                  r="3"
+                  r={colorR}
                   fill={stream.color}
                   filter="url(#pulseGlow)"
                   opacity="0"
@@ -409,7 +424,7 @@ function FlowDiagram({ stream, onSelectPacket }: FlowDiagramProps) {
 
                 {/* 8) Wide trailing glow behind the pulse */}
                 <circle
-                  r="10"
+                  r={glowR}
                   fill={stream.color}
                   opacity="0"
                   style={{
@@ -422,7 +437,7 @@ function FlowDiagram({ stream, onSelectPacket }: FlowDiagramProps) {
 
                 {/* 9) Second pulse wave — offset by half period for continuous stream feel */}
                 <circle
-                  r="2.5"
+                  r={wave2LeadR}
                   fill="#fff"
                   filter="url(#pulseGlow)"
                   opacity="0"
@@ -433,7 +448,7 @@ function FlowDiagram({ stream, onSelectPacket }: FlowDiagramProps) {
                   } as React.CSSProperties}
                 />
                 <circle
-                  r="2"
+                  r={wave2ColorR}
                   fill={stream.color}
                   opacity="0"
                   style={{
@@ -443,7 +458,7 @@ function FlowDiagram({ stream, onSelectPacket }: FlowDiagramProps) {
                   } as React.CSSProperties}
                 />
                 <circle
-                  r="7"
+                  r={wave2GlowR}
                   fill={stream.color}
                   opacity="0"
                   style={{
