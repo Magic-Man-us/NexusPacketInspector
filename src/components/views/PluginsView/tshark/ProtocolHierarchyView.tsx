@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { FONT } from "../../../../styles/typography";
 import { ProtocolNode } from "../../../../types/plugin";
 import { formatBytes } from "../../../../lib/formatters";
 
@@ -11,7 +12,7 @@ export function ProtocolHierarchyView({ nodes }: Props) {
 
   if (nodes.length === 0) {
     return (
-      <div style={{ color: "var(--text-faint)", fontSize: "11px", textAlign: "center", padding: "20px" }}>
+      <div style={{ color: "var(--text-faint)", fontSize: FONT.size.base, textAlign: "center", padding: "20px" }}>
         No protocol hierarchy data
       </div>
     );
@@ -50,16 +51,16 @@ export function ProtocolHierarchyView({ nodes }: Props) {
     <div>
       <div
         style={{
-          fontFamily: "'Orbitron'",
-          fontSize: "10px",
+          fontFamily: FONT.family.display,
+          fontSize: FONT.size.md,
           color: "var(--accent)",
           marginBottom: "12px",
-          letterSpacing: "0.5px",
+          letterSpacing: FONT.spacing.normal,
         }}
       >
         PROTOCOL HIERARCHY
       </div>
-      <div style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: "11px" }}>
+      <div style={{ fontFamily: FONT.family.mono, fontSize: FONT.size.base }}>
         {visibleNodes.map(({ node, index, hasChildren }) => {
           const barWidth = (node.frames / maxFrames) * 100;
           const isCollapsed = collapsed.has(index);
@@ -85,12 +86,12 @@ export function ProtocolHierarchyView({ nodes }: Props) {
                 onClick={() => hasChildren && toggleCollapse(index)}
               >
                 {/* Expand/collapse indicator */}
-                <span style={{ width: "12px", fontSize: "10px", color: "var(--text-dim)" }}>
+                <span style={{ width: "12px", fontSize: FONT.size.md, color: "var(--text-dim)" }}>
                   {hasChildren ? (isCollapsed ? "\u25B6" : "\u25BC") : " "}
                 </span>
 
                 {/* Protocol name */}
-                <span style={{ width: "120px", color: "var(--accent)", fontWeight: "bold" }}>
+                <span style={{ width: "120px", color: "var(--accent)", fontWeight: FONT.weight.bold }}>
                   {node.protocol}
                 </span>
 
@@ -107,13 +108,13 @@ export function ProtocolHierarchyView({ nodes }: Props) {
                 </div>
 
                 {/* Stats */}
-                <span style={{ width: "55px", textAlign: "right", color: "var(--text-secondary)", fontSize: "10px" }}>
+                <span style={{ width: "55px", textAlign: "right", color: "var(--text-secondary)", fontSize: FONT.size.md }}>
                   {node.percentFrames.toFixed(1)}%
                 </span>
-                <span style={{ width: "65px", textAlign: "right", color: "var(--text-muted)", fontSize: "10px" }}>
+                <span style={{ width: "65px", textAlign: "right", color: "var(--text-muted)", fontSize: FONT.size.md }}>
                   {node.frames} frm
                 </span>
-                <span style={{ width: "70px", textAlign: "right", color: "var(--text-muted)", fontSize: "10px" }}>
+                <span style={{ width: "70px", textAlign: "right", color: "var(--text-muted)", fontSize: FONT.size.md }}>
                   {formatBytes(node.bytes)}
                 </span>
               </div>

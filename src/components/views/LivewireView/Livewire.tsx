@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 import { usePacketStore } from "../../../hooks/usePacketStore";
 import { styles } from "../../../styles/components";
 import { PROTOCOL_COLORS } from "../../../styles/theme";
+import { FONT } from "../../../styles/typography";
 import { ENCRYPTED_PROTOCOLS } from "../../../lib/protocol-templates";
 import { EmptyState } from "../../shared/EmptyState";
 import {
@@ -67,7 +68,7 @@ export function Livewire() {
       {/* Left panel — Stream selector */}
       <div style={styles.livewireStreamPanel}>
         <div style={{ padding: "10px 12px", borderBottom: "1px solid rgba(0,255,159,0.1)" }}>
-          <div style={{ fontFamily: "'Orbitron'", fontSize: "11px", color: "#00ff9f", marginBottom: "8px" }}>
+          <div style={{ fontFamily: FONT.family.display, fontSize: FONT.size.base, color: "#00ff9f", marginBottom: "8px" }}>
             STREAM CONTENT
           </div>
           <input
@@ -82,8 +83,8 @@ export function Livewire() {
               border: "1px solid rgba(0,255,159,0.15)",
               borderRadius: "3px",
               color: "#e0e0e0",
-              fontSize: "10px",
-              fontFamily: "'Share Tech Mono', monospace",
+              fontSize: FONT.size.md,
+              fontFamily: FONT.family.mono,
               outline: "none",
               boxSizing: "border-box",
             }}
@@ -119,19 +120,19 @@ export function Livewire() {
                       flexShrink: 0,
                     }}
                   />
-                  <span style={{ fontSize: "10px", fontWeight: 700, color: isSelected ? "#00ff9f" : "var(--text-primary)" }}>
+                  <span style={{ fontSize: FONT.size.md, fontWeight: FONT.weight.bold, color: isSelected ? "#00ff9f" : "var(--text-primary)" }}>
                     {stream.protocol}
                   </span>
                   {isEncrypted && (
-                    <span style={{ fontSize: "8px", color: "#ff3366", fontWeight: 700, padding: "1px 4px", border: "1px solid rgba(255,51,102,0.3)", borderRadius: "2px" }}>
+                    <span style={{ fontSize: FONT.size.xs, color: "#ff3366", fontWeight: FONT.weight.bold, padding: "1px 4px", border: "1px solid rgba(255,51,102,0.3)", borderRadius: "2px" }}>
                       ENCRYPTED
                     </span>
                   )}
-                  <span style={{ fontSize: "9px", color: "var(--text-muted)", marginLeft: "auto" }}>
+                  <span style={{ fontSize: FONT.size.sm, color: "var(--text-muted)", marginLeft: "auto" }}>
                     {stream.packets.length} pkts
                   </span>
                 </div>
-                <div style={{ fontSize: "9px", color: "var(--text-secondary)", fontFamily: "monospace" }}>
+                <div style={{ fontSize: FONT.size.sm, color: "var(--text-secondary)", fontFamily: FONT.family.mono }}>
                   {stream.srcIP} → {stream.dstIP}
                 </div>
               </div>
@@ -143,7 +144,7 @@ export function Livewire() {
       {/* Right panel — Content display */}
       <div style={styles.livewireContentArea}>
         {!selectedStreamKey || !reassembled ? (
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: "var(--text-faint)", fontSize: "12px" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: "var(--text-faint)", fontSize: FONT.size.lg }}>
             Select a stream to view reconstructed content
           </div>
         ) : (
@@ -222,11 +223,11 @@ export function Livewire() {
 function EncryptedMessage({ protocol }: { protocol: string }) {
   return (
     <div style={styles.livewireEncrypted}>
-      <span style={{ fontSize: "48px" }}>🔒</span>
-      <span style={{ fontFamily: "'Orbitron'", fontSize: "13px", color: "#ff3366" }}>
+      <span style={{ fontSize: FONT.size["5xl"] }}>🔒</span>
+      <span style={{ fontFamily: FONT.family.display, fontSize: FONT.size.lg, color: "#ff3366" }}>
         ENCRYPTED STREAM
       </span>
-      <span style={{ fontSize: "11px", textAlign: "center", maxWidth: "300px" }}>
+      <span style={{ fontSize: FONT.size.base, textAlign: "center", maxWidth: "300px" }}>
         {protocol} traffic is encrypted. Content reconstruction is not possible for this stream.
       </span>
     </div>
@@ -241,7 +242,7 @@ function RawView({ reassembled, direction }: { reassembled: ReassembledStream; d
         ? reassembled.serverText
         : `${reassembled.clientText}\n--- SERVER ---\n${reassembled.serverText}`;
 
-  if (!text) return <div style={{ color: "var(--text-faint)", fontSize: "11px" }}>No payload data</div>;
+  if (!text) return <div style={{ color: "var(--text-faint)", fontSize: FONT.size.base }}>No payload data</div>;
 
   return <pre style={styles.livewireCodeBlock}>{text}</pre>;
 }
@@ -256,7 +257,7 @@ function HexView({ reassembled, direction }: { reassembled: ReassembledStream; d
     return combined;
   }, [direction, reassembled]);
 
-  if (bytes.length === 0) return <div style={{ color: "var(--text-faint)", fontSize: "11px" }}>No payload data</div>;
+  if (bytes.length === 0) return <div style={{ color: "var(--text-faint)", fontSize: FONT.size.base }}>No payload data</div>;
 
   return <pre style={styles.livewireCodeBlock}>{formatHexDump(bytes)}</pre>;
 }
@@ -293,10 +294,10 @@ function HttpRenderer({ exchanges, direction }: { exchanges: HttpExchange[]; dir
           {(direction === "both" || direction === "client") && (
             <div style={styles.livewireCard}>
               <div style={{ ...styles.livewireCardHeader, backgroundColor: "rgba(0,100,255,0.1)", color: "#00b8ff" }}>
-                <span style={{ fontFamily: "'Orbitron'", fontSize: "8px", padding: "2px 6px", border: "1px solid rgba(0,184,255,0.3)", borderRadius: "2px" }}>
+                <span style={{ fontFamily: FONT.family.display, fontSize: FONT.size.xs, padding: "2px 6px", border: "1px solid rgba(0,184,255,0.3)", borderRadius: "2px" }}>
                   REQUEST
                 </span>
-                <span style={{ color: "#ff6b00", fontWeight: 700 }}>{ex.request.method}</span>
+                <span style={{ color: "#ff6b00", fontWeight: FONT.weight.bold }}>{ex.request.method}</span>
                 <span style={{ color: "#e0e0e0" }}>{ex.request.path}</span>
                 <span style={{ color: "var(--text-muted)" }}>{ex.request.version}</span>
               </div>
@@ -319,10 +320,10 @@ function HttpRenderer({ exchanges, direction }: { exchanges: HttpExchange[]; dir
                   color: ex.response.status < 400 ? "#00ff9f" : "#ff3366",
                 }}
               >
-                <span style={{ fontFamily: "'Orbitron'", fontSize: "8px", padding: "2px 6px", border: `1px solid ${ex.response.status < 400 ? "rgba(0,255,159,0.3)" : "rgba(255,51,102,0.3)"}`, borderRadius: "2px" }}>
+                <span style={{ fontFamily: FONT.family.display, fontSize: FONT.size.xs, padding: "2px 6px", border: `1px solid ${ex.response.status < 400 ? "rgba(0,255,159,0.3)" : "rgba(255,51,102,0.3)"}`, borderRadius: "2px" }}>
                   RESPONSE
                 </span>
-                <span style={{ fontWeight: 700 }}>{ex.response.status}</span>
+                <span style={{ fontWeight: FONT.weight.bold }}>{ex.response.status}</span>
                 <span style={{ color: "var(--text-secondary)" }}>{ex.response.statusText}</span>
               </div>
               <div style={styles.livewireCardBody}>
@@ -338,7 +339,7 @@ function HttpRenderer({ exchanges, direction }: { exchanges: HttpExchange[]; dir
         </React.Fragment>
       ))}
       {exchanges.length === 0 && (
-        <div style={{ color: "var(--text-faint)", fontSize: "11px" }}>No HTTP exchanges detected</div>
+        <div style={{ color: "var(--text-faint)", fontSize: FONT.size.base }}>No HTTP exchanges detected</div>
       )}
     </>
   );
@@ -350,7 +351,7 @@ function HeaderList({ headers }: { headers: Record<string, string> }) {
   const shown = expanded ? entries : entries.slice(0, 3);
 
   return (
-    <div style={{ fontSize: "10px" }}>
+    <div style={{ fontSize: FONT.size.md }}>
       {shown.map(([k, v]) => (
         <div key={k} style={{ padding: "1px 0" }}>
           <span style={{ color: "#00b8ff" }}>{k}</span>
@@ -361,7 +362,7 @@ function HeaderList({ headers }: { headers: Record<string, string> }) {
       {entries.length > 3 && (
         <button
           onClick={() => setExpanded(!expanded)}
-          style={{ background: "none", border: "none", color: "#00ff9f", fontSize: "9px", cursor: "pointer", padding: "2px 0" }}
+          style={{ background: "none", border: "none", color: "#00ff9f", fontSize: FONT.size.sm, cursor: "pointer", padding: "2px 0" }}
         >
           {expanded ? "▲ collapse" : `▼ ${entries.length - 3} more headers`}
         </button>
@@ -374,12 +375,12 @@ function SmtpRenderer({ envelope }: { envelope: SmtpEnvelope }) {
   return (
     <div style={styles.livewireCard}>
       <div style={{ ...styles.livewireCardHeader, backgroundColor: "rgba(255,149,0,0.1)", color: "#ff9500" }}>
-        <span style={{ fontFamily: "'Orbitron'", fontSize: "8px", padding: "2px 6px", border: "1px solid rgba(255,149,0,0.3)", borderRadius: "2px" }}>
+        <span style={{ fontFamily: FONT.family.display, fontSize: FONT.size.xs, padding: "2px 6px", border: "1px solid rgba(255,149,0,0.3)", borderRadius: "2px" }}>
           EMAIL
         </span>
       </div>
       <div style={styles.livewireCardBody}>
-        <div style={{ marginBottom: "10px", fontSize: "10px" }}>
+        <div style={{ marginBottom: "10px", fontSize: FONT.size.md }}>
           <div style={{ padding: "2px 0" }}>
             <span style={{ color: "#ff9500" }}>From: </span>
             <span style={{ color: "#e0e0e0" }}>{envelope.from || "—"}</span>
@@ -390,7 +391,7 @@ function SmtpRenderer({ envelope }: { envelope: SmtpEnvelope }) {
           </div>
           <div style={{ padding: "2px 0" }}>
             <span style={{ color: "#ff9500" }}>Subject: </span>
-            <span style={{ color: "#e0e0e0", fontWeight: 700 }}>{envelope.subject || "—"}</span>
+            <span style={{ color: "#e0e0e0", fontWeight: FONT.weight.bold }}>{envelope.subject || "—"}</span>
           </div>
         </div>
         <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: "10px" }}>
@@ -452,8 +453,8 @@ function MqttRenderer({ messages }: { messages: MqttMsg[] }) {
           <div style={{ ...styles.livewireCardHeader, backgroundColor: `${typeColors[msg.type] || "#888"}11` }}>
             <span
               style={{
-                fontFamily: "'Orbitron'",
-                fontSize: "8px",
+                fontFamily: FONT.family.display,
+                fontSize: FONT.size.xs,
                 padding: "2px 6px",
                 border: `1px solid ${typeColors[msg.type] || "#888"}55`,
                 borderRadius: "2px",
@@ -462,7 +463,7 @@ function MqttRenderer({ messages }: { messages: MqttMsg[] }) {
             >
               {msg.type}
             </span>
-            {msg.topic && <span style={{ color: "var(--text-secondary)", fontSize: "9px" }}>{msg.topic}</span>}
+            {msg.topic && <span style={{ color: "var(--text-secondary)", fontSize: FONT.size.sm }}>{msg.topic}</span>}
           </div>
           {msg.payload && (
             <div style={styles.livewireCardBody}>
@@ -477,7 +478,7 @@ function MqttRenderer({ messages }: { messages: MqttMsg[] }) {
 
 function DnsRenderer({ queries }: { queries: DnsQuery[] }) {
   return (
-    <div style={{ fontSize: "10px" }}>
+    <div style={{ fontSize: FONT.size.md }}>
       {queries.map((q, i) => (
         <div
           key={i}
@@ -491,8 +492,8 @@ function DnsRenderer({ queries }: { queries: DnsQuery[] }) {
         >
           <span
             style={{
-              fontFamily: "'Orbitron'",
-              fontSize: "7px",
+              fontFamily: FONT.family.display,
+              fontSize: FONT.size.xxs,
               padding: "2px 5px",
               border: `1px solid ${q.direction === "query" ? "rgba(0,184,255,0.3)" : "rgba(0,255,159,0.3)"}`,
               borderRadius: "2px",
@@ -502,7 +503,7 @@ function DnsRenderer({ queries }: { queries: DnsQuery[] }) {
           >
             {q.direction === "query" ? "Q" : "R"}
           </span>
-          <div style={{ flex: 1, fontFamily: "'Share Tech Mono', monospace" }}>
+          <div style={{ flex: 1, fontFamily: FONT.family.mono }}>
             {q.direction === "query" ? (
               <span>
                 <span style={{ color: "#00b8ff" }}>{q.type}</span>{" "}

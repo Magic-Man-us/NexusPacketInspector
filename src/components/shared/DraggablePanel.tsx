@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect, ReactNode } from "react";
+import { FONT } from "../../styles/typography";
 
 type SnapCorner = "top-left" | "top-right" | "bottom-left" | "bottom-right";
 
@@ -199,10 +200,10 @@ export function DraggablePanel({
       >
         <span
           style={{
-            fontFamily: "'Orbitron'",
-            fontSize: "8px",
+            fontFamily: FONT.family.display,
+            fontSize: FONT.size.xs,
             color: "var(--accent)",
-            letterSpacing: "1px",
+            letterSpacing: FONT.spacing.wide,
           }}
         >
           {title || "PANEL"}
@@ -217,7 +218,7 @@ export function DraggablePanel({
               background: "none",
               border: "none",
               color: "var(--text-muted)",
-              fontSize: "10px",
+              fontSize: FONT.size.md,
               cursor: "pointer",
               padding: "0 4px",
               lineHeight: 1,

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { FONT } from "../../../styles/typography";
 import { usePluginStore } from "../../../hooks/usePluginStore";
 import { getPluginParams, runPlugin, cancelPlugin } from "../../../lib/tauri-bridge";
 import { NmapScanResult, ScanProfile, NmapHost } from "../../../types/plugin";
@@ -68,11 +69,11 @@ export function NmapPanel() {
           gap: "12px",
         }}
       >
-        <div style={{ fontSize: "32px", color: "var(--text-faint)" }}>&#9888;</div>
-        <div style={{ fontFamily: "'Orbitron'", fontSize: "12px", color: "var(--text-secondary)" }}>
+        <div style={{ fontSize: FONT.size["4xl"], color: "var(--text-faint)" }}>&#9888;</div>
+        <div style={{ fontFamily: FONT.family.display, fontSize: FONT.size.lg, color: "var(--text-secondary)" }}>
           NMAP NOT INSTALLED
         </div>
-        <div style={{ fontSize: "10px", color: "var(--text-faint)", maxWidth: "280px", textAlign: "center", lineHeight: "1.5" }}>
+        <div style={{ fontSize: FONT.size.md, color: "var(--text-faint)", maxWidth: "280px", textAlign: "center", lineHeight: "1.5" }}>
           Install nmap to enable network scanning capabilities.
           Visit nmap.org for installation instructions.
         </div>
@@ -94,10 +95,10 @@ export function NmapPanel() {
         style={{
           padding: "10px 14px",
           borderBottom: "1px solid var(--border)",
-          fontFamily: "'Orbitron'",
-          fontSize: "11px",
+          fontFamily: FONT.family.display,
+          fontSize: FONT.size.base,
           color: "var(--accent)",
-          letterSpacing: "1px",
+          letterSpacing: FONT.spacing.wide,
           display: "flex",
           alignItems: "center",
           gap: "8px",
@@ -105,7 +106,7 @@ export function NmapPanel() {
       >
         NMAP SCANNER
         {isRunning && (
-          <span style={{ fontSize: "8px", color: "#00ffff", animation: "nmapPulse 1.5s ease-in-out infinite" }}>
+          <span style={{ fontSize: FONT.size.xs, color: "#00ffff", animation: "nmapPulse 1.5s ease-in-out infinite" }}>
             RUNNING
           </span>
         )}
@@ -124,11 +125,11 @@ export function NmapPanel() {
             <label
               style={{
                 display: "block",
-                fontSize: "9px",
+                fontSize: FONT.size.sm,
                 color: "var(--text-muted)",
                 marginBottom: "4px",
-                fontFamily: "'Orbitron'",
-                letterSpacing: "0.5px",
+                fontFamily: FONT.family.display,
+                letterSpacing: FONT.spacing.normal,
               }}
             >
               TARGET
@@ -146,8 +147,8 @@ export function NmapPanel() {
                 borderRadius: "4px",
                 padding: "8px",
                 color: "var(--accent)",
-                fontFamily: "'Share Tech Mono', monospace",
-                fontSize: "12px",
+                fontFamily: FONT.family.mono,
+                fontSize: FONT.size.lg,
                 outline: "none",
                 boxSizing: "border-box",
               }}
@@ -157,11 +158,11 @@ export function NmapPanel() {
             <label
               style={{
                 display: "block",
-                fontSize: "9px",
+                fontSize: FONT.size.sm,
                 color: "var(--text-muted)",
                 marginBottom: "4px",
-                fontFamily: "'Orbitron'",
-                letterSpacing: "0.5px",
+                fontFamily: FONT.family.display,
+                letterSpacing: FONT.spacing.normal,
               }}
             >
               PROFILE
@@ -176,8 +177,8 @@ export function NmapPanel() {
                 borderRadius: "4px",
                 padding: "8px",
                 color: "var(--accent)",
-                fontFamily: "'Share Tech Mono', monospace",
-                fontSize: "11px",
+                fontFamily: FONT.family.mono,
+                fontSize: FONT.size.base,
                 outline: "none",
                 cursor: "pointer",
               }}
@@ -198,9 +199,9 @@ export function NmapPanel() {
                 borderRadius: "4px",
                 background: "#ff3366",
                 color: "#fff",
-                fontFamily: "'Orbitron'",
-                fontSize: "10px",
-                fontWeight: 700,
+                fontFamily: FONT.family.display,
+                fontSize: FONT.size.md,
+                fontWeight: FONT.weight.bold,
                 cursor: "pointer",
               }}
             >
@@ -215,9 +216,9 @@ export function NmapPanel() {
                 borderRadius: "4px",
                 background: "var(--accent)",
                 color: "var(--bg-primary)",
-                fontFamily: "'Orbitron'",
-                fontSize: "10px",
-                fontWeight: 700,
+                fontFamily: FONT.family.display,
+                fontSize: FONT.size.md,
+                fontWeight: FONT.weight.bold,
                 cursor: "pointer",
               }}
             >
@@ -240,8 +241,8 @@ export function NmapPanel() {
                 borderRadius: "4px",
                 padding: "8px",
                 color: "var(--accent)",
-                fontFamily: "'Share Tech Mono', monospace",
-                fontSize: "11px",
+                fontFamily: FONT.family.mono,
+                fontSize: FONT.size.base,
                 outline: "none",
                 boxSizing: "border-box",
               }}
@@ -266,25 +267,25 @@ export function NmapPanel() {
             >
               <div
                 style={{
-                  fontFamily: "'Orbitron'",
-                  fontSize: "10px",
+                  fontFamily: FONT.family.display,
+                  fontSize: FONT.size.md,
                   color: "var(--accent)",
                   marginBottom: "6px",
-                  letterSpacing: "0.5px",
+                  letterSpacing: FONT.spacing.normal,
                 }}
               >
                 SCAN SUMMARY
               </div>
-              <div style={{ fontSize: "11px", color: "var(--text-primary)" }}>
+              <div style={{ fontSize: FONT.size.base, color: "var(--text-primary)" }}>
                 {result.summary}
               </div>
               {scanData.scanInfo.args && (
                 <div
                   style={{
-                    fontSize: "9px",
+                    fontSize: FONT.size.sm,
                     color: "var(--text-muted)",
                     marginTop: "4px",
-                    fontFamily: "'Share Tech Mono', monospace",
+                    fontFamily: FONT.family.mono,
                   }}
                 >
                   {scanData.scanInfo.args}
@@ -304,7 +305,7 @@ export function NmapPanel() {
                   textAlign: "center",
                   color: "var(--text-faint)",
                   padding: "20px",
-                  fontSize: "11px",
+                  fontSize: FONT.size.base,
                 }}
               >
                 No hosts found up
@@ -323,8 +324,8 @@ export function NmapPanel() {
               gap: "8px",
             }}
           >
-            <div style={{ fontSize: "32px" }}>&#9906;</div>
-            <div style={{ fontSize: "11px" }}>
+            <div style={{ fontSize: FONT.size["4xl"] }}>&#9906;</div>
+            <div style={{ fontSize: FONT.size.base }}>
               Enter a target and click SCAN to begin
             </div>
           </div>
@@ -373,28 +374,28 @@ function HostCard({ host }: { host: NmapHost }) {
         <div>
           <span
             style={{
-              fontFamily: "'Share Tech Mono', monospace",
-              fontSize: "13px",
+              fontFamily: FONT.family.mono,
+              fontSize: FONT.size.lg,
               color: "var(--accent)",
             }}
           >
             {host.address}
           </span>
           {host.hostname && (
-            <span style={{ fontSize: "10px", color: "var(--text-secondary)", marginLeft: "10px" }}>
+            <span style={{ fontSize: FONT.size.md, color: "var(--text-secondary)", marginLeft: "10px" }}>
               ({host.hostname})
             </span>
           )}
         </div>
         <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
           {host.osMatches.length > 0 && (
-            <span style={{ fontSize: "9px", color: "#00b8ff" }}>
+            <span style={{ fontSize: FONT.size.sm, color: "#00b8ff" }}>
               {host.osMatches[0].name}
             </span>
           )}
           <span
             style={{
-              fontSize: "9px",
+              fontSize: FONT.size.sm,
               padding: "2px 8px",
               borderRadius: "3px",
               backgroundColor: "rgba(var(--accent-rgb),0.15)",
@@ -412,11 +413,11 @@ function HostCard({ host }: { host: NmapHost }) {
             style={{
               display: "flex",
               padding: "6px 14px",
-              fontSize: "8px",
+              fontSize: FONT.size.xs,
               color: "var(--text-muted)",
-              fontFamily: "'Orbitron'",
+              fontFamily: FONT.family.display,
               borderBottom: "1px solid rgba(255,255,255,0.04)",
-              letterSpacing: "0.5px",
+              letterSpacing: FONT.spacing.normal,
             }}
           >
             <span style={{ width: "70px" }}>PORT</span>
@@ -430,7 +431,7 @@ function HostCard({ host }: { host: NmapHost }) {
               style={{
                 display: "flex",
                 padding: "6px 14px",
-                fontSize: "10px",
+                fontSize: FONT.size.md,
                 borderBottom: "1px solid rgba(255,255,255,0.02)",
                 backgroundColor: i % 2 === 0 ? "transparent" : "rgba(255,255,255,0.01)",
               }}
@@ -438,7 +439,7 @@ function HostCard({ host }: { host: NmapHost }) {
               <span
                 style={{
                   width: "70px",
-                  fontFamily: "'Share Tech Mono', monospace",
+                  fontFamily: FONT.family.mono,
                   color: "var(--text-primary)",
                 }}
               >

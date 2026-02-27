@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { FONT } from "../../../../styles/typography";
 import { ExpertEntry } from "../../../../types/plugin";
 
 interface Props {
@@ -43,7 +44,7 @@ export function ExpertInfoView({ entries }: Props) {
 
   if (entries.length === 0) {
     return (
-      <div style={{ color: "var(--text-faint)", fontSize: "11px", textAlign: "center", padding: "20px" }}>
+      <div style={{ color: "var(--text-faint)", fontSize: FONT.size.base, textAlign: "center", padding: "20px" }}>
         No expert info entries found
       </div>
     );
@@ -55,11 +56,11 @@ export function ExpertInfoView({ entries }: Props) {
     <div>
       <div
         style={{
-          fontFamily: "'Orbitron'",
-          fontSize: "10px",
+          fontFamily: FONT.family.display,
+          fontSize: FONT.size.md,
           color: "var(--accent)",
           marginBottom: "12px",
-          letterSpacing: "0.5px",
+          letterSpacing: FONT.spacing.normal,
         }}
       >
         EXPERT INFORMATION
@@ -78,8 +79,8 @@ export function ExpertInfoView({ entries }: Props) {
               borderRadius: "3px",
               background: filter === f ? "rgba(255,255,255,0.06)" : "transparent",
               color: f === "all" ? "var(--text-secondary)" : (SEVERITY_COLORS[f] || "var(--text-secondary)"),
-              fontFamily: "'Share Tech Mono', monospace",
-              fontSize: "10px",
+              fontFamily: FONT.family.mono,
+              fontSize: FONT.size.md,
               cursor: "pointer",
             }}
           >
@@ -89,17 +90,17 @@ export function ExpertInfoView({ entries }: Props) {
       </div>
 
       {/* Table */}
-      <div style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: "10px" }}>
+      <div style={{ fontFamily: FONT.family.mono, fontSize: FONT.size.md }}>
         {/* Header */}
         <div
           style={{
             display: "flex",
             padding: "6px 10px",
-            fontSize: "8px",
+            fontSize: FONT.size.xs,
             color: "var(--text-muted)",
-            fontFamily: "'Orbitron'",
+            fontFamily: FONT.family.display,
             borderBottom: "1px solid var(--border)",
-            letterSpacing: "0.5px",
+            letterSpacing: FONT.spacing.normal,
           }}
         >
           <span style={{ width: "70px" }}>SEVERITY</span>
@@ -122,7 +123,7 @@ export function ExpertInfoView({ entries }: Props) {
                 alignItems: "flex-start",
               }}
             >
-              <span style={{ width: "70px", color, fontWeight: "bold" }}>
+              <span style={{ width: "70px", color, fontWeight: FONT.weight.bold }}>
                 {entry.severity}
               </span>
               <span style={{ width: "80px", color: "var(--text-muted)" }}>

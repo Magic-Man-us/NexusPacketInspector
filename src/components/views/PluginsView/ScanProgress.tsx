@@ -1,4 +1,5 @@
 import { useRef, useEffect } from "react";
+import { FONT } from "../../../styles/typography";
 import { usePluginStore } from "../../../hooks/usePluginStore";
 
 export function ScanProgress() {
@@ -20,7 +21,7 @@ export function ScanProgress() {
             style={{
               display: "flex",
               justifyContent: "space-between",
-              fontSize: "9px",
+              fontSize: FONT.size.sm,
               color: "var(--text-secondary)",
               marginBottom: "4px",
             }}
@@ -56,8 +57,8 @@ export function ScanProgress() {
           backgroundColor: "rgba(0,0,0,0.3)",
           borderRadius: "4px",
           padding: "8px",
-          fontFamily: "'Share Tech Mono', monospace",
-          fontSize: "10px",
+          fontFamily: FONT.family.mono,
+          fontSize: FONT.size.md,
           color: "var(--text-secondary)",
         }}
       >

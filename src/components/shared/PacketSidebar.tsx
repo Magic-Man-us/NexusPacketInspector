@@ -1,9 +1,8 @@
 import { useState, useMemo, useRef, useCallback, useEffect } from "react";
 import { usePacketStore } from "../../hooks/usePacketStore";
 import { PROTOCOL_COLORS } from "../../styles/theme";
-import { HexViewer } from "./HexViewer";
+import { FONT } from "../../styles/typography";
 
-type SidebarTab = "packets" | "hexdump";
 type SnapCorner = "top-left" | "top-right" | "bottom-left" | "bottom-right";
 
 const SNAP_MARGIN = 16;
@@ -49,12 +48,11 @@ function findNearestCorner(
 export function PacketSidebar() {
   const packets = usePacketStore((s) => s.packets);
   const selectedPacket = usePacketStore((s) => s.selectedPacket);
+  const selectedPackets = usePacketStore((s) => s.selectedPackets);
   const setSelectedPacket = usePacketStore((s) => s.setSelectedPacket);
+  const toggleSelectedPacket = usePacketStore((s) => s.toggleSelectedPacket);
   const activeView = usePacketStore((s) => s.activeView);
-  const highlightedByteRange = usePacketStore((s) => s.highlightedByteRange);
   const [collapsed, setCollapsed] = useState(false);
-  const [activeTab, setActiveTab] = useState<SidebarTab>("packets");
-  const [splitView, setSplitView] = useState(false);
   const [detached, setDetached] = useState(false);
   const [edgeExpanded, setEdgeExpanded] = useState(false);
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
@@ -64,13 +62,10 @@ export function PacketSidebar() {
   const dragCleanupRef = useRef<(() => void) | null>(null);
   const recentPackets = useMemo(() => packets.slice(-100), [packets]);
 
-  // Clean up drag listeners on unmount
   useEffect(() => {
     return () => { dragCleanupRef.current?.(); };
   }, []);
 
-  // --- Drag logic (viewport-based fixed positioning) ---
-  // useCallback must be before any early returns to satisfy React hooks rules
   const onDragStart = useCallback((e: React.MouseEvent) => {
     if (!panelRef.current) return;
     e.preventDefault();
@@ -113,12 +108,8 @@ export function PacketSidebar() {
     document.addEventListener("mouseup", onUp);
   }, []);
 
-  // Don't show on plugins
   if (activeView === "plugins") return null;
 
-  const hexPacket = selectedPacket || (packets.length > 0 ? packets[packets.length - 1] : null);
-
-  // --- Edge hover handlers ---
   const handleEdgeEnter = () => {
     if (collapsed && !detached) {
       setCollapsed(false);
@@ -138,7 +129,6 @@ export function PacketSidebar() {
     setCollapsed(!collapsed);
   };
 
-  // --- Detach / dock ---
   const handleDetach = () => {
     setDetached(true);
     setCollapsed(false);
@@ -152,25 +142,35 @@ export function PacketSidebar() {
     setPos(null);
   };
 
-  // --- Shared content ---
   const packetListContent = (
-    <div style={{ flex: splitView ? "0 0 40%" : 1, overflowY: "auto", minHeight: 0 }}>
-      {recentPackets.map((p) => (
+    <div style={{ flex: 1, overflowY: "auto", minHeight: 0 }}>
+      {recentPackets.map((p) => {
+        const isMultiSelected = selectedPackets.some((sp) => sp.id === p.id);
+        const isSingleSelected = selectedPacket?.id === p.id && selectedPackets.length <= 1;
+        return (
         <div
           key={p.id}
-          onClick={() => setSelectedPacket(p)}
+          onClick={(e) => {
+            if (e.ctrlKey || e.metaKey) {
+              toggleSelectedPacket(p);
+            } else {
+              setSelectedPacket(p);
+            }
+          }}
           style={{
             padding: "5px 8px",
             borderBottom: "1px solid rgba(255,255,255,0.02)",
             cursor: "pointer",
             backgroundColor:
-              selectedPacket?.id === p.id
+              isMultiSelected
+                ? "rgba(var(--accent-rgb),0.15)"
+                : isSingleSelected
                 ? "rgba(var(--accent-rgb),0.1)"
                 : "transparent",
             display: "flex",
             gap: "6px",
             alignItems: "center",
-            fontSize: "9px",
+            fontSize: FONT.size.sm,
           }}
         >
           <span
@@ -200,173 +200,25 @@ export function PacketSidebar() {
               overflow: "hidden",
               textOverflow: "ellipsis",
               whiteSpace: "nowrap",
-              fontFamily: "'Share Tech Mono', monospace",
+              fontFamily: FONT.family.mono,
             }}
           >
             {p.ip.srcIp} → {p.ip.dstIp}
           </span>
         </div>
-      ))}
+        );
+      })}
       {recentPackets.length === 0 && (
         <div
           style={{
             padding: "16px",
             textAlign: "center",
             color: "var(--text-faint)",
-            fontSize: "11px",
+            fontSize: FONT.size.base,
           }}
         >
           No packets
         </div>
-      )}
-    </div>
-  );
-
-  const hexDumpContent = (
-    <div style={{ flex: splitView ? "0 0 60%" : 1, display: "flex", flexDirection: "column" as const, minHeight: 0, overflow: "hidden" }}>
-      {hexPacket ? (
-        <>
-          <div
-            style={{
-              padding: "8px 12px",
-              backgroundColor: "var(--bg-console)",
-              borderBottom: "1px solid rgba(var(--accent-rgb),0.05)",
-              fontSize: "10px",
-              fontWeight: 600,
-              fontFamily: "monospace",
-              display: "flex",
-              flexDirection: "column",
-              gap: "3px",
-              flexShrink: 0,
-            }}
-          >
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <span style={{ color: "var(--accent)" }}>#{hexPacket.id} {hexPacket.protocol}</span>
-              <span style={{ color: "var(--text-muted)" }}>{hexPacket.length} B</span>
-            </div>
-            <div>
-              <span style={{ color: "#00b8ff" }}>{hexPacket.ip.srcIp}</span>
-              <span style={{ color: "var(--text-faint)" }}> → </span>
-              <span style={{ color: "#ff6b00" }}>{hexPacket.ip.dstIp}</span>
-            </div>
-          </div>
-
-          <div
-            style={{
-              padding: "6px 12px",
-              borderBottom: "1px solid rgba(var(--accent-rgb),0.05)",
-              display: "flex",
-              gap: "4px",
-              flexShrink: 0,
-            }}
-          >
-            <button
-              onClick={() => {
-                const idx = packets.findIndex((p) => p.id === hexPacket.id);
-                if (idx > 0) setSelectedPacket(packets[idx - 1]);
-              }}
-              style={navBtnStyle}
-            >
-              PREV
-            </button>
-            <button
-              onClick={() => {
-                const idx = packets.findIndex((p) => p.id === hexPacket.id);
-                if (idx < packets.length - 1) setSelectedPacket(packets[idx + 1]);
-              }}
-              style={navBtnStyle}
-            >
-              NEXT
-            </button>
-            <button
-              onClick={() => {
-                if (packets.length > 0) setSelectedPacket(packets[packets.length - 1]);
-              }}
-              style={{
-                ...navBtnStyle,
-                border: "1px solid rgba(var(--accent-rgb),0.3)",
-                background: "rgba(var(--accent-rgb),0.05)",
-                color: "var(--accent)",
-              }}
-            >
-              LATEST
-            </button>
-          </div>
-
-          <div style={{ flex: 1, overflow: "auto", padding: "8px", minHeight: 0 }}>
-            <HexViewer packet={hexPacket} highlightedByteRange={highlightedByteRange} />
-          </div>
-        </>
-      ) : (
-        <div
-          style={{
-            padding: "16px",
-            textAlign: "center",
-            color: "var(--text-faint)",
-            fontSize: "11px",
-          }}
-        >
-          No packet selected
-        </div>
-      )}
-    </div>
-  );
-
-  const tabBar = (
-    <div
-      style={{
-        display: "flex",
-        borderBottom: "1px solid rgba(var(--accent-rgb),0.1)",
-        flexShrink: 0,
-      }}
-    >
-      <button
-        onClick={() => { setActiveTab("packets"); setSplitView(false); }}
-        style={{
-          ...tabBtnStyle,
-          borderBottom: !splitView && activeTab === "packets" ? "2px solid var(--accent)" : "2px solid transparent",
-          color: !splitView && activeTab === "packets" ? "var(--accent)" : "var(--text-dim)",
-        }}
-      >
-        PACKETS
-      </button>
-      <button
-        onClick={() => { setActiveTab("hexdump"); setSplitView(false); }}
-        style={{
-          ...tabBtnStyle,
-          borderBottom: !splitView && activeTab === "hexdump" ? "2px solid var(--accent)" : "2px solid transparent",
-          color: !splitView && activeTab === "hexdump" ? "var(--accent)" : "var(--text-dim)",
-        }}
-      >
-        HEX DUMP
-      </button>
-      <button
-        onClick={() => setSplitView(!splitView)}
-        style={{
-          ...tabBtnStyle,
-          borderBottom: splitView ? "2px solid var(--accent)" : "2px solid transparent",
-          color: splitView ? "var(--accent)" : "var(--text-dim)",
-          marginLeft: "auto",
-          fontSize: "8px",
-        }}
-      >
-        SPLIT
-      </button>
-    </div>
-  );
-
-  const contentArea = (
-    <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0, overflow: "hidden" }}>
-      {splitView ? (
-        <>
-          {packetListContent}
-          <div style={{ height: "1px", backgroundColor: "rgba(var(--accent-rgb),0.15)", flexShrink: 0 }} />
-          {hexDumpContent}
-        </>
-      ) : activeTab === "packets" ? (
-        packetListContent
-      ) : (
-        hexDumpContent
       )}
     </div>
   );
@@ -376,10 +228,8 @@ export function PacketSidebar() {
     const panelH = window.innerHeight * (DETACHED_HEIGHT_VH / 100);
     return (
       <>
-        {/* Placeholder so layout doesn't shift */}
         <div style={{ width: 0, flexShrink: 0 }} />
 
-        {/* Fixed floating panel */}
         <div
           ref={panelRef}
           style={{
@@ -400,7 +250,6 @@ export function PacketSidebar() {
             userSelect: dragging ? "none" : "auto",
           }}
         >
-          {/* Title bar / drag handle */}
           <div
             onMouseDown={onDragStart}
             style={{
@@ -415,10 +264,10 @@ export function PacketSidebar() {
           >
             <span
               style={{
-                fontFamily: "'Orbitron'",
-                fontSize: "9px",
+                fontFamily: FONT.family.display,
+                fontSize: FONT.size.sm,
                 color: "var(--accent)",
-                letterSpacing: "1px",
+                letterSpacing: FONT.spacing.wide,
               }}
             >
               SIDEBAR
@@ -432,11 +281,7 @@ export function PacketSidebar() {
             </button>
           </div>
 
-          {/* Tabs */}
-          {tabBar}
-
-          {/* Content */}
-          {contentArea}
+          {packetListContent}
         </div>
       </>
     );
@@ -445,7 +290,6 @@ export function PacketSidebar() {
   // ==================== NORMAL (DOCKED) MODE ====================
   return (
     <>
-      {/* Edge trigger zone — only when collapsed */}
       {collapsed && (
         <div
           onMouseEnter={handleEdgeEnter}
@@ -473,7 +317,6 @@ export function PacketSidebar() {
           backgroundColor: "var(--bg-secondary)",
         }}
       >
-        {/* Title bar with toggle + detach */}
         <div
           style={{
             display: "flex",
@@ -489,8 +332,8 @@ export function PacketSidebar() {
               border: "none",
               background: "transparent",
               color: "var(--accent)",
-              fontFamily: "'Orbitron'",
-              fontSize: "10px",
+              fontFamily: FONT.family.display,
+              fontSize: FONT.size.md,
               cursor: "pointer",
               textAlign: "left",
               whiteSpace: "nowrap",
@@ -512,43 +355,18 @@ export function PacketSidebar() {
           )}
         </div>
 
-        {/* Tab bar */}
-        {!collapsed && tabBar}
-
-        {/* Content */}
-        {!collapsed && contentArea}
+        {!collapsed && packetListContent}
       </div>
     </>
   );
 }
-
-const tabBtnStyle: React.CSSProperties = {
-  padding: "8px 12px",
-  border: "none",
-  background: "transparent",
-  fontFamily: "'Orbitron'",
-  fontSize: "9px",
-  cursor: "pointer",
-  whiteSpace: "nowrap",
-};
-
-const navBtnStyle: React.CSSProperties = {
-  padding: "3px 8px",
-  border: "1px solid rgba(255,255,255,0.1)",
-  borderRadius: "3px",
-  background: "transparent",
-  color: "var(--text-muted)",
-  fontSize: "9px",
-  cursor: "pointer",
-  fontFamily: "'Orbitron'",
-};
 
 const titleBarBtnStyle: React.CSSProperties = {
   background: "none",
   border: "1px solid rgba(var(--accent-rgb),0.2)",
   borderRadius: "3px",
   color: "var(--accent)",
-  fontSize: "12px",
+  fontSize: FONT.size.lg,
   cursor: "pointer",
   padding: "2px 6px",
   lineHeight: 1,

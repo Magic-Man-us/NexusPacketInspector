@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { usePacketStore, ViewId } from "../../../hooks/usePacketStore";
+import { FONT } from "../../../styles/typography";
 
 interface ToolCard {
   id: ViewId | "settings";
@@ -199,7 +200,7 @@ export function Dashboard() {
             >
               <span
                 style={{
-                  fontSize: "22px",
+                  fontSize: FONT.size["3xl"],
                   lineHeight: 1,
                   color: card.accent,
                   filter: isHovered ? `drop-shadow(0 0 6px ${card.accent})` : "none",
@@ -210,10 +211,10 @@ export function Dashboard() {
               </span>
               <span
                 style={{
-                  fontFamily: "'Orbitron'",
-                  fontSize: "12px",
-                  fontWeight: 800,
-                  letterSpacing: "1.5px",
+                  fontFamily: FONT.family.display,
+                  fontSize: FONT.size.lg,
+                  fontWeight: FONT.weight.heavy,
+                  letterSpacing: FONT.spacing.wider,
                   color: isHovered ? card.accent : "var(--text-primary)",
                   transition: "color 0.25s ease",
                 }}
@@ -224,8 +225,8 @@ export function Dashboard() {
             <p
               style={{
                 margin: 0,
-                fontSize: "11px",
-                fontWeight: 600,
+                fontSize: FONT.size.base,
+                fontWeight: FONT.weight.medium,
                 lineHeight: "1.5",
                 color: isHovered ? "var(--text-primary)" : "var(--text-secondary)",
                 transition: "color 0.25s ease",
@@ -236,8 +237,8 @@ export function Dashboard() {
             <p
               style={{
                 margin: 0,
-                fontSize: "10px",
-                fontWeight: 500,
+                fontSize: FONT.size.md,
+                fontWeight: FONT.weight.normal,
                 lineHeight: "1.5",
                 color: isHovered ? "var(--text-secondary)" : "var(--text-muted)",
                 borderTop: `1px solid ${card.accent}22`,

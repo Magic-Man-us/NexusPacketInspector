@@ -12,6 +12,7 @@ export interface VisualEffects {
   colorScheme: ColorScheme;
   grid: boolean;
   gridOpacity: number;
+  sequenceFx: "river" | "arrows";
 }
 
 interface PacketStore {
@@ -27,6 +28,9 @@ interface PacketStore {
   // Selection
   selectedPacket: ParsedPacket | null;
   setSelectedPacket: (packet: ParsedPacket | null) => void;
+  selectedPackets: ParsedPacket[];
+  toggleSelectedPacket: (packet: ParsedPacket) => void;
+  clearSelectedPackets: () => void;
 
   // Cross-highlight (structure view → hex viewer)
   highlightedByteRange: { start: number; end: number } | null;
@@ -100,6 +104,7 @@ const defaultEffects: VisualEffects = {
   colorScheme: "nexus",
   grid: false,
   gridOpacity: 0.015,
+  sequenceFx: "river",
 };
 
 export const usePacketStore = create<PacketStore>((set, get) => ({
@@ -113,10 +118,24 @@ export const usePacketStore = create<PacketStore>((set, get) => ({
         ? [...state.packets, ...newPackets].slice(-500)
         : [...state.packets, ...newPackets],
     })),
-  clearPackets: () => set({ packets: [], selectedPacket: null, pcapFilePath: null }),
+  clearPackets: () => set({ packets: [], selectedPacket: null, selectedPackets: [], pcapFilePath: null }),
 
   selectedPacket: null,
-  setSelectedPacket: (packet) => set({ selectedPacket: packet, highlightedByteRange: null }),
+  setSelectedPacket: (packet) => set({ selectedPacket: packet, selectedPackets: packet ? [packet] : [], highlightedByteRange: null }),
+  selectedPackets: [],
+  toggleSelectedPacket: (packet) =>
+    set((state) => {
+      const exists = state.selectedPackets.some((p) => p.id === packet.id);
+      const next = exists
+        ? state.selectedPackets.filter((p) => p.id !== packet.id)
+        : [...state.selectedPackets, packet];
+      return {
+        selectedPackets: next,
+        selectedPacket: next.length > 0 ? next[next.length - 1] : null,
+        highlightedByteRange: null,
+      };
+    }),
+  clearSelectedPackets: () => set({ selectedPackets: [], selectedPacket: null, highlightedByteRange: null }),
 
   highlightedByteRange: null,
   setHighlightedByteRange: (range) => set({ highlightedByteRange: range }),

@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { ParsedPacket } from "../../types/packet";
 import { LAYER_COLORS } from "../../styles/theme";
+import { FONT } from "../../styles/typography";
 
 interface Props {
   packet: ParsedPacket;
@@ -134,9 +135,9 @@ export function HexViewer({ packet, highlightedByteRange }: Props) {
   return (
     <div
       style={{
-        fontFamily: "'Share Tech Mono', monospace",
-        fontSize: "12px",
-        fontWeight: 500,
+        fontFamily: FONT.family.mono,
+        fontSize: FONT.size.lg,
+        fontWeight: FONT.weight.normal,
         overflow: "auto",
       }}
     >
@@ -152,8 +153,8 @@ export function HexViewer({ packet, highlightedByteRange }: Props) {
               borderRadius: "3px",
               backgroundColor: layerColors[r.layer].bg,
               color: layerColors[r.layer].text,
-              fontSize: "10px",
-              fontWeight: 600,
+              fontSize: FONT.size.md,
+              fontWeight: FONT.weight.medium,
               cursor: "pointer",
               border: hoveredLayer === r.layer ? `1px solid ${layerColors[r.layer].text}` : "1px solid transparent",
             }}
@@ -170,7 +171,7 @@ export function HexViewer({ packet, highlightedByteRange }: Props) {
           return (
             <div key={rowIdx} style={{ display: "flex", alignItems: "center" }}>
               {/* Offset */}
-              <span style={{ width: "50px", color: "var(--text-faint)", flexShrink: 0, fontSize: "10px", fontWeight: 600 }}>
+              <span style={{ width: "50px", color: "var(--text-faint)", flexShrink: 0, fontSize: FONT.size.md, fontWeight: FONT.weight.medium }}>
                 {offset.toString(16).padStart(4, "0")}
               </span>
 
@@ -262,7 +263,7 @@ export function HexViewer({ packet, highlightedByteRange }: Props) {
 
       {/* Byte info on hover */}
       {hoveredByte !== null && (
-        <div style={{ marginTop: "8px", fontSize: "10px", fontWeight: 600, color: "var(--text-secondary)", borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: "6px" }}>
+        <div style={{ marginTop: "8px", fontSize: FONT.size.md, fontWeight: FONT.weight.medium, color: "var(--text-secondary)", borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: "6px" }}>
           Offset: 0x{hoveredByte.toString(16).padStart(4, "0")} | Byte: 0x{bytes[hoveredByte]?.toString(16).padStart(2, "0")} ({bytes[hoveredByte]}) | Layer: {getLayerForByte(hoveredByte, regions) || "unknown"}
         </div>
       )}

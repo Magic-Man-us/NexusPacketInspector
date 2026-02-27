@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { styles } from "../../../styles/components";
 import { usePacketStore } from "../../../hooks/usePacketStore";
+import { FONT } from "../../../styles/typography";
 import { EmptyState } from "../../shared/EmptyState";
 import type { ParsedPacket } from "../../../types/packet";
 
@@ -139,7 +140,7 @@ export function ConversationMatrix() {
                       <span
                         style={{
                           color: intensity > 0.5 ? "#000" : "#00ff9f",
-                          fontSize: "9px",
+                          fontSize: FONT.size.sm,
                         }}
                       >
                         {sortBy === "packets"

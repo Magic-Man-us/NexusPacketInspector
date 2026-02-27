@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { FONT } from "../../styles/typography";
 
 const STORAGE_KEY = "nexus-mobile-ack";
 const MOBILE_QUERY = "(max-width: 768px)";
@@ -48,11 +49,11 @@ export function MobileWarning() {
       >
         <h2
           style={{
-            fontFamily: "'Orbitron', sans-serif",
+            fontFamily: FONT.family.display,
             color: "#00ff9f",
-            fontSize: 18,
+            fontSize: FONT.size["3xl"],
             margin: "0 0 16px",
-            letterSpacing: 2,
+            letterSpacing: FONT.spacing.widest,
             textTransform: "uppercase",
           }}
         >
@@ -61,7 +62,7 @@ export function MobileWarning() {
         <p
           style={{
             color: "#8a9bb2",
-            fontSize: 14,
+            fontSize: FONT.size.xl,
             lineHeight: 1.6,
             margin: "0 0 24px",
           }}
@@ -72,14 +73,14 @@ export function MobileWarning() {
         <button
           onClick={handleContinue}
           style={{
-            fontFamily: "'Orbitron', sans-serif",
+            fontFamily: FONT.family.display,
             background: "transparent",
             color: "#00ff9f",
             border: "1px solid #00ff9f",
             borderRadius: 4,
             padding: "10px 32px",
-            fontSize: 13,
-            letterSpacing: 2,
+            fontSize: FONT.size.lg,
+            letterSpacing: FONT.spacing.widest,
             cursor: "pointer",
             textTransform: "uppercase",
             transition: "background 0.2s, box-shadow 0.2s",

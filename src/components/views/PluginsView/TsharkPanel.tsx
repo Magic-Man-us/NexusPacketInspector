@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { FONT } from "../../../styles/typography";
 import { usePluginStore } from "../../../hooks/usePluginStore";
 import { usePacketStore } from "../../../hooks/usePacketStore";
 import { runPlugin, cancelPlugin } from "../../../lib/tauri-bridge";
@@ -84,11 +85,11 @@ export function TsharkPanel() {
           gap: "12px",
         }}
       >
-        <div style={{ fontSize: "32px", color: "var(--text-faint)" }}>&#9888;</div>
-        <div style={{ fontFamily: "'Orbitron'", fontSize: "12px", color: "var(--text-secondary)" }}>
+        <div style={{ fontSize: FONT.size["4xl"], color: "var(--text-faint)" }}>&#9888;</div>
+        <div style={{ fontFamily: FONT.family.display, fontSize: FONT.size.lg, color: "var(--text-secondary)" }}>
           TSHARK NOT INSTALLED
         </div>
-        <div style={{ fontSize: "10px", color: "var(--text-faint)", maxWidth: "280px", textAlign: "center", lineHeight: "1.5" }}>
+        <div style={{ fontSize: FONT.size.md, color: "var(--text-faint)", maxWidth: "280px", textAlign: "center", lineHeight: "1.5" }}>
           Install Wireshark/tshark to enable deep PCAP analysis.
           Visit wireshark.org for installation instructions.
         </div>
@@ -105,10 +106,10 @@ export function TsharkPanel() {
         style={{
           padding: "10px 14px",
           borderBottom: "1px solid var(--border)",
-          fontFamily: "'Orbitron'",
-          fontSize: "11px",
+          fontFamily: FONT.family.display,
+          fontSize: FONT.size.base,
           color: "var(--accent)",
-          letterSpacing: "1px",
+          letterSpacing: FONT.spacing.wide,
           display: "flex",
           alignItems: "center",
           gap: "8px",
@@ -116,12 +117,12 @@ export function TsharkPanel() {
       >
         TSHARK ANALYZER
         {!pcapFilePath && (
-          <span style={{ fontSize: "9px", color: "var(--text-muted)", fontFamily: "'Share Tech Mono', monospace" }}>
+          <span style={{ fontSize: FONT.size.sm, color: "var(--text-muted)", fontFamily: FONT.family.mono }}>
             - Load a PCAP first
           </span>
         )}
         {isRunning && (
-          <span style={{ fontSize: "8px", color: "#00ffff", animation: "tsharkPulse 1.5s ease-in-out infinite" }}>
+          <span style={{ fontSize: FONT.size.xs, color: "#00ffff", animation: "tsharkPulse 1.5s ease-in-out infinite" }}>
             RUNNING
           </span>
         )}
@@ -149,9 +150,9 @@ export function TsharkPanel() {
               borderRadius: "3px",
               background: activeMode === mode.id ? "rgba(var(--accent-rgb),0.12)" : "transparent",
               color: activeMode === mode.id ? "var(--accent)" : "var(--text-muted)",
-              fontFamily: "'Orbitron'",
-              fontSize: "8px",
-              letterSpacing: "0.5px",
+              fontFamily: FONT.family.display,
+              fontSize: FONT.size.xs,
+              letterSpacing: FONT.spacing.normal,
               cursor: "pointer",
               transition: "all 0.15s",
             }}
@@ -290,8 +291,8 @@ export function TsharkPanel() {
               gap: "8px",
             }}
           >
-            <div style={{ fontSize: "32px" }}>&#9906;</div>
-            <div style={{ fontSize: "11px" }}>
+            <div style={{ fontSize: FONT.size["4xl"] }}>&#9906;</div>
+            <div style={{ fontSize: FONT.size.base }}>
               {pcapFilePath
                 ? "Select a mode and click ANALYZE"
                 : "Load a PCAP file first, then select an analysis mode"}
@@ -330,7 +331,7 @@ function ResultRouter({ result }: { result: TsharkResult }) {
   }
 
   return (
-    <div style={{ color: "var(--text-faint)", fontSize: "11px" }}>
+    <div style={{ color: "var(--text-faint)", fontSize: FONT.size.base }}>
       No result data to display
     </div>
   );
@@ -338,11 +339,11 @@ function ResultRouter({ result }: { result: TsharkResult }) {
 
 const labelStyle: React.CSSProperties = {
   display: "block",
-  fontSize: "9px",
+  fontSize: FONT.size.sm,
   color: "var(--text-muted)",
   marginBottom: "4px",
-  fontFamily: "'Orbitron'",
-  letterSpacing: "0.5px",
+  fontFamily: FONT.family.display,
+  letterSpacing: FONT.spacing.normal,
 };
 
 const inputStyle: React.CSSProperties = {
@@ -351,8 +352,8 @@ const inputStyle: React.CSSProperties = {
   borderRadius: "4px",
   padding: "7px 8px",
   color: "var(--accent)",
-  fontFamily: "'Share Tech Mono', monospace",
-  fontSize: "11px",
+  fontFamily: FONT.family.mono,
+  fontSize: FONT.size.base,
   outline: "none",
   boxSizing: "border-box",
   width: "100%",
@@ -364,8 +365,8 @@ const selectStyle: React.CSSProperties = {
   borderRadius: "4px",
   padding: "7px 8px",
   color: "var(--accent)",
-  fontFamily: "'Share Tech Mono', monospace",
-  fontSize: "11px",
+  fontFamily: FONT.family.mono,
+  fontSize: FONT.size.base,
   outline: "none",
   cursor: "pointer",
 };
@@ -376,9 +377,9 @@ const runBtnStyle: React.CSSProperties = {
   borderRadius: "4px",
   background: "var(--accent)",
   color: "var(--bg-primary)",
-  fontFamily: "'Orbitron'",
-  fontSize: "10px",
-  fontWeight: 700,
+  fontFamily: FONT.family.display,
+  fontSize: FONT.size.md,
+  fontWeight: FONT.weight.bold,
   cursor: "pointer",
 };
 
@@ -388,8 +389,8 @@ const cancelBtnStyle: React.CSSProperties = {
   borderRadius: "4px",
   background: "#ff3366",
   color: "#fff",
-  fontFamily: "'Orbitron'",
-  fontSize: "10px",
-  fontWeight: 700,
+  fontFamily: FONT.family.display,
+  fontSize: FONT.size.md,
+  fontWeight: FONT.weight.bold,
   cursor: "pointer",
 };

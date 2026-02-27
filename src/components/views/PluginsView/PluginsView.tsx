@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { FONT } from "../../../styles/typography";
 import { PluginSelector } from "./PluginSelector";
 import { NmapPanel } from "./NmapPanel";
 import { TsharkPanel } from "./TsharkPanel";
@@ -20,7 +21,7 @@ export function PluginsView() {
               alignItems: "center",
               justifyContent: "center",
               color: "var(--text-faint)",
-              fontSize: "11px",
+              fontSize: FONT.size.base,
             }}
           >
             Plugin &quot;{selectedPlugin}&quot; has no dedicated UI panel yet
@@ -34,7 +35,7 @@ export function PluginsView() {
               alignItems: "center",
               justifyContent: "center",
               color: "var(--text-faint)",
-              fontSize: "11px",
+              fontSize: FONT.size.base,
             }}
           >
             Select a plugin from the sidebar

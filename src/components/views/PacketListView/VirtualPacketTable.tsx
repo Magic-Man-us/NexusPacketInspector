@@ -5,6 +5,7 @@ import { ParsedPacket } from "../../../types/packet";
 import { usePacketStore } from "../../../hooks/usePacketStore";
 import { styles } from "../../../styles/components";
 import { PROTOCOL_COLORS } from "../../../styles/theme";
+import { FONT } from "../../../styles/typography";
 import { formatTCPFlags } from "../../../lib/formatters";
 
 interface Props {
@@ -98,7 +99,7 @@ export function VirtualPacketTable({ packets }: Props) {
                   <span style={{ ...styles.tableCell, width: "50px", color: "var(--text-muted)" }}>
                     {pkt.id}
                   </span>
-                  <span style={{ ...styles.tableCell, width: "80px", fontSize: "10px" }}>
+                  <span style={{ ...styles.tableCell, width: "80px", fontSize: FONT.size.md }}>
                     {new Date(pkt.timestamp).toLocaleTimeString()}
                   </span>
                   <span
@@ -106,7 +107,7 @@ export function VirtualPacketTable({ packets }: Props) {
                       ...styles.tableCell,
                       width: "50px",
                       color: PROTOCOL_COLORS[pkt.protocol],
-                      fontWeight: "bold",
+                      fontWeight: FONT.weight.bold,
                     }}
                   >
                     {pkt.protocol}
@@ -115,8 +116,8 @@ export function VirtualPacketTable({ packets }: Props) {
                     style={{
                       ...styles.tableCell,
                       width: "120px",
-                      fontSize: "10px",
-                      fontFamily: "monospace",
+                      fontSize: FONT.size.md,
+                      fontFamily: FONT.family.mono,
                     }}
                   >
                     {pkt.ip.srcIp}
@@ -125,8 +126,8 @@ export function VirtualPacketTable({ packets }: Props) {
                     style={{
                       ...styles.tableCell,
                       width: "120px",
-                      fontSize: "10px",
-                      fontFamily: "monospace",
+                      fontSize: FONT.size.md,
+                      fontFamily: FONT.family.mono,
                     }}
                   >
                     {pkt.ip.dstIp}

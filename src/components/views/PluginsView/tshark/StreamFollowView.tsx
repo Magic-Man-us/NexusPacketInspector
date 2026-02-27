@@ -1,3 +1,4 @@
+import { FONT } from "../../../../styles/typography";
 import { StreamData } from "../../../../types/plugin";
 
 interface Props {
@@ -7,7 +8,7 @@ interface Props {
 export function StreamFollowView({ stream }: Props) {
   if (stream.segments.length === 0) {
     return (
-      <div style={{ color: "var(--text-faint)", fontSize: "11px", textAlign: "center", padding: "20px" }}>
+      <div style={{ color: "var(--text-faint)", fontSize: FONT.size.base, textAlign: "center", padding: "20px" }}>
         No stream data found
       </div>
     );
@@ -17,24 +18,24 @@ export function StreamFollowView({ stream }: Props) {
     <div>
       <div
         style={{
-          fontFamily: "'Orbitron'",
-          fontSize: "10px",
+          fontFamily: FONT.family.display,
+          fontSize: FONT.size.md,
           color: "var(--accent)",
           marginBottom: "8px",
-          letterSpacing: "0.5px",
+          letterSpacing: FONT.spacing.normal,
           display: "flex",
           gap: "12px",
           alignItems: "center",
         }}
       >
         <span>STREAM FOLLOW</span>
-        <span style={{ fontSize: "9px", color: "var(--text-muted)", fontFamily: "'Share Tech Mono', monospace" }}>
+        <span style={{ fontSize: FONT.size.sm, color: "var(--text-muted)", fontFamily: FONT.family.mono }}>
           {stream.protocol.toUpperCase()} Stream #{stream.streamIndex}
         </span>
       </div>
 
       {/* Legend */}
-      <div style={{ display: "flex", gap: "16px", marginBottom: "12px", fontSize: "9px" }}>
+      <div style={{ display: "flex", gap: "16px", marginBottom: "12px", fontSize: FONT.size.sm }}>
         <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
           <span style={{ width: "8px", height: "8px", borderRadius: "2px", background: "rgba(0,255,255,0.2)", border: "1px solid #00ffff" }} />
           <span style={{ color: "#00ffff" }}>Client</span>
@@ -66,8 +67,8 @@ export function StreamFollowView({ stream }: Props) {
                     ? "rgba(255,165,0,0.08)"
                     : "rgba(0,255,255,0.08)",
                   border: `1px solid ${isServer ? "rgba(255,165,0,0.2)" : "rgba(0,255,255,0.2)"}`,
-                  fontFamily: "'Share Tech Mono', monospace",
-                  fontSize: "10px",
+                  fontFamily: FONT.family.mono,
+                  fontSize: FONT.size.md,
                   color: "var(--text-primary)",
                   whiteSpace: "pre-wrap",
                   wordBreak: "break-all",

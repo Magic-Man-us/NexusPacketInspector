@@ -1,3 +1,4 @@
+import { FONT } from "../../../styles/typography";
 import { usePluginStore } from "../../../hooks/usePluginStore";
 
 interface Props {
@@ -27,7 +28,7 @@ export function EnrichmentBadge({ ip }: Props) {
         .join("\n")}
       style={{
         display: "inline-block",
-        fontSize: "8px",
+        fontSize: FONT.size.xs,
         padding: "1px 5px",
         marginLeft: "4px",
         backgroundColor: "rgba(0,184,255,0.15)",

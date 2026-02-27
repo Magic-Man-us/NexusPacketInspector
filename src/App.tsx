@@ -20,6 +20,7 @@ import { Livewire } from "./components/views/LivewireView/Livewire";
 import { Stats } from "./components/views/StatsView/Stats";
 import { usePluginEvents } from "./hooks/usePluginEvents";
 import { PacketSidebar } from "./components/shared/PacketSidebar";
+import { HexStrip } from "./components/shared/HexStrip";
 import { globalStyles, noiseBackground } from "./styles/globalStyles";
 import { styles } from "./styles/components";
 
@@ -70,22 +71,25 @@ export default function App() {
 
       <NavTabs />
 
-      <div style={{ ...styles.mainContent, flexDirection: "row" }}>
-        <PacketSidebar />
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0, overflow: "hidden" }}>
-        {activeView === "dashboard" && <Dashboard />}
-        {activeView === "packets" && <PacketListView />}
-        {activeView === "structure" && <PacketStructure />}
-        {activeView === "routetrace" && <RouteTrace />}
-        {activeView === "matrix" && <ConversationMatrix />}
-        {activeView === "sankey" && <SankeyDiagram />}
-        {activeView === "sequence" && <SequenceTimeline />}
-        {activeView === "topology" && <HierarchicalTopology />}
-        {activeView === "services" && <ServiceMap />}
-        {activeView === "plugins" && <PluginsView />}
-        {activeView === "livewire" && <Livewire />}
-        {activeView === "stats" && <Stats />}
+      <div style={{ ...styles.mainContent, flexDirection: "column" }}>
+        <div style={{ flex: 1, display: "flex", flexDirection: "row", minHeight: 0, overflow: "hidden" }}>
+          <PacketSidebar />
+          <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0, overflow: "hidden" }}>
+            {activeView === "dashboard" && <Dashboard />}
+            {activeView === "packets" && <PacketListView />}
+            {activeView === "structure" && <PacketStructure />}
+            {activeView === "routetrace" && <RouteTrace />}
+            {activeView === "matrix" && <ConversationMatrix />}
+            {activeView === "sankey" && <SankeyDiagram />}
+            {activeView === "sequence" && <SequenceTimeline />}
+            {activeView === "topology" && <HierarchicalTopology />}
+            {activeView === "services" && <ServiceMap />}
+            {activeView === "plugins" && <PluginsView />}
+            {activeView === "livewire" && <Livewire />}
+            {activeView === "stats" && <Stats />}
+          </div>
         </div>
+        {activeView !== "plugins" && <HexStrip />}
       </div>
 
       <StatusBar />

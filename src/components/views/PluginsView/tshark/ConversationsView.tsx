@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { FONT } from "../../../../styles/typography";
 import { ConversationEntry } from "../../../../types/plugin";
 import { formatBytes } from "../../../../lib/formatters";
 
@@ -29,7 +30,7 @@ export function ConversationsView({ entries }: Props) {
 
   if (entries.length === 0) {
     return (
-      <div style={{ color: "var(--text-faint)", fontSize: "11px", textAlign: "center", padding: "20px" }}>
+      <div style={{ color: "var(--text-faint)", fontSize: FONT.size.base, textAlign: "center", padding: "20px" }}>
         No conversation data
       </div>
     );
@@ -42,27 +43,27 @@ export function ConversationsView({ entries }: Props) {
     <div>
       <div
         style={{
-          fontFamily: "'Orbitron'",
-          fontSize: "10px",
+          fontFamily: FONT.family.display,
+          fontSize: FONT.size.md,
           color: "var(--accent)",
           marginBottom: "12px",
-          letterSpacing: "0.5px",
+          letterSpacing: FONT.spacing.normal,
         }}
       >
         CONVERSATIONS ({entries.length})
       </div>
 
-      <div style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: "10px", overflowX: "auto" }}>
+      <div style={{ fontFamily: FONT.family.mono, fontSize: FONT.size.md, overflowX: "auto" }}>
         {/* Header */}
         <div
           style={{
             display: "flex",
             padding: "6px 10px",
-            fontSize: "8px",
+            fontSize: FONT.size.xs,
             color: "var(--text-muted)",
-            fontFamily: "'Orbitron'",
+            fontFamily: FONT.family.display,
             borderBottom: "1px solid var(--border)",
-            letterSpacing: "0.5px",
+            letterSpacing: FONT.spacing.normal,
             minWidth: "700px",
           }}
         >

@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef } from "react";
 import * as d3 from "d3";
 import { styles } from "../../../styles/components";
 import { usePacketStore } from "../../../hooks/usePacketStore";
+import { FONT } from "../../../styles/typography";
 import { useContainerSize } from "../../../hooks/useContainerSize";
 import { EmptyState } from "../../shared/EmptyState";
 import { DraggablePanel } from "../../shared/DraggablePanel";
@@ -145,8 +146,8 @@ export function HierarchicalTopology() {
       .attr("x", (d) => (d.children ? -12 : 10))
       .attr("text-anchor", (d) => (d.children ? "end" : "start"))
       .attr("fill", "var(--text-secondary)")
-      .attr("font-size", "10px")
-      .attr("font-family", "monospace")
+      .attr("font-size", FONT.size.md)
+      .attr("font-family", FONT.family.mono)
       .text((d) =>
         d.data.name.length > 20
           ? d.data.name.substring(0, 20) + "..."
@@ -173,7 +174,7 @@ export function HierarchicalTopology() {
         )}
       </div>
       <DraggablePanel title="LEGEND" defaultCorner="bottom-left" width={140}>
-        <div style={{ fontSize: "9px", color: "var(--text-secondary)", display: "flex", flexDirection: "column", gap: "4px" }}>
+        <div style={{ fontSize: FONT.size.sm, color: "var(--text-secondary)", display: "flex", flexDirection: "column", gap: "4px" }}>
           <div><span style={{ color: "#ffd600" }}>&#x25CF;</span> Root</div>
           <div><span style={{ color: "#00b8ff" }}>&#x25CF;</span> Category</div>
           <div><span style={{ color: "#00ff9f" }}>&#x25CF;</span> Subnet</div>

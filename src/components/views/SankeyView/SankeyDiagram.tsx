@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import * as d3 from "d3";
 import { styles } from "../../../styles/components";
 import { PROTOCOL_COLORS } from "../../../styles/theme";
+import { FONT } from "../../../styles/typography";
 import { usePacketStore } from "../../../hooks/usePacketStore";
 import { useContainerSize } from "../../../hooks/useContainerSize";
 import { EmptyState } from "../../shared/EmptyState";
@@ -156,8 +157,8 @@ export function SankeyDiagram() {
         .attr("dy", "0.35em")
         .attr("text-anchor", "end")
         .attr("fill", "var(--text-secondary)")
-        .attr("font-size", "10px")
-        .attr("font-family", "monospace")
+        .attr("font-size", FONT.size.md)
+        .attr("font-family", FONT.family.mono)
         .text(name.length > 15 ? name.substring(0, 15) + "..." : name);
     });
 
@@ -175,8 +176,8 @@ export function SankeyDiagram() {
         .attr("y", y + targetY.bandwidth() / 2)
         .attr("dy", "0.35em")
         .attr("fill", "var(--text-secondary)")
-        .attr("font-size", "10px")
-        .attr("font-family", "monospace")
+        .attr("font-size", FONT.size.md)
+        .attr("font-family", FONT.family.mono)
         .text(name.length > 15 ? name.substring(0, 15) + "..." : name);
     });
     return () => {
@@ -245,9 +246,9 @@ export function SankeyDiagram() {
                 backgroundColor: "rgba(10,15,10,0.95)",
                 border: "1px solid rgba(0,255,159,0.4)",
                 borderRadius: "4px",
-                fontSize: "10px",
+                fontSize: FONT.size.md,
                 color: "#00ff9f",
-                fontFamily: "monospace",
+                fontFamily: FONT.family.mono,
                 pointerEvents: "none",
                 zIndex: 10,
                 whiteSpace: "nowrap",

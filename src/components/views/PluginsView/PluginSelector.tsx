@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { FONT } from "../../../styles/typography";
 import { usePluginStore } from "../../../hooks/usePluginStore";
 import { PluginCategory, PluginInfo } from "../../../types/plugin";
 
@@ -49,10 +50,10 @@ export function PluginSelector({ selected, onSelect }: Props) {
         style={{
           padding: "12px 14px",
           borderBottom: "1px solid var(--border)",
-          fontFamily: "'Orbitron'",
-          fontSize: "11px",
+          fontFamily: FONT.family.display,
+          fontSize: FONT.size.base,
           color: "var(--accent)",
-          letterSpacing: "1px",
+          letterSpacing: FONT.spacing.wide,
         }}
       >
         PLUGINS
@@ -68,16 +69,16 @@ export function PluginSelector({ selected, onSelect }: Props) {
               <div
                 style={{
                   padding: "10px 14px 4px",
-                  fontSize: "8px",
-                  fontFamily: "'Orbitron'",
+                  fontSize: FONT.size.xs,
+                  fontFamily: FONT.family.display,
                   color: "var(--text-muted)",
-                  letterSpacing: "1.5px",
+                  letterSpacing: FONT.spacing.wider,
                   display: "flex",
                   alignItems: "center",
                   gap: "6px",
                 }}
               >
-                <span style={{ fontSize: "10px", color: "var(--text-dim)" }}>{meta.icon}</span>
+                <span style={{ fontSize: FONT.size.md, color: "var(--text-dim)" }}>{meta.icon}</span>
                 {meta.label}
               </div>
 
@@ -123,8 +124,8 @@ export function PluginSelector({ selected, onSelect }: Props) {
                     >
                       <span
                         style={{
-                          fontSize: "12px",
-                          fontWeight: "bold",
+                          fontSize: FONT.size.lg,
+                          fontWeight: FONT.weight.bold,
                           color: isSelected ? "var(--accent)" : "var(--text-primary)",
                           textTransform: "uppercase",
                         }}
@@ -148,7 +149,7 @@ export function PluginSelector({ selected, onSelect }: Props) {
                         }}
                       />
                     </div>
-                    <div style={{ fontSize: "9px", color: "var(--text-muted)", lineHeight: "1.3" }}>
+                    <div style={{ fontSize: FONT.size.sm, color: "var(--text-muted)", lineHeight: "1.3" }}>
                       {plugin.description}
                     </div>
                     <div
@@ -163,19 +164,19 @@ export function PluginSelector({ selected, onSelect }: Props) {
                         <span
                           key={cap}
                           style={{
-                            fontSize: "7px",
+                            fontSize: FONT.size.xxs,
                             padding: "1px 5px",
                             backgroundColor: "rgba(0,184,255,0.08)",
                             color: "#00b8ff",
                             borderRadius: "2px",
-                            letterSpacing: "0.3px",
+                            letterSpacing: FONT.spacing.tight,
                           }}
                         >
                           {cap}
                         </span>
                       ))}
                       {plugin.capabilities.length > 4 && (
-                        <span style={{ fontSize: "7px", padding: "1px 5px", color: "var(--text-dim)" }}>
+                        <span style={{ fontSize: FONT.size.xxs, padding: "1px 5px", color: "var(--text-dim)" }}>
                           +{plugin.capabilities.length - 4}
                         </span>
                       )}
@@ -192,7 +193,7 @@ export function PluginSelector({ selected, onSelect }: Props) {
               padding: "20px",
               textAlign: "center",
               color: "var(--text-faint)",
-              fontSize: "11px",
+              fontSize: FONT.size.base,
             }}
           >
             No plugins registered

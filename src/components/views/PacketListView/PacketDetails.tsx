@@ -2,6 +2,7 @@ import { useState } from "react";
 import { usePacketStore } from "../../../hooks/usePacketStore";
 import { styles } from "../../../styles/components";
 import { PROTOCOL_COLORS } from "../../../styles/theme";
+import { FONT } from "../../../styles/typography";
 import { formatTCPFlags } from "../../../lib/formatters";
 import { HexViewer } from "../../shared/HexViewer";
 
@@ -69,8 +70,8 @@ export function PacketDetails() {
           borderRadius: "4px",
           background: showHex ? "rgba(0,255,159,0.1)" : "transparent",
           color: showHex ? "#00ff9f" : "var(--text-muted)",
-          fontFamily: "'Orbitron'",
-          fontSize: "9px",
+          fontFamily: FONT.family.display,
+          fontSize: FONT.size.sm,
           cursor: "pointer",
           marginBottom: "8px",
         }}

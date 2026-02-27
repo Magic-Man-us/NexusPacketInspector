@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { FONT } from "../../../../styles/typography";
 import { LAYER_COLORS } from "../../../../styles/theme";
 
 interface Props {
@@ -17,7 +18,7 @@ const LAYER_KEYS: Record<string, keyof typeof LAYER_COLORS> = {
 export function PacketJsonView({ data }: Props) {
   if (!data || (Array.isArray(data) && data.length === 0)) {
     return (
-      <div style={{ color: "var(--text-faint)", fontSize: "11px", textAlign: "center", padding: "20px" }}>
+      <div style={{ color: "var(--text-faint)", fontSize: FONT.size.base, textAlign: "center", padding: "20px" }}>
         No packet data
       </div>
     );
@@ -29,11 +30,11 @@ export function PacketJsonView({ data }: Props) {
     <div>
       <div
         style={{
-          fontFamily: "'Orbitron'",
-          fontSize: "10px",
+          fontFamily: FONT.family.display,
+          fontSize: FONT.size.md,
           color: "var(--accent)",
           marginBottom: "12px",
-          letterSpacing: "0.5px",
+          letterSpacing: FONT.spacing.normal,
         }}
       >
         PACKET JSON ({packets.length} packets)
@@ -44,7 +45,7 @@ export function PacketJsonView({ data }: Props) {
           <PacketItem key={i} index={i} data={pkt} />
         ))}
         {packets.length > 50 && (
-          <div style={{ color: "var(--text-muted)", fontSize: "10px", textAlign: "center", padding: "8px" }}>
+          <div style={{ color: "var(--text-muted)", fontSize: FONT.size.md, textAlign: "center", padding: "8px" }}>
             Showing first 50 of {packets.length} packets
           </div>
         )}
@@ -73,11 +74,11 @@ function PacketItem({ index, data }: { index: number; data: unknown }) {
           alignItems: "center",
           gap: "8px",
           backgroundColor: "var(--bg-surface)",
-          fontSize: "10px",
+          fontSize: FONT.size.md,
         }}
       >
         <span style={{ color: "var(--text-dim)" }}>{expanded ? "\u25BC" : "\u25B6"}</span>
-        <span style={{ color: "var(--text-muted)", fontFamily: "'Share Tech Mono', monospace" }}>
+        <span style={{ color: "var(--text-muted)", fontFamily: FONT.family.mono }}>
           Packet #{index + 1}
         </span>
       </div>
@@ -108,7 +109,7 @@ function JsonTree({ value, depth, keyPath }: { value: unknown; depth: number; ke
 
   if (typeof value === "string") {
     return (
-      <span style={{ color: "#ffd600", fontSize: "10px", fontFamily: "'Share Tech Mono', monospace" }}>
+      <span style={{ color: "#ffd600", fontSize: FONT.size.md, fontFamily: FONT.family.mono }}>
         &quot;{value.length > 200 ? value.slice(0, 200) + "..." : value}&quot;
       </span>
     );
@@ -116,7 +117,7 @@ function JsonTree({ value, depth, keyPath }: { value: unknown; depth: number; ke
 
   if (typeof value === "number" || typeof value === "boolean") {
     return (
-      <span style={{ color: "#00b8ff", fontSize: "10px", fontFamily: "'Share Tech Mono', monospace" }}>
+      <span style={{ color: "#00b8ff", fontSize: FONT.size.md, fontFamily: FONT.family.mono }}>
         {String(value)}
       </span>
     );
@@ -129,14 +130,14 @@ function JsonTree({ value, depth, keyPath }: { value: unknown; depth: number; ke
       <div style={{ paddingLeft: depth > 0 ? "16px" : "0" }}>
         <span
           onClick={() => setCollapsed(!collapsed)}
-          style={{ cursor: "pointer", color: "var(--text-dim)", fontSize: "10px" }}
+          style={{ cursor: "pointer", color: "var(--text-dim)", fontSize: FONT.size.md }}
         >
           {collapsed ? "\u25B6" : "\u25BC"} [{value.length} items]
         </span>
         {!collapsed &&
           value.slice(0, 20).map((item, i) => (
             <div key={i} style={{ paddingLeft: "16px", marginTop: "2px" }}>
-              <span style={{ color: "var(--text-dim)", fontSize: "9px" }}>{i}: </span>
+              <span style={{ color: "var(--text-dim)", fontSize: FONT.size.sm }}>{i}: </span>
               <JsonTree value={item} depth={depth + 1} keyPath={`${keyPath}[${i}]`} />
             </div>
           ))}
@@ -152,7 +153,7 @@ function JsonTree({ value, depth, keyPath }: { value: unknown; depth: number; ke
       <div style={{ paddingLeft: depth > 0 ? "16px" : "0" }}>
         <span
           onClick={() => setCollapsed(!collapsed)}
-          style={{ cursor: "pointer", color: "var(--text-dim)", fontSize: "10px" }}
+          style={{ cursor: "pointer", color: "var(--text-dim)", fontSize: FONT.size.md }}
         >
           {collapsed ? "\u25B6" : "\u25BC"} {"{"}
           {entries.length}
@@ -166,9 +167,9 @@ function JsonTree({ value, depth, keyPath }: { value: unknown; depth: number; ke
                 <span
                   style={{
                     color: layerColor || "#ff6b00",
-                    fontSize: "10px",
-                    fontFamily: "'Share Tech Mono', monospace",
-                    fontWeight: layerColor ? "bold" : "normal",
+                    fontSize: FONT.size.md,
+                    fontFamily: FONT.family.mono,
+                    fontWeight: layerColor ? FONT.weight.bold : FONT.weight.normal,
                   }}
                 >
                   {key}

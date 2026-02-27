@@ -1,6 +1,7 @@
 import React, { useMemo, useState, useEffect, useRef } from "react";
 import { styles } from "../../../styles/components";
 import { PROTOCOL_COLORS } from "../../../styles/theme";
+import { FONT } from "../../../styles/typography";
 import { usePacketStore } from "../../../hooks/usePacketStore";
 import { EmptyState } from "../../shared/EmptyState";
 import { formatTCPFlags } from "../../../lib/formatters";
@@ -22,6 +23,12 @@ function ensureAnimStyles() {
       from { stroke-dashoffset: 24; }
       to   { stroke-dashoffset: 0; }
     }
+    @keyframes arrowFlow {
+      0%   { offset-distance: 0%; opacity: 0; }
+      5%   { opacity: 1; }
+      95%  { opacity: 1; }
+      100% { offset-distance: 100%; opacity: 0; }
+    }
   `;
   document.head.appendChild(style);
 }
@@ -33,6 +40,7 @@ const MAX_VISIBLE_PACKETS = 100;
 export function SequenceTimeline() {
   const streams = usePacketStore((s) => s.streams);
   const setSelectedPacket = usePacketStore((s) => s.setSelectedPacket);
+  const sequenceFx = usePacketStore((s) => s.visualEffects.sequenceFx);
   const [selectedStream, setSelectedStream] = useState<string | null>(null);
   const [packetPage, setPacketPage] = useState(0);
 
@@ -81,7 +89,7 @@ export function SequenceTimeline() {
                     : "transparent",
               }}
             >
-              <span style={{ color: PROTOCOL_COLORS[stream.protocol] }}>
+              <span style={{ color: PROTOCOL_COLORS[stream.protocol], fontSize: FONT.size.lg, fontWeight: FONT.weight.bold }}>
                 {stream.protocol}
               </span>
               <span style={styles.sequenceStreamPkts}>
@@ -113,7 +121,7 @@ export function SequenceTimeline() {
                 <div style={{
                   display: "flex", alignItems: "center", justifyContent: "center", gap: "12px",
                   padding: "6px 12px", borderBottom: "1px solid rgba(0,255,159,0.15)",
-                  backgroundColor: "rgba(0,0,0,0.2)", fontSize: "10px", flexShrink: 0,
+                  backgroundColor: "rgba(0,0,0,0.2)", fontSize: FONT.size.md, flexShrink: 0,
                 }}>
                   <button
                     onClick={() => setPacketPage((p) => Math.max(0, p - 1))}
@@ -121,7 +129,7 @@ export function SequenceTimeline() {
                     style={{
                       background: "none", border: "1px solid rgba(0,255,159,0.3)", borderRadius: "3px",
                       color: packetPage === 0 ? "var(--text-faint)" : "#00ff9f", cursor: packetPage === 0 ? "default" : "pointer",
-                      padding: "2px 8px", fontSize: "9px", fontFamily: "'Orbitron'",
+                      padding: "2px 8px", fontSize: FONT.size.sm, fontFamily: FONT.family.display,
                     }}
                   >
                     PREV
@@ -136,7 +144,7 @@ export function SequenceTimeline() {
                       background: "none", border: "1px solid rgba(0,255,159,0.3)", borderRadius: "3px",
                       color: packetPage >= totalPages - 1 ? "var(--text-faint)" : "#00ff9f",
                       cursor: packetPage >= totalPages - 1 ? "default" : "pointer",
-                      padding: "2px 8px", fontSize: "9px", fontFamily: "'Orbitron'",
+                      padding: "2px 8px", fontSize: FONT.size.sm, fontFamily: FONT.family.display,
                     }}
                   >
                     NEXT
@@ -153,6 +161,7 @@ export function SequenceTimeline() {
                 ),
               }}
               onSelectPacket={setSelectedPacket}
+              sequenceFx={sequenceFx}
             />
           </>
         )}
@@ -166,15 +175,14 @@ export function SequenceTimeline() {
 interface FlowDiagramProps {
   stream: StreamData;
   onSelectPacket: (packet: StreamData["packets"][number]) => void;
+  sequenceFx: "river" | "arrows";
 }
 
 const ROW_HEIGHT = 52;
-const LINE_X_SRC = 200;
-const LINE_X_DST = 520;
 const LINE_Y_OFFSET = ROW_HEIGHT / 2;
 const SVG_WIDTH = 720;
 
-function FlowDiagram({ stream, onSelectPacket }: FlowDiagramProps) {
+function FlowDiagram({ stream, onSelectPacket, sequenceFx }: FlowDiagramProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ w: SVG_WIDTH, h: 600 });
 
@@ -220,14 +228,14 @@ function FlowDiagram({ stream, onSelectPacket }: FlowDiagramProps) {
         <div style={{ width: lineXSrc, textAlign: "center" }}>
           <div style={endpointBoxStyle(stream.color)}>
             {stream.srcIP}
-            <span style={{ color: "var(--text-muted)", fontSize: "9px" }}>:{stream.srcPort}</span>
+            <span style={{ color: "var(--text-muted)", fontSize: FONT.size.base }}>:{stream.srcPort}</span>
           </div>
         </div>
         <div style={{ flex: 1 }} />
         <div style={{ width: dimensions.w - lineXDst, textAlign: "center" }}>
           <div style={endpointBoxStyle(stream.color)}>
             {stream.dstIP}
-            <span style={{ color: "var(--text-muted)", fontSize: "9px" }}>:{stream.dstPort}</span>
+            <span style={{ color: "var(--text-muted)", fontSize: FONT.size.base }}>:{stream.dstPort}</span>
           </div>
         </div>
       </div>
@@ -310,19 +318,74 @@ function FlowDiagram({ stream, onSelectPacket }: FlowDiagramProps) {
             const x1 = isForward ? lineXSrc : lineXDst;
             const x2 = isForward ? lineXDst : lineXSrc;
             const pathD = `M ${x1} ${y} L ${x2} ${y}`;
-            // Path direction (M x1 L x2) already handles forward vs reverse,
-            // so always animate forward along the path.
             const dashAnim = "streamDashRight";
             const pulseAnim = "flowPulseRight";
-            // Stagger each row so streams feel organic
             const stagger = (i * 0.25) % 1.6;
 
-            // Scale visual weight by packet size (log scale, 0.4–1.0)
-            // Tiny ACKs ~54B → 0.4, large data ~1500B → 1.0
             const sz = Math.max(40, Math.min(pkt.length, 1500));
             const scale = 0.4 + 0.6 * (Math.log(sz) - Math.log(40)) / (Math.log(1500) - Math.log(40));
             const arrowSize = 5 + 5 * scale;
             const arrowHalf = 3 + 4 * scale;
+
+            if (sequenceFx === "arrows") {
+              // ── Arrows mode: single glowing line + N flowing chevrons ──
+              const lineOpacity = 0.3 + 0.4 * scale;
+              const chevronCount = Math.max(1, Math.round(pkt.length / 200));
+              const chevronSize = 5 + 3 * scale;
+              const rowStagger = (i * 0.3) % 3;
+
+              return (
+                <g key={i}>
+                  {/* Single glowing line */}
+                  <line
+                    x1={x1} y1={y} x2={x2} y2={y}
+                    stroke={stream.color}
+                    strokeOpacity={lineOpacity}
+                    strokeWidth={1.5}
+                    filter="url(#streamGlow)"
+                  />
+
+                  {/* Static arrowhead at destination */}
+                  {isForward ? (
+                    <polygon
+                      points={`${x2},${y} ${x2 - arrowSize},${y - arrowHalf} ${x2 - arrowSize},${y + arrowHalf}`}
+                      fill={stream.color}
+                      opacity="0.85"
+                      filter="url(#pulseGlow)"
+                    />
+                  ) : (
+                    <polygon
+                      points={`${x2},${y} ${x2 + arrowSize},${y - arrowHalf} ${x2 + arrowSize},${y + arrowHalf}`}
+                      fill={stream.color}
+                      opacity="0.85"
+                      filter="url(#pulseGlow)"
+                    />
+                  )}
+
+                  {/* N flowing chevron arrows */}
+                  {Array.from({ length: chevronCount }, (_, j) => {
+                    const delay = (j / chevronCount) * 3 + rowStagger;
+                    const cs = chevronSize;
+                    return (
+                      <polygon
+                        key={j}
+                        points={`${-cs},${-cs * 0.5} 0,0 ${-cs},${cs * 0.5}`}
+                        fill={stream.color}
+                        filter="url(#pulseGlow)"
+                        opacity="0"
+                        style={{
+                          offsetPath: `path("${pathD}")`,
+                          animation: `arrowFlow 3s linear infinite`,
+                          animationDelay: `${delay}s`,
+                        } as React.CSSProperties}
+                      />
+                    );
+                  })}
+                </g>
+              );
+            }
+
+            // ── River mode (default): full 9-element SVG ──
             const riverWidth = 1 + 2.5 * scale;
             const coreWidth = 0.5 + 1 * scale;
             const gradWidth = 1.5 + 2.5 * scale;
@@ -335,15 +398,12 @@ function FlowDiagram({ stream, onSelectPacket }: FlowDiagramProps) {
 
             return (
               <g key={i}>
-                {/* 1) Dim base line — always visible */}
                 <line
                   x1={x1} y1={y} x2={x2} y2={y}
                   stroke={stream.color}
                   strokeOpacity="0.08"
                   strokeWidth="1"
                 />
-
-                {/* 2) Glowing streaming "river" — animated dashes flowing in direction */}
                 <path
                   d={pathD}
                   stroke={stream.color}
@@ -356,8 +416,6 @@ function FlowDiagram({ stream, onSelectPacket }: FlowDiagramProps) {
                     animation: `${dashAnim} 0.6s linear infinite`,
                   } as React.CSSProperties}
                 />
-
-                {/* 3) Brighter thin core stream — tighter dashes, faster */}
                 <path
                   d={pathD}
                   stroke={stream.color}
@@ -369,8 +427,6 @@ function FlowDiagram({ stream, onSelectPacket }: FlowDiagramProps) {
                     animation: `${dashAnim} 0.4s linear infinite`,
                   } as React.CSSProperties}
                 />
-
-                {/* 4) Gradient overlay line for directionality fade */}
                 <path
                   d={pathD}
                   stroke={isForward ? "url(#flowGradRight)" : "url(#flowGradLeft)"}
@@ -378,8 +434,6 @@ function FlowDiagram({ stream, onSelectPacket }: FlowDiagramProps) {
                   fill="none"
                   strokeOpacity="0.25"
                 />
-
-                {/* 5) Arrowhead */}
                 {isForward ? (
                   <polygon
                     points={`${x2},${y} ${x2 - arrowSize},${y - arrowHalf} ${x2 - arrowSize},${y + arrowHalf}`}
@@ -395,8 +449,6 @@ function FlowDiagram({ stream, onSelectPacket }: FlowDiagramProps) {
                     filter="url(#pulseGlow)"
                   />
                 )}
-
-                {/* 6) Lead pulse — bright dot traveling the line */}
                 <circle
                   r={leadR}
                   fill="#fff"
@@ -408,8 +460,6 @@ function FlowDiagram({ stream, onSelectPacket }: FlowDiagramProps) {
                     animationDelay: `${stagger}s`,
                   } as React.CSSProperties}
                 />
-
-                {/* 7) Core colored pulse — slightly behind the white lead */}
                 <circle
                   r={colorR}
                   fill={stream.color}
@@ -421,8 +471,6 @@ function FlowDiagram({ stream, onSelectPacket }: FlowDiagramProps) {
                     animationDelay: `${stagger + 0.04}s`,
                   } as React.CSSProperties}
                 />
-
-                {/* 8) Wide trailing glow behind the pulse */}
                 <circle
                   r={glowR}
                   fill={stream.color}
@@ -434,8 +482,6 @@ function FlowDiagram({ stream, onSelectPacket }: FlowDiagramProps) {
                     filter: "blur(8px)",
                   } as React.CSSProperties}
                 />
-
-                {/* 9) Second pulse wave — offset by half period for continuous stream feel */}
                 <circle
                   r={wave2LeadR}
                   fill="#fff"
@@ -478,7 +524,6 @@ function FlowDiagram({ stream, onSelectPacket }: FlowDiagramProps) {
           const isForward = pkt.ip.srcIp === stream.srcIP;
           const flags = pkt.tcp?.flags ? formatTCPFlags(pkt.tcp.flags) : "";
           const y = i * ROW_HEIGHT;
-          const midX = (lineXSrc + lineXDst) / 2;
 
           return (
             <div
@@ -510,33 +555,35 @@ function FlowDiagram({ stream, onSelectPacket }: FlowDiagramProps) {
                   top: 4,
                   display: "flex",
                   justifyContent: "center",
-                  gap: "8px",
-                  fontSize: "9px",
+                  gap: "10px",
+                  fontSize: FONT.size.lg,
+                  fontWeight: FONT.weight.bold,
                   pointerEvents: "none",
+                  textShadow: seqTextShadow,
                 }}
               >
                 {flags && (
-                  <span style={{ color: "#ff6b00", fontWeight: "bold", fontFamily: "'Orbitron'" }}>
+                  <span style={{ color: "var(--accent)", fontWeight: FONT.weight.black, fontFamily: FONT.family.display, letterSpacing: FONT.spacing.normal }}>
                     {flags}
                   </span>
                 )}
-                <span style={{ color: "var(--text-secondary)" }}>{pkt.length}B</span>
+                <span style={{ color: "var(--text-primary)", fontFamily: FONT.family.mono }}>{pkt.length}B</span>
                 {isForward ? (
-                  <span style={{ color: "var(--text-faint)", fontSize: "10px" }}>&rarr;</span>
+                  <span style={{ color: "var(--text-secondary)", fontSize: FONT.size.xl }}>&rarr;</span>
                 ) : (
-                  <span style={{ color: "var(--text-faint)", fontSize: "10px" }}>&larr;</span>
+                  <span style={{ color: "var(--text-secondary)", fontSize: FONT.size.xl }}>&larr;</span>
                 )}
               </div>
 
               {/* Info (far right) */}
               <div style={infoCellStyle}>
                 {pkt.tcp && (
-                  <span style={{ color: "var(--text-dim)" }}>
+                  <span style={{ color: "var(--text-secondary)" }}>
                     Seq {pkt.tcp.sequenceNumber % 10000}
                   </span>
                 )}
                 {pkt.tcp && pkt.tcp.ackNumber > 0 && (
-                  <span style={{ color: "var(--text-faint)", marginLeft: "6px" }}>
+                  <span style={{ color: "var(--text-muted)", marginLeft: "8px" }}>
                     Ack {pkt.tcp.ackNumber % 10000}
                   </span>
                 )}
@@ -557,28 +604,36 @@ function endpointBoxStyle(color: string): React.CSSProperties {
     padding: "8px 16px",
     border: `2px solid ${color}`,
     borderRadius: "4px",
-    backgroundColor: "rgba(0,0,0,0.4)",
+    backgroundColor: "var(--bg-surface)",
     textAlign: "center",
-    fontSize: "11px",
-    fontFamily: "monospace",
-    color: "#e0e0e0",
+    fontSize: FONT.size.lg,
+    fontWeight: FONT.weight.bold,
+    fontFamily: FONT.family.mono,
+    color: "var(--text-primary)",
+    textShadow: seqTextShadow,
   };
 }
+
+const seqTextShadow = "0 0 4px var(--bg-primary), 0 0 8px var(--bg-primary), 0 1px 2px var(--bg-primary)";
 
 const timeCellStyle: React.CSSProperties = {
   position: "absolute",
   left: "8px",
-  fontSize: "9px",
-  color: "var(--text-muted)",
-  fontFamily: "'Share Tech Mono', monospace",
+  fontSize: FONT.size.base,
+  fontWeight: FONT.weight.bold,
+  color: "var(--text-secondary)",
+  fontFamily: FONT.family.mono,
   whiteSpace: "nowrap",
+  textShadow: seqTextShadow,
 };
 
 const infoCellStyle: React.CSSProperties = {
   position: "absolute",
   right: "8px",
-  fontSize: "9px",
-  fontFamily: "'Share Tech Mono', monospace",
+  fontSize: FONT.size.base,
+  fontWeight: FONT.weight.bold,
+  fontFamily: FONT.family.mono,
   whiteSpace: "nowrap",
   textAlign: "right",
+  textShadow: seqTextShadow,
 };

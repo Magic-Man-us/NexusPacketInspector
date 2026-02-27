@@ -2,6 +2,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { usePacketStore } from "../../../hooks/usePacketStore";
 import { styles } from "../../../styles/components";
 import { PROTOCOL_COLORS, LAYER_COLORS } from "../../../styles/theme";
+import { FONT } from "../../../styles/typography";
 import { FieldEncyclopediaPanel } from "./FieldEncyclopediaPanel";
 import { getFieldByteRange } from "../../../lib/fieldByteOffsets";
 
@@ -192,20 +193,20 @@ export function PacketStructure() {
         )}
         <div
           style={{
-            fontSize: "8px",
+            fontSize: FONT.size.xs,
             color: isHovered ? "#000" : colors.text,
-            fontFamily: "'Orbitron', sans-serif",
-            fontWeight: 700,
+            fontFamily: FONT.family.display,
+            fontWeight: FONT.weight.bold,
             marginBottom: "4px",
             textTransform: "uppercase" as const,
-            letterSpacing: "0.5px",
+            letterSpacing: FONT.spacing.normal,
           }}
         >
           {field.name}
         </div>
         <div
           style={{
-            fontSize: "11px",
+            fontSize: FONT.size.base,
             color: isHovered ? "#000" : "#fff",
             fontFamily: "'JetBrains Mono', monospace",
             wordBreak: "break-all" as const,
@@ -215,7 +216,7 @@ export function PacketStructure() {
         </div>
         <div
           style={{
-            fontSize: "7px",
+            fontSize: FONT.size.xxs,
             color: isHovered ? "var(--text-faint)" : "var(--text-dim)",
             marginTop: "4px",
           }}
@@ -247,21 +248,21 @@ export function PacketStructure() {
             gap: "10px",
           }}
         >
-          <span style={{ fontSize: "16px" }}>{icon}</span>
+          <span style={{ fontSize: FONT.size["2xl"] }}>{icon}</span>
           <span
             style={{
-              fontFamily: "'Orbitron', sans-serif",
-              fontSize: "11px",
-              fontWeight: 700,
+              fontFamily: FONT.family.display,
+              fontSize: FONT.size.base,
+              fontWeight: FONT.weight.bold,
               color: colors.text,
-              letterSpacing: "1px",
+              letterSpacing: FONT.spacing.wide,
             }}
           >
             {name}
           </span>
           <span
             style={{
-              fontSize: "9px",
+              fontSize: FONT.size.sm,
               color: "var(--text-muted)",
               marginLeft: "auto",
             }}
@@ -302,12 +303,12 @@ export function PacketStructure() {
             }}
           >
             <div>
-              <span style={{ color: "var(--text-muted)", fontSize: "10px" }}>PACKET </span>
+              <span style={{ color: "var(--text-muted)", fontSize: FONT.size.md }}>PACKET </span>
               <span
                 style={{
                   color: "#00ff9f",
-                  fontFamily: "'Orbitron', sans-serif",
-                  fontWeight: 700,
+                  fontFamily: FONT.family.display,
+                  fontWeight: FONT.weight.bold,
                 }}
               >
                 #{packet.id}
@@ -315,15 +316,15 @@ export function PacketStructure() {
             </div>
             <div style={{ width: "1px", height: "24px", backgroundColor: "rgba(255,255,255,0.1)" }} />
             <div>
-              <span style={{ color: PROTOCOL_COLORS[packet.protocol], fontWeight: "bold" }}>
+              <span style={{ color: PROTOCOL_COLORS[packet.protocol], fontWeight: FONT.weight.bold }}>
                 {packet.protocol}
               </span>
             </div>
             <div style={{ width: "1px", height: "24px", backgroundColor: "rgba(255,255,255,0.1)" }} />
-            <div style={{ fontFamily: "monospace", fontSize: "11px", color: "var(--text-secondary)" }}>
+            <div style={{ fontFamily: FONT.family.mono, fontSize: FONT.size.base, color: "var(--text-secondary)" }}>
               {packet.ip.srcIp}:{packet.srcPort} {"\u2192"} {packet.ip.dstIp}:{packet.dstPort}
             </div>
-            <div style={{ marginLeft: "auto", color: "var(--text-muted)", fontSize: "11px" }}>
+            <div style={{ marginLeft: "auto", color: "var(--text-muted)", fontSize: FONT.size.base }}>
               {packet.length} bytes
             </div>
           </div>

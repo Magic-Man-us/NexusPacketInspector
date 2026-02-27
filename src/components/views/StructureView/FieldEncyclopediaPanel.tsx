@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { LAYER_COLORS } from "../../../styles/theme";
+import { FONT } from "../../../styles/typography";
 import { getFieldEncyclopedia } from "../../../data/fieldEncyclopedia";
 import type { ActiveField, PopoverAnchor } from "./PacketStructure";
 
@@ -77,11 +78,11 @@ export function FieldEncyclopediaPanel({ field, anchor, onMouseEnter, onMouseLea
       >
         <span
           style={{
-            fontFamily: "'Orbitron', sans-serif",
-            fontSize: "8px",
-            fontWeight: 700,
+            fontFamily: FONT.family.display,
+            fontSize: FONT.size.xs,
+            fontWeight: FONT.weight.bold,
             color: "var(--text-muted)",
-            letterSpacing: "1.5px",
+            letterSpacing: FONT.spacing.wider,
           }}
         >
           FIELD ENCYCLOPEDIA
@@ -93,12 +94,12 @@ export function FieldEncyclopediaPanel({ field, anchor, onMouseEnter, onMouseLea
             backgroundColor: colors.bg,
             border: `1px solid ${colors.border}`,
             borderRadius: "4px",
-            fontSize: "8px",
-            fontFamily: "'Orbitron', sans-serif",
-            fontWeight: 700,
+            fontSize: FONT.size.xs,
+            fontFamily: FONT.family.display,
+            fontWeight: FONT.weight.bold,
             color: colors.text,
             textTransform: "uppercase" as const,
-            letterSpacing: "1px",
+            letterSpacing: FONT.spacing.wide,
           }}
         >
           {field.layer}
@@ -117,10 +118,10 @@ export function FieldEncyclopediaPanel({ field, anchor, onMouseEnter, onMouseLea
         <div style={{ marginBottom: "14px" }}>
           <div
             style={{
-              fontSize: "14px",
-              fontWeight: 700,
+              fontSize: FONT.size.xl,
+              fontWeight: FONT.weight.bold,
               color: colors.text,
-              fontFamily: "'Orbitron', sans-serif",
+              fontFamily: FONT.family.display,
               marginBottom: "4px",
             }}
           >
@@ -129,7 +130,7 @@ export function FieldEncyclopediaPanel({ field, anchor, onMouseEnter, onMouseLea
           <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" as const }}>
             <span
               style={{
-                fontSize: "12px",
+                fontSize: FONT.size.lg,
                 fontFamily: "'JetBrains Mono', monospace",
                 color: "#fff",
                 wordBreak: "break-all" as const,
@@ -142,9 +143,9 @@ export function FieldEncyclopediaPanel({ field, anchor, onMouseEnter, onMouseLea
                 padding: "2px 6px",
                 backgroundColor: "rgba(var(--accent-rgb),0.1)",
                 borderRadius: "3px",
-                fontSize: "9px",
+                fontSize: FONT.size.sm,
                 color: "#00ff9f",
-                fontFamily: "'Share Tech Mono', monospace",
+                fontFamily: FONT.family.mono,
               }}
             >
               {field.bits}b / {Math.ceil(field.bits / 8)}B
@@ -176,9 +177,9 @@ export function FieldEncyclopediaPanel({ field, anchor, onMouseEnter, onMouseLea
                       backgroundColor: `${colors.border}15`,
                       border: `1px solid ${colors.border}25`,
                       borderRadius: "3px",
-                      fontSize: "9px",
+                      fontSize: FONT.size.sm,
                       color: "var(--text-primary)",
-                      fontFamily: "'Share Tech Mono', monospace",
+                      fontFamily: FONT.family.mono,
                       lineHeight: "1.4",
                     }}
                   >
@@ -193,7 +194,7 @@ export function FieldEncyclopediaPanel({ field, anchor, onMouseEnter, onMouseLea
             </Section>
           </>
         ) : (
-          <div style={{ color: "var(--text-dim)", fontSize: "11px", fontStyle: "italic" }}>
+          <div style={{ color: "var(--text-dim)", fontSize: FONT.size.base, fontStyle: "italic" }}>
             No encyclopedia entry available for this field.
           </div>
         )}
@@ -203,13 +204,13 @@ export function FieldEncyclopediaPanel({ field, anchor, onMouseEnter, onMouseLea
             <div
               style={{
                 fontFamily: "'JetBrains Mono', monospace",
-                fontSize: "10px",
+                fontSize: FONT.size.md,
                 color: "#ff6b00",
                 wordBreak: "break-all" as const,
                 backgroundColor: "rgba(255,107,0,0.1)",
                 padding: "6px 8px",
                 borderRadius: "3px",
-                letterSpacing: "1px",
+                letterSpacing: FONT.spacing.wide,
               }}
             >
               {field.value.toString(2).padStart(field.bits, "0")}
@@ -222,10 +223,10 @@ export function FieldEncyclopediaPanel({ field, anchor, onMouseEnter, onMouseLea
 }
 
 const bodyTextStyle: React.CSSProperties = {
-  fontSize: "10px",
+  fontSize: FONT.size.md,
   color: "var(--text-secondary)",
   lineHeight: "1.5",
-  fontFamily: "'Share Tech Mono', monospace",
+  fontFamily: FONT.family.mono,
   margin: 0,
 };
 
@@ -242,11 +243,11 @@ function Section({
     <div style={{ marginBottom: "12px" }}>
       <div
         style={{
-          fontSize: "8px",
-          fontFamily: "'Orbitron', sans-serif",
-          fontWeight: 700,
+          fontSize: FONT.size.xs,
+          fontFamily: FONT.family.display,
+          fontWeight: FONT.weight.bold,
           color: color,
-          letterSpacing: "1.5px",
+          letterSpacing: FONT.spacing.wider,
           marginBottom: "4px",
           opacity: 0.8,
         }}

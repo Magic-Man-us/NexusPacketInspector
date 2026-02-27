@@ -3,6 +3,7 @@ import * as d3 from "d3";
 import { usePacketStore } from "../../../hooks/usePacketStore";
 import { useContainerSize } from "../../../hooks/useContainerSize";
 import { PROTOCOL_COLORS } from "../../../styles/theme";
+import { FONT } from "../../../styles/typography";
 import { formatBytes, PORT_SERVICE_NAMES } from "../../../lib/formatters";
 
 const widgetStyle: React.CSSProperties = {
@@ -16,11 +17,11 @@ const widgetStyle: React.CSSProperties = {
 };
 
 const widgetTitle: React.CSSProperties = {
-  fontFamily: "'Orbitron'",
-  fontSize: "10px",
+  fontFamily: FONT.family.display,
+  fontSize: FONT.size.md,
   color: "#00ff9f",
   marginBottom: "12px",
-  letterSpacing: "1px",
+  letterSpacing: FONT.spacing.wide,
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -65,14 +66,14 @@ function ProtocolDonut() {
       .attr("text-anchor", "middle")
       .attr("dy", "-4px")
       .attr("fill", "#00ff9f")
-      .attr("font-family", "'Orbitron'")
-      .attr("font-size", "16px")
+      .attr("font-family", FONT.family.display)
+      .attr("font-size", FONT.size["2xl"])
       .text(total.toLocaleString());
     g.append("text")
       .attr("text-anchor", "middle")
       .attr("dy", "12px")
       .attr("fill", "var(--text-muted)")
-      .attr("font-size", "8px")
+      .attr("font-size", FONT.size.xs)
       .text("PACKETS");
   }, [data]);
 
@@ -81,7 +82,7 @@ function ProtocolDonut() {
       <div style={widgetTitle}>PROTOCOL DISTRIBUTION</div>
       <div style={{ display: "flex", gap: "12px", flex: 1, alignItems: "center" }}>
         <svg ref={svgRef} />
-        <div style={{ display: "flex", flexDirection: "column", gap: "3px", fontSize: "9px" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "3px", fontSize: FONT.size.sm }}>
           {data.map(([name, count]) => (
             <div key={name} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
               <span style={{ width: "8px", height: "8px", borderRadius: "2px", backgroundColor: PROTOCOL_COLORS[name] || "var(--text-faint)", flexShrink: 0 }} />
@@ -124,7 +125,7 @@ function SizeHistogram() {
       <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "flex-end", gap: "2px" }}>
         {bins.map((bin, i) => (
           <div key={i} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-            <span style={{ width: "60px", fontSize: "8px", color: "var(--text-dim)", textAlign: "right", fontFamily: "monospace" }}>
+            <span style={{ width: "60px", fontSize: FONT.size.xs, color: "var(--text-dim)", textAlign: "right", fontFamily: FONT.family.mono }}>
               {bin.label}
             </span>
             <div style={{ flex: 1, height: "12px", backgroundColor: "rgba(0,0,0,0.3)", borderRadius: "2px", overflow: "hidden" }}>
@@ -138,7 +139,7 @@ function SizeHistogram() {
                 }}
               />
             </div>
-            <span style={{ width: "30px", fontSize: "9px", color: "var(--text-muted)", textAlign: "right" }}>{bin.count}</span>
+            <span style={{ width: "30px", fontSize: FONT.size.sm, color: "var(--text-muted)", textAlign: "right" }}>{bin.count}</span>
           </div>
         ))}
       </div>
@@ -209,14 +210,14 @@ function PacketsTimeline() {
     <div style={widgetStyle}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div style={widgetTitle}>PACKETS / SECOND</div>
-        <span style={{ fontFamily: "'Orbitron'", fontSize: "18px", color: "#00ff9f" }}>
+        <span style={{ fontFamily: FONT.family.display, fontSize: FONT.size["3xl"], color: "#00ff9f" }}>
           {currentPps}
         </span>
       </div>
       <div ref={containerRef} style={{ flex: 1, minHeight: 0 }}>
         <svg ref={svgRef} />
       </div>
-      <div style={{ display: "flex", justifyContent: "space-between", fontSize: "8px", color: "var(--text-faint)" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", fontSize: FONT.size.xs, color: "var(--text-faint)" }}>
         <span>-30s</span>
         <span>now</span>
       </div>
@@ -244,7 +245,7 @@ function TopTalkers() {
       <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "3px" }}>
         {top.map(([ip, count]) => (
           <div key={ip} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-            <span style={{ width: "100px", fontSize: "9px", color: "var(--text-secondary)", fontFamily: "monospace", overflow: "hidden", textOverflow: "ellipsis" }}>
+            <span style={{ width: "100px", fontSize: FONT.size.sm, color: "var(--text-secondary)", fontFamily: FONT.family.mono, overflow: "hidden", textOverflow: "ellipsis" }}>
               {ip}
             </span>
             <div style={{ flex: 1, height: "10px", backgroundColor: "rgba(0,0,0,0.3)", borderRadius: "2px", overflow: "hidden" }}>
@@ -258,7 +259,7 @@ function TopTalkers() {
                 }}
               />
             </div>
-            <span style={{ width: "30px", fontSize: "9px", color: "var(--text-muted)", textAlign: "right" }}>{count}</span>
+            <span style={{ width: "30px", fontSize: FONT.size.sm, color: "var(--text-muted)", textAlign: "right" }}>{count}</span>
           </div>
         ))}
       </div>
@@ -291,10 +292,10 @@ function PortDistribution() {
       <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "3px" }}>
         {top.map((item) => (
           <div key={item.port} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-            <span style={{ width: "80px", fontSize: "9px", color: "var(--text-secondary)", fontFamily: "monospace" }}>
+            <span style={{ width: "80px", fontSize: FONT.size.sm, color: "var(--text-secondary)", fontFamily: FONT.family.mono }}>
               {item.service}
             </span>
-            <span style={{ width: "40px", fontSize: "8px", color: "var(--text-dim)" }}>:{item.port}</span>
+            <span style={{ width: "40px", fontSize: FONT.size.xs, color: "var(--text-dim)" }}>:{item.port}</span>
             <div style={{ flex: 1, height: "10px", backgroundColor: "rgba(0,0,0,0.3)", borderRadius: "2px", overflow: "hidden" }}>
               <div
                 style={{
@@ -306,7 +307,7 @@ function PortDistribution() {
                 }}
               />
             </div>
-            <span style={{ width: "30px", fontSize: "9px", color: "var(--text-muted)", textAlign: "right" }}>{item.count}</span>
+            <span style={{ width: "30px", fontSize: FONT.size.sm, color: "var(--text-muted)", textAlign: "right" }}>{item.count}</span>
           </div>
         ))}
       </div>
@@ -352,14 +353,14 @@ function AnomalyDetection() {
               textAlign: "center",
             }}
           >
-            <div style={{ fontSize: "20px", fontFamily: "'Orbitron'", color: item.color }}>
+            <div style={{ fontSize: FONT.size["3xl"], fontFamily: FONT.family.display, color: item.color }}>
               {item.value}
             </div>
-            <div style={{ fontSize: "8px", color: "var(--text-muted)", marginTop: "2px" }}>{item.label}</div>
+            <div style={{ fontSize: FONT.size.xs, color: "var(--text-muted)", marginTop: "2px" }}>{item.label}</div>
             <div
               style={{
                 marginTop: "4px",
-                fontSize: "8px",
+                fontSize: FONT.size.xs,
                 padding: "1px 6px",
                 borderRadius: "3px",
                 display: "inline-block",
@@ -380,10 +381,10 @@ function AnomalyDetection() {
             textAlign: "center",
           }}
         >
-          <div style={{ fontSize: "16px", fontFamily: "'Orbitron'", color: "#00b8ff" }}>
+          <div style={{ fontSize: FONT.size["2xl"], fontFamily: FONT.family.display, color: "#00b8ff" }}>
             {formatBytes(totalBytes)}
           </div>
-          <div style={{ fontSize: "8px", color: "var(--text-muted)", marginTop: "2px" }}>TOTAL TRAFFIC</div>
+          <div style={{ fontSize: FONT.size.xs, color: "var(--text-muted)", marginTop: "2px" }}>TOTAL TRAFFIC</div>
         </div>
       </div>
     </div>
@@ -400,18 +401,18 @@ const cardStyle: React.CSSProperties = {
   padding: "14px",
 };
 const cardTitle: React.CSSProperties = {
-  fontFamily: "'Orbitron'",
-  fontSize: "10px",
+  fontFamily: FONT.family.display,
+  fontSize: FONT.size.md,
   color: "#00ff9f",
   marginBottom: "12px",
-  letterSpacing: "1px",
+  letterSpacing: FONT.spacing.wide,
 };
 const statRow: React.CSSProperties = {
   display: "flex",
   justifyContent: "space-between",
   padding: "4px 0",
   borderBottom: "1px solid rgba(255,255,255,0.03)",
-  fontSize: "10px",
+  fontSize: FONT.size.md,
 };
 
 function StatisticsSection() {
@@ -489,8 +490,8 @@ function StatisticsSection() {
           { value: `${computed.durationSec.toFixed(1)}s`, label: "DURATION" },
         ].map((item) => (
           <div key={item.label} style={summaryCardStyle}>
-            <div style={{ fontFamily: "'Orbitron'", fontSize: "18px", color: "#00ff9f" }}>{item.value}</div>
-            <div style={{ fontSize: "9px", color: "var(--text-muted)", marginTop: "4px" }}>{item.label}</div>
+            <div style={{ fontFamily: FONT.family.display, fontSize: FONT.size["3xl"], color: "#00ff9f" }}>{item.value}</div>
+            <div style={{ fontSize: FONT.size.sm, color: "var(--text-muted)", marginTop: "4px" }}>{item.label}</div>
           </div>
         ))}
       </div>
@@ -507,7 +508,7 @@ function StatisticsSection() {
         ].map((row) => (
           <div key={row.label} style={statRow}>
             <span style={{ color: "var(--text-secondary)" }}>{row.label}</span>
-            <span style={{ color: "#fff", fontFamily: "monospace" }}>{row.value}</span>
+            <span style={{ color: "#fff", fontFamily: FONT.family.mono }}>{row.value}</span>
           </div>
         ))}
       </div>
@@ -523,14 +524,14 @@ function StatisticsSection() {
         ].map((row) => (
           <div key={row.label} style={statRow}>
             <span style={{ color: "var(--text-secondary)" }}>{row.label}</span>
-            <span style={{ color: row.color, fontFamily: "monospace" }}>{row.value}</span>
+            <span style={{ color: row.color, fontFamily: FONT.family.mono }}>{row.value}</span>
           </div>
         ))}
         <div style={{ marginTop: "8px", height: "8px", borderRadius: "4px", overflow: "hidden", display: "flex", backgroundColor: "rgba(0,0,0,0.3)" }}>
           <div style={{ width: `${stats.total > 0 ? (stats.tcpCount / stats.total) * 100 : 50}%`, backgroundColor: "#00ff9f", transition: "width 0.3s" }} />
           <div style={{ flex: 1, backgroundColor: "#00b8ff" }} />
         </div>
-        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "8px", color: "var(--text-dim)", marginTop: "2px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: FONT.size.xs, color: "var(--text-dim)", marginTop: "2px" }}>
           <span>TCP</span>
           <span>UDP</span>
         </div>
@@ -553,7 +554,7 @@ function StatisticsSection() {
               <div style={{ flex: 1, height: "6px", backgroundColor: "rgba(0,0,0,0.3)", borderRadius: "3px", overflow: "hidden", margin: "0 8px" }}>
                 <div style={{ width: `${(row.value / max) * 100}%`, height: "100%", backgroundColor: row.color, borderRadius: "3px" }} />
               </div>
-              <span style={{ color: "var(--text-secondary)", fontFamily: "monospace", width: "40px", textAlign: "right" }}>{row.value}</span>
+              <span style={{ color: "var(--text-secondary)", fontFamily: FONT.family.mono, width: "40px", textAlign: "right" }}>{row.value}</span>
             </div>
           );
         })}
@@ -564,7 +565,7 @@ function StatisticsSection() {
         <div style={cardTitle}>PROTOCOL DISTRIBUTION</div>
         {protocolData.map(([proto, count]) => (
           <div key={proto} style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-            <span style={{ width: 50, color: PROTOCOL_COLORS[proto], fontSize: "10px" }}>{proto}</span>
+            <span style={{ width: 50, color: PROTOCOL_COLORS[proto], fontSize: FONT.size.md }}>{proto}</span>
             <div style={{ flex: 1, height: "14px", backgroundColor: "rgba(0,0,0,0.3)", borderRadius: "3px", overflow: "hidden" }}>
               <div
                 style={{
@@ -575,10 +576,10 @@ function StatisticsSection() {
                 }}
               />
             </div>
-            <span style={{ width: 40, textAlign: "right" as const, color: "var(--text-secondary)", fontSize: "10px" }}>
+            <span style={{ width: 40, textAlign: "right" as const, color: "var(--text-secondary)", fontSize: FONT.size.md }}>
               {count}
             </span>
-            <span style={{ width: 40, textAlign: "right" as const, color: "var(--text-dim)", fontSize: "9px" }}>
+            <span style={{ width: 40, textAlign: "right" as const, color: "var(--text-dim)", fontSize: FONT.size.sm }}>
               {stats.total > 0 ? ((count / stats.total) * 100).toFixed(1) : 0}%
             </span>
           </div>
@@ -591,8 +592,8 @@ function StatisticsSection() {
           const maxConvBytes = computed.topConversations[0]?.[1].bytes || 1;
           return (
             <div key={conv} style={{ marginBottom: "6px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "9px" }}>
-                <span style={{ color: "var(--text-secondary)", fontFamily: "monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "180px" }}>{conv}</span>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: FONT.size.sm }}>
+                <span style={{ color: "var(--text-secondary)", fontFamily: FONT.family.mono, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "180px" }}>{conv}</span>
                 <span style={{ color: "var(--text-muted)", flexShrink: 0 }}>{formatBytes(data.bytes)}</span>
               </div>
               <div style={{ height: "4px", backgroundColor: "rgba(0,0,0,0.3)", borderRadius: "2px", overflow: "hidden", marginTop: "2px" }}>
@@ -618,7 +619,7 @@ function StatisticsSection() {
         ].map((row) => (
           <div key={row.label} style={statRow}>
             <span style={{ color: "var(--text-secondary)" }}>{row.label}</span>
-            <span style={{ color: "#fff", fontFamily: "monospace" }}>{row.value}</span>
+            <span style={{ color: "#fff", fontFamily: FONT.family.mono }}>{row.value}</span>
           </div>
         ))}
       </div>
@@ -630,11 +631,11 @@ function StatisticsSection() {
           const max = computed.topSrcIps[0]?.[1] || 1;
           return (
             <div key={ip} style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px" }}>
-              <span style={{ width: "100px", fontSize: "9px", color: "var(--text-secondary)", fontFamily: "monospace", overflow: "hidden", textOverflow: "ellipsis" }}>{ip}</span>
+              <span style={{ width: "100px", fontSize: FONT.size.sm, color: "var(--text-secondary)", fontFamily: FONT.family.mono, overflow: "hidden", textOverflow: "ellipsis" }}>{ip}</span>
               <div style={{ flex: 1, height: "8px", backgroundColor: "rgba(0,0,0,0.3)", borderRadius: "3px", overflow: "hidden" }}>
                 <div style={{ width: `${(count / max) * 100}%`, height: "100%", backgroundColor: "#00b8ff", borderRadius: "3px" }} />
               </div>
-              <span style={{ width: "30px", fontSize: "9px", color: "var(--text-muted)", textAlign: "right" }}>{count}</span>
+              <span style={{ width: "30px", fontSize: FONT.size.sm, color: "var(--text-muted)", textAlign: "right" }}>{count}</span>
             </div>
           );
         })}
@@ -646,11 +647,11 @@ function StatisticsSection() {
           const max = computed.topDstIps[0]?.[1] || 1;
           return (
             <div key={ip} style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px" }}>
-              <span style={{ width: "100px", fontSize: "9px", color: "var(--text-secondary)", fontFamily: "monospace", overflow: "hidden", textOverflow: "ellipsis" }}>{ip}</span>
+              <span style={{ width: "100px", fontSize: FONT.size.sm, color: "var(--text-secondary)", fontFamily: FONT.family.mono, overflow: "hidden", textOverflow: "ellipsis" }}>{ip}</span>
               <div style={{ flex: 1, height: "8px", backgroundColor: "rgba(0,0,0,0.3)", borderRadius: "3px", overflow: "hidden" }}>
                 <div style={{ width: `${(count / max) * 100}%`, height: "100%", backgroundColor: "#ff6b00", borderRadius: "3px" }} />
               </div>
-              <span style={{ width: "30px", fontSize: "9px", color: "var(--text-muted)", textAlign: "right" }}>{count}</span>
+              <span style={{ width: "30px", fontSize: FONT.size.sm, color: "var(--text-muted)", textAlign: "right" }}>{count}</span>
             </div>
           );
         })}
@@ -663,12 +664,12 @@ function StatisticsSection() {
           const service = PORT_SERVICE_NAMES[Number(port)] || `Port ${port}`;
           return (
             <div key={port} style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px" }}>
-              <span style={{ width: "70px", fontSize: "9px", color: "var(--text-secondary)" }}>{service}</span>
-              <span style={{ width: "36px", fontSize: "8px", color: "var(--text-dim)", fontFamily: "monospace" }}>:{port}</span>
+              <span style={{ width: "70px", fontSize: FONT.size.sm, color: "var(--text-secondary)" }}>{service}</span>
+              <span style={{ width: "36px", fontSize: FONT.size.xs, color: "var(--text-dim)", fontFamily: FONT.family.mono }}>:{port}</span>
               <div style={{ flex: 1, height: "8px", backgroundColor: "rgba(0,0,0,0.3)", borderRadius: "3px", overflow: "hidden" }}>
                 <div style={{ width: `${(count / max) * 100}%`, height: "100%", backgroundColor: "#ffd600", borderRadius: "3px" }} />
               </div>
-              <span style={{ width: "30px", fontSize: "9px", color: "var(--text-muted)", textAlign: "right" }}>{count}</span>
+              <span style={{ width: "30px", fontSize: FONT.size.sm, color: "var(--text-muted)", textAlign: "right" }}>{count}</span>
             </div>
           );
         })}
@@ -683,11 +684,11 @@ function StatisticsSection() {
             .sort((a, b) => parseInt(a[0]) - parseInt(b[0]))
             .map(([bucket, count]) => (
               <div key={bucket} style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "3px" }}>
-                <span style={{ width: "50px", fontSize: "9px", color: "var(--text-secondary)", fontFamily: "monospace" }}>{bucket}</span>
+                <span style={{ width: "50px", fontSize: FONT.size.sm, color: "var(--text-secondary)", fontFamily: FONT.family.mono }}>{bucket}</span>
                 <div style={{ flex: 1, height: "8px", backgroundColor: "rgba(0,0,0,0.3)", borderRadius: "3px", overflow: "hidden" }}>
                   <div style={{ width: `${(count / ttlMax) * 100}%`, height: "100%", backgroundColor: "#00ffff", borderRadius: "3px" }} />
                 </div>
-                <span style={{ width: "30px", fontSize: "9px", color: "var(--text-muted)", textAlign: "right" }}>{count}</span>
+                <span style={{ width: "30px", fontSize: FONT.size.sm, color: "var(--text-muted)", textAlign: "right" }}>{count}</span>
               </div>
             ));
         })()}
@@ -703,7 +704,7 @@ function StatisticsSection() {
         ].map((row) => (
           <div key={row.label} style={{ ...statRow, alignItems: "center" }}>
             <span style={{ color: "var(--text-secondary)", flex: 1 }}>{row.label}</span>
-            <span style={{ fontFamily: "'Orbitron'", fontSize: "14px", color: row.color }}>{row.value}</span>
+            <span style={{ fontFamily: FONT.family.display, fontSize: FONT.size.xl, color: row.color }}>{row.value}</span>
           </div>
         ))}
       </div>
@@ -717,11 +718,11 @@ function StatisticsSection() {
             const max = Object.values(dashboardStats.bytesPerProtocol).reduce((a, b) => Math.max(a, b), 1);
             return (
               <div key={proto} style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px" }}>
-                <span style={{ width: "50px", fontSize: "9px", color: PROTOCOL_COLORS[proto] || "var(--text-secondary)" }}>{proto}</span>
+                <span style={{ width: "50px", fontSize: FONT.size.sm, color: PROTOCOL_COLORS[proto] || "var(--text-secondary)" }}>{proto}</span>
                 <div style={{ flex: 1, height: "8px", backgroundColor: "rgba(0,0,0,0.3)", borderRadius: "3px", overflow: "hidden" }}>
                   <div style={{ width: `${(bytes / max) * 100}%`, height: "100%", backgroundColor: PROTOCOL_COLORS[proto] || "#00ff9f", borderRadius: "3px" }} />
                 </div>
-                <span style={{ width: "50px", fontSize: "9px", color: "var(--text-muted)", textAlign: "right" }}>{formatBytes(bytes)}</span>
+                <span style={{ width: "50px", fontSize: FONT.size.sm, color: "var(--text-muted)", textAlign: "right" }}>{formatBytes(bytes)}</span>
               </div>
             );
           })}
